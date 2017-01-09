@@ -123,14 +123,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\nescore\schpunetypes.h" />
+    <ClInclude Include="..\..\src\nescore\apu.h" />
+    <ClInclude Include="..\..\src\nescore\apu_pulse.h" />
+    <ClInclude Include="..\..\src\nescore\apu_support.h" />
     <ClInclude Include="..\..\src\nescore\cpu.h" />
     <ClInclude Include="..\..\src\nescore\cpubus.h" />
     <ClInclude Include="..\..\src\nescore\cpustate.h" />
     <ClInclude Include="..\..\src\nescore\cpu_addrmodes.h" />
     <ClInclude Include="..\..\src\nescore\cpu_instructions.h" />
     <ClInclude Include="..\..\src\nescore\resetinfo.h" />
+    <ClInclude Include="..\..\src\nescore\subsystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\nescore\apu_pulse.cpp" />
     <ClCompile Include="..\..\src\nescore\cpu.cpp" />
     <ClCompile Include="..\..\src\nescore\cpubus.cpp" />
   </ItemGroup>

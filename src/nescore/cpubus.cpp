@@ -2,6 +2,7 @@
 #include "cpubus.h"
 #include "resetinfo.h"
 #include <stdexcept>
+#include "cpu.h"
 
 namespace schcore
 {
@@ -42,6 +43,8 @@ namespace schcore
     //  Memory accessing
     u8 CpuBus::read(u16 a)
     {
+        cpu->consumeCycle();
+
         u8 v = dLine;
         for(auto& proc : readers[a>>12])
         {
@@ -55,6 +58,8 @@ namespace schcore
 
     void CpuBus::write(u16 a, u8 v)
     {
+        cpu->consumeCycle();
+
         for(auto& proc : writers[a>>12])
         {
             if(!proc)       break;

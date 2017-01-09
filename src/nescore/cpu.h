@@ -4,6 +4,7 @@
 
 #include "schpunetypes.h"
 #include "cpustate.h"
+#include "subsystem.h"
 
 
 namespace schcore
@@ -11,7 +12,7 @@ namespace schcore
     struct ResetInfo;
     class CpuBus;
 
-    class Cpu
+    class Cpu : public SubSystem
     {
     public:
         //////////////////////////////////////////////////
@@ -20,9 +21,15 @@ namespace schcore
 
         //////////////////////////////////////////////////
         //  Running
-        void                run(timestamp_t runto);
+        virtual void        run(timestamp_t runto) override;
 
-        timestamp_t         curCyc(); // TODO move to subsystem
+    private:
+        //////////////////////////////////////////
+        //  Interface for CpuBus:  consuming a cycle
+        //    CpuBus will call this for every read/write, even those initiated by other
+        //  subsystems (DMA unit)
+        friend class CpuBus;
+        void                consumeCycle();
 
 
     private:

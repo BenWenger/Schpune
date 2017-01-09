@@ -30,12 +30,27 @@
     <ClInclude Include="..\..\src\nescore\cpu_instructions.h">
       <Filter>private</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\nescore\subsystem.h">
+      <Filter>private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\apu.h">
+      <Filter>private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\apu_support.h">
+      <Filter>private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\apu_pulse.h">
+      <Filter>private</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\nescore\cpubus.cpp">
       <Filter>private</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\nescore\cpu.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\nescore\apu_pulse.cpp">
       <Filter>private</Filter>
     </ClCompile>
   </ItemGroup>

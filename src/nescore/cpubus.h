@@ -11,6 +11,7 @@
 namespace schcore
 {
     struct ResetInfo;
+    class Cpu;
 
     class CpuBus
     {
@@ -74,6 +75,8 @@ namespace schcore
         rdproc_t                    readers[0x10][maxProcs];
         wrproc_t                    writers[0x10][maxProcs];
         pkproc_t                    peekers[0x10][maxProcs];
+
+        Cpu*                        cpu;                // access to CPU for consuming cycles
 
         u16                         aLine;
         u8                          dLine;

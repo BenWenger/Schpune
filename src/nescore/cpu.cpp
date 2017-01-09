@@ -18,6 +18,12 @@ namespace schcore
     {
         wantInterrupt = bus->isNmiPending() || ( !cpu.getI() && bus->isIrqPending() );
     }
+
+    void Cpu::consumeCycle()
+    {
+        cyc();
+        // TODO - check for events and perform them
+    }
     
     ////////////////////////////////////////////////////
     //  Reset
@@ -34,6 +40,61 @@ namespace schcore
             cpu.PC = 0;         // this doesn't actually matter ... 'wantReset' will cause the reset vector to be loaded shortly
             cpu.setStatus( 0x34 );
         }
+
+        // I flag will be set when the reset interrupt is performed.
+    }
+
+    ////////////////////////////////////////////////////
+    //  Interrupts
+    void Cpu::performInterrupt(bool sw)
+    {
+        u16 vector = 0xFFFE;        // default to IRQ/BRK vector
+
+        if(sw)
+        {
+            // First cycle was opcode read -- we performed that already
+            rd(cpu.PC++);
+        }
+        else
+        {
+            rd(cpu.PC);
+            rd(cpu.PC);
+        }
+
+        if(wantReset)
+        {
+            // don't push anything, perform reads instead
+            bus->read(0x0100 | cpu.SP--);       // PCH
+            bus->read(0x0100 | cpu.SP--);       // PCL
+            bus->read(0x0100 | cpu.SP--);       // Status
+            vector = 0xFFFC;
+            wantReset = false;
+        }
+        else
+        {
+            push( static_cast<u8>(cpu.PC >> 8) );
+            push( static_cast<u8>(cpu.PC     ) );
+            // hijacking happens at this point
+            if(bus->isNmiPending())
+            {
+                vector = 0xFFFA;
+                bus->acknowledgeNmi();
+                sw = false;
+            }
+            else if(bus->isIrqPending())
+            {
+                sw = false;
+            }
+            push( cpu.getStatus(sw) );
+        }
+
+        // fetch vector
+        cpu.PC  = rd(vector++);
+        cpu.PC |= rd(vector) << 8;
+
+        // set I flag, don't want another interrupt after this one
+        wantInterrupt = false;
+        cpu.setI(1);
     }
     
     ////////////////////////////////////////////////////

@@ -57,7 +57,7 @@ namespace schcore
     //////////////////////////////////////////////////
     //////////////////////////////////////////////////
     //////////////////////////////////////////////////
-    u8 CpuState::getStatus(bool sw) const
+    inline u8 CpuState::getStatus(bool sw) const
     {
         u8 out = R_FLAG;
         if(getC())      out |= C_FLAG;
@@ -70,7 +70,7 @@ namespace schcore
         return out;
     }
 
-    void CpuState::setStatus(u8 v)
+    inline void CpuState::setStatus(u8 v)
     {
         setC( v & C_FLAG );
         setI( v & I_FLAG );
@@ -82,14 +82,14 @@ namespace schcore
             fNZ |= 0x100;
     }
 
-    void CpuState::setZ(int v)
+    inline void CpuState::setZ(int v)
     {
         if(!v)              fNZ |= 1;
         else if(getN())     fNZ  = 0x100;
         else                fNZ  = 0;
     }
 
-    void CpuState::setN(int v)
+    inline void CpuState::setN(int v)
     {
         if(v)               fNZ |= 0x100;
         else                fNZ  = !getZ();
