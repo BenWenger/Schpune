@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="public">
+      <UniqueIdentifier>{c7ef6470-4a9e-4520-b1e9-393d72e30631}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="private">
+      <UniqueIdentifier>{19a9c183-f503-4945-8e92-6bc86fce0b48}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\nescore\schpunetypes.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\cpubus.h">
+      <Filter>private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\resetinfo.h">
+      <Filter>private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\cpu.h">
+      <Filter>private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\cpustate.h">
+      <Filter>private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\cpu_addrmodes.h">
+      <Filter>private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\cpu_instructions.h">
+      <Filter>private</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\nescore\cpubus.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\nescore\cpu.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
