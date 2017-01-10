@@ -13,7 +13,7 @@ namespace schcore
     //   This class is for BOTH pulse channels, since their output interferes
     // with each other
 
-    class Apu_Pulse
+    class Apu_Pulse : public AudioChannel
     {
     public:
 

@@ -3,6 +3,7 @@
 #define SCHPUNE_NESCORE_SCHPUNETYPES_H_INCLUDED
 
 #include <cstdint>
+#include <limits>
 
 namespace schcore
 {
@@ -21,6 +22,14 @@ namespace schcore
     // Other common types
     typedef std::uint_fast16_t  irqsource_t;
     typedef std::int_fast32_t   timestamp_t;
+
+    ////////////////////////////////////////////////
+    // Special fixed timestamp values
+    namespace Time
+    {
+        static const timestamp_t    Never = std::numeric_limits<timestamp_t>::max() - 10000;
+        static const timestamp_t    Now = std::numeric_limits<timestamp_t>::min() + 10000;
+    }
 }
 
 #endif

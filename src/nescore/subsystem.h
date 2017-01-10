@@ -15,11 +15,12 @@ namespace schcore
 
         virtual void    run(timestamp_t runto) = 0;
 
+        timestamp_t     curCyc() const       { return timestamp;            }
+        timestamp_t     getClockBase() const { return clockBase;            }
+
     protected:
         void            cyc()           { timestamp += clockBase;           }
         void            cyc(int cycs)   { timestamp += cycs * clockBase;    }
-
-        timestamp_t     curCyc() const  { return timestamp;                 }
 
     private:
         timestamp_t     timestamp;

@@ -4,6 +4,7 @@
 
 #include <vector>
 #include "schpunetypes.h"
+#include "subsystem.h"
 
 
 namespace schcore
@@ -13,17 +14,24 @@ namespace schcore
     class AudioChannel
     {
     public:
-        virtual ~AudioChannel() {}
+        virtual                 ~AudioChannel() {}
+
+        void                    run(timestamp_t runto, bool doaudio, bool docpu);
 
     protected:
-        std::vector<float>      outputLevels[2];
-        
+        //  To be implemented by derived classes
+        virtual int             doTicks(timestamp_t ticks, bool doaudio, bool docpu) = 0;
+        virtual timestamp_t     clocksToNextUpdate() = 0;
 
-        void                changeOutput( timestamp_t tick, int out );
 
     private:
-        int                 prevOut;
-        AudioBuilder*       builder;
+        std::vector<float>      outputLevels[2];
+
+        timestamp_t             clockRate;
+        timestamp_t             timestamp;
+
+        int                     prevOut;
+        AudioBuilder*           builder;
     };
 
 

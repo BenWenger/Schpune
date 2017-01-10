@@ -1,15 +1,78 @@
 
+#include <algorithm>
 #include "audiobuilder.h"
 
 namespace schcore
 {
-    namespace
+    ////////////////////////////////////////////////////
+    //  Generate audio samples!!!
+
+    int AudioBuilder::generateSamples(int startpos, s16* audio, int count_in_s16s)
     {
-        
-        int AudioBuilder::completedSamples() const
+        int maxtopull = bufferSizeInElements - startpos;
+        int desired = stereo ? (count_in_s16s / 2) : count_in_s16s;
+        int actual = std::min(maxtopull, desired);
+
+        if(stereo)
         {
+            // TODO
+            return 0;
+        }
+        else
+        {
+            for(int i = 0; i < actual; ++i)
+            {
+                outSample[0] += transitionBuffer[0][startpos + i];
+
+                // TODO -- add REAL filters here.. this is temporary!
+                s16 v;
+                if     (outSample[0] < -0x7FFF)     v = -0x7FFF;
+                else if(outSample[0] >  0x7FFF)     v =  0x7FFF;
+                else                                v = static_cast<s16>( outSample[0] );
+
+                v -= v >> 10;
+
+                audio[i] = v;
+            }
+
+            return actual;
         }
 
+        // should never reach here
+        return 0;
+    }
+    
+    ////////////////////////////////////////////////////
+    //  Wipe Samples from the transition buffer
+    void AudioBuilder::wipeSamples(int count, timestamp_t timereduction)
+    {
+        if(timereduction < 0)
+            throw std::runtime_error("");       // TODO set this message
+
+        if(count <= 0)      return;     // This should never happen
+
+        for(int chan = 0; chan < (stereo ? 2 : 1); ++chan)
+        {
+            for(int i = count; i < bufferSizeInElements; ++i)
+                transitionBuffer[chan][i - count] = transitionBuffer[chan][i];
+            for(int i = bufferSizeInElements - count; i < bufferSizeInElements; ++i)
+                transitionBuffer[chan][i] = 0;
+        }
+
+        ///////////////////////////////////////
+
+        // TODO update timeOverflow
+    }
+    
+    int AudioBuilder::samplesAvailableAtTimestamp( timestamp_t time )
+    {
+        auto x = ((time * timeScalar) + timeOverflow) >> (timeShift + 5);
+
+        return static_cast<int>(x) - 1;
+    }
+
+    namespace
+    {
         ////////////////////////////////////////////////////////////////////
         //  There are 32 "sets".
         //      Set 0 is the transition happening exactly on a sample.
@@ -60,10 +123,11 @@ namespace schcore
     void AudioBuilder::addTransition( timestamp_t clocktime, float l, float r )
     {
         // Convert the given clock time to a sample time
-        timestamp_t sampletime = ((clocktime * timeConversion) + timeBase) >> timeShift;
+        timestamp_t sampletime = ((clocktime * timeScalar) + timeOverflow) >> timeShift;
         const float* set = sincTable[sampletime & 0x1F];
         sampletime >>= 5;
 
+        //  This should never happen... but just in case....
         if(sampletime >= maxSampleTimestamp)        return;     // transition is too far out... abort!
 
         if(stereo)
@@ -83,19 +147,4 @@ namespace schcore
         }
     }
 
- /*   
-    class AudioBuilder
-    {
-    public:
-        void                    addTransition( timestamp_t clocktime, float l, float r );
-
-    private:
-        double                  mainClockRate;
-        int                     sampleRate;
-        int                     bufferSizeInMilliseconds;
-
-        std::vector<float>      transitionBuffer[2];        // [0] = left, [1] = right
-        bool                    stereo;
-    };
-    */
 }
