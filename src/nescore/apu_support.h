@@ -161,7 +161,7 @@ namespace schcore
             forceSilence = (freqReg < 8) || (!negate && ((freqReg + (freqReg >> shift)) > 0x7FF));
         }
 
-        void reset(bool subone)
+        void hardReset(bool subone)
         {
             freqReg = 0x7FF;
             forceSilence = true;

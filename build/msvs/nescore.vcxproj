@@ -126,6 +126,8 @@
     <ClInclude Include="..\..\src\nescore\apu.h" />
     <ClInclude Include="..\..\src\nescore\apu_pulse.h" />
     <ClInclude Include="..\..\src\nescore\apu_support.h" />
+    <ClInclude Include="..\..\src\nescore\audiobuilder.h" />
+    <ClInclude Include="..\..\src\nescore\audiochannel.h" />
     <ClInclude Include="..\..\src\nescore\cpu.h" />
     <ClInclude Include="..\..\src\nescore\cpubus.h" />
     <ClInclude Include="..\..\src\nescore\cpustate.h" />
@@ -136,6 +138,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\nescore\apu_pulse.cpp" />
+    <ClCompile Include="..\..\src\nescore\audiobuilder.cpp" />
+    <ClCompile Include="..\..\src\nescore\audiochannel.cpp" />
     <ClCompile Include="..\..\src\nescore\cpu.cpp" />
     <ClCompile Include="..\..\src\nescore\cpubus.cpp" />
   </ItemGroup>

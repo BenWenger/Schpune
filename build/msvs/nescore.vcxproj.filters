@@ -42,6 +42,12 @@
     <ClInclude Include="..\..\src\nescore\apu_pulse.h">
       <Filter>private</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\nescore\audiochannel.h">
+      <Filter>private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\audiobuilder.h">
+      <Filter>private</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\nescore\cpubus.cpp">
@@ -51,6 +57,12 @@
       <Filter>private</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\nescore\apu_pulse.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\nescore\audiochannel.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\nescore\audiobuilder.cpp">
       <Filter>private</Filter>
     </ClCompile>
   </ItemGroup>
