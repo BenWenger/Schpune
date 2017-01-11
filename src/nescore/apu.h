@@ -11,6 +11,7 @@ namespace schcore
 {
     struct ResetInfo;
     class CpuBus;
+    class AudioBuilder;
 
     class Apu : public SubSystem
     {
@@ -26,6 +27,25 @@ namespace schcore
     private:
         void                onWrite(u16 a, u8 v);
         void                onRead(u16 a, u8& v);
+        
+        void                clockSeqHalf();
+        void                clockSeqQuarter();
+        void                doSeqIrq();
+
+        CpuBus*             bus;
+        AudioBuilder*       builder;
+
+        bool                oddCycle;
+        int                 seqCounter;
+        int                 nextSeqPhase;
+        int                 seqMode;
+
+        int                 modeResetCounter;
+        u8                  newSeqMode;             // mode to be reset to
+
+        bool                frameIrqEnabled;
+        bool                frameIrqPending;
+        irqsource_t         frameIrqBit;
 
 
         Apu_Pulse           pulses;

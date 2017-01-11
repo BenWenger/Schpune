@@ -1,5 +1,7 @@
 
 #include "apu.h"
+#include "cpubus.h"
+#include "audiobuilder.h"
 
 namespace schcore
 {
@@ -44,7 +46,11 @@ namespace schcore
     
     //////////////////////////////////////////////////////////
     //   Running
-
+    
+    void Apu::run(timestamp_t runto)
+    {
+        ////////////////////////
+    }
 
 
 }
