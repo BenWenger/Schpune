@@ -4,7 +4,7 @@
 
 #include "schpunetypes.h"
 #include "subsystem.h"
-#include "apu_support.h"
+#include "apu_pulse.h"
 
 
 namespace schcore
@@ -24,6 +24,11 @@ namespace schcore
         virtual void        run(timestamp_t runto) override;
 
     private:
+        void                onWrite(u16 a, u8 v);
+        void                onRead(u16 a, u8& v);
+
+
+        Apu_Pulse           pulses;
     };
 
 

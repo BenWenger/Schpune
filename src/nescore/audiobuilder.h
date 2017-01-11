@@ -11,19 +11,28 @@ namespace schcore
     class AudioBuilder
     {
     public:
+                                AudioBuilder();
         void                    addTransition( timestamp_t clocktime, float l, float r );
         int                     generateSamples( int startpos, s16* audio, int count_in_s16s );
-        void                    wipeSamples( int count, timestamp_t timereduction );
-        int                     samplesAvailableAtTimestamp( timestamp_t time );
-        //int                     completedSamples( timestamp_t clocktime ) const;            //
-        //int                     
+        void                    wipeSamples( int count_in_s16s, timestamp_t timereduction );
+
+        int                     samplesAvailableAtTimestamp( timestamp_t time );        // returns how many samples will be available at given timestamp
+        timestamp_t             timestampToProduceSamples( int s16s );                  // returns what timestamp you need to run to to get this many samples
+
+        void                    setFormat( int samplerate, bool stereo );
+        void                    setClockRates( timestamp_t clocks_per_second, timestamp_t clocks_per_frame );
+        void                    flushTransitionBuffers();
+
+        timestamp_t             getMaxAllowedTimestamp() const  { return clocksPerFrame;        }
+        int                     getSampleRate() const           { return sampleRate;            }
+        bool                    isStereo() const                { return stereo;                }
 
     private:
-        double                  mainClockRate;
+        void                    recalc();
         int                     sampleRate;
-        int                     bufferSizeInMilliseconds;
-        int                     bufferSizeInElements;
-        timestamp_t             maxSampleTimestamp;
+        timestamp_t             bufferSizeInElements;
+        timestamp_t             clocksPerSecond;
+        timestamp_t             clocksPerFrame;
 
         timestamp_t             timeScalar;
         timestamp_t             timeOverflow;

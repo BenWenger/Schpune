@@ -4,8 +4,7 @@
 #include "audiobuilder.h"
 
 namespace schcore
-{
-    
+{    
     void AudioChannel::run(timestamp_t runto, bool doaudio, bool docpu)
     {
         // add clockRate-1 to dif to round up

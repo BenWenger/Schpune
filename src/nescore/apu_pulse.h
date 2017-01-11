@@ -17,9 +17,17 @@ namespace schcore
     {
     public:
 
-        void                run(timestamp_t starttick, timestamp_t runfor);
-        void                write(u16 a, u8 v);
-        void                reset(bool hard);
+        void                    writeMain(u16 a, u8 v);
+        void                    write4015(u8 v);
+        void                    read4015(u8& v);
+
+        void                    reset(bool hard);
+        void                    clockSeqHalf();
+        void                    clockSeqQuarter();
+
+    protected:
+        virtual int             doTicks(timestamp_t ticks, bool doaudio, bool docpu) override;
+        virtual timestamp_t     clocksToNextUpdate() override;
 
 
     private:

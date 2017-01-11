@@ -4,7 +4,16 @@
 
 namespace schcore
 {
-    void Apu_Pulse::write(u16 a, u8 v)
+    
+    const bool Apu_Pulse::Data::dutyLut[4][8] = 
+    {
+        {false,true ,false,false,false,false,false,false},
+        {false,true ,true ,false,false,false,false,false},
+        {false,true ,true ,true ,true ,false,false,false},
+        {true ,false,false,true ,true ,true ,true ,true }
+    };
+
+    void Apu_Pulse::writeMain(u16 a, u8 v)
     {
         auto& ch = dat[(a >> 2) & 1];
 
@@ -29,28 +38,51 @@ namespace schcore
         }
     }
 
-
-    void Apu_Pulse::run(timestamp_t starttick, timestamp_t runfor)
+    void Apu_Pulse::write4015(u8 v)
     {
-        timestamp_t tick = 1;
+        dat[0].length.writeEnable(0x01);
+        dat[1].length.writeEnable(0x02);
+    }
 
-        while(runfor > 0)
+    void Apu_Pulse::read4015(u8& v)
+    {
+        if(dat[0].length.isAudible())   v |= 0x01;
+        if(dat[1].length.isAudible())   v |= 0x02;
+    }
+    
+    int Apu_Pulse::doTicks(timestamp_t ticks, bool doaudio, bool docpu)
+    {
+        if(!doaudio)
+            return 0;
+
+        return dat[0].clock(ticks) | (dat[1].clock(ticks) << 4);
+    }
+
+    void Apu_Pulse::clockSeqHalf()
+    {
+        for(auto& ch : dat)
         {
-            starttick += tick;
-            runfor -= tick;
-
-            //////////////////////////////////////
-            int out  = dat[0].clock(tick);
-            out     |= dat[1].clock(tick) << 4;
-
-            changeOutput( starttick, out );
-
-
-            //////////////////////////////////////
-            tick = runfor;
-            if(dat[0].isAudible())      tick = std::min(tick, dat[0].freqCounter);
-            if(dat[1].isAudible())      tick = std::min(tick, dat[1].freqCounter);
+            ch.length.clock();
+            ch.sweep.clock();
         }
+    }
+    
+    void Apu_Pulse::clockSeqQuarter()
+    {
+        for(auto& ch : dat)
+        {
+            ch.decay.clock();
+        }
+    }
+
+    timestamp_t Apu_Pulse::clocksToNextUpdate()
+    {
+        timestamp_t next = Time::Never;
+
+        if(dat[0].isAudible())      next = dat[0].freqCounter;
+        if(dat[1].isAudible())      next = std::min(next, dat[1].freqCounter);
+
+        return next;
     }
 
     void Apu_Pulse::reset(bool hard)

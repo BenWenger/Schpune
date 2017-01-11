@@ -65,5 +65,8 @@
     <ClCompile Include="..\..\src\nescore\audiobuilder.cpp">
       <Filter>private</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\nescore\apu.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

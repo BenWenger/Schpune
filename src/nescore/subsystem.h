@@ -21,6 +21,12 @@ namespace schcore
     protected:
         void            cyc()           { timestamp += clockBase;           }
         void            cyc(int cycs)   { timestamp += cycs * clockBase;    }
+        void            catchUp();      // TODO figure out how to do this
+
+        timestamp_t     unitsToTimestamp(timestamp_t target)
+        {
+            return ((target - timestamp) + (clockBase - 1)) / clockBase;
+        }
 
     private:
         timestamp_t     timestamp;

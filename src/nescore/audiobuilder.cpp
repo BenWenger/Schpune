@@ -4,6 +4,22 @@
 
 namespace schcore
 {
+    AudioBuilder::AudioBuilder()
+    {
+        sampleRate = 48000;
+        stereo = false;
+
+        clocksPerSecond = 0;
+        clocksPerFrame = 0;
+        bufferSizeInElements = 0;
+
+        timeScalar = 0;
+        timeOverflow = 0;
+        timeShift = 0;
+
+        outSample[0] = outSample[1] = 0;
+    }
+
     ////////////////////////////////////////////////////
     //  Generate audio samples!!!
 
@@ -16,7 +32,8 @@ namespace schcore
         if(stereo)
         {
             // TODO
-            return 0;
+
+            return actual * 2;
         }
         else
         {
@@ -44,10 +61,14 @@ namespace schcore
     
     ////////////////////////////////////////////////////
     //  Wipe Samples from the transition buffer
-    void AudioBuilder::wipeSamples(int count, timestamp_t timereduction)
+    void AudioBuilder::wipeSamples(int count_in_s16s, timestamp_t timereduction)
     {
+        int count = count_in_s16s;
+        if(stereo)
+            count /= 2;
+
         if(timereduction < 0)
-            throw std::runtime_error("");       // TODO set this message
+            throw std::runtime_error("Internal Error:  timereduction cannot be negative in AudioBuilder::wipeSamples"); // this should never happen
 
         if(count <= 0)      return;     // This should never happen
 
@@ -60,8 +81,13 @@ namespace schcore
         }
 
         ///////////////////////////////////////
+        //  we need to adjust timeOverflow to account for the changing timestamp and the wiped samples
 
-        // TODO update timeOverflow
+        // we cut exactly how many samples we just wiped
+        timeOverflow -= (count << (timeShift + 5));
+
+        // now add how ever much we're reducing from the timestamp
+        timeOverflow += (timereduction * timeScalar);
     }
     
     int AudioBuilder::samplesAvailableAtTimestamp( timestamp_t time )
@@ -69,6 +95,94 @@ namespace schcore
         auto x = ((time * timeScalar) + timeOverflow) >> (timeShift + 5);
 
         return static_cast<int>(x) - 1;
+    }
+
+    timestamp_t AudioBuilder::timestampToProduceSamples( int s16s )
+    {
+        timestamp_t samps = s16s;
+        if(stereo)      samps /= 2;
+        ++samps;
+
+        return ((samps << (timeShift + 5)) - timeOverflow) / timeScalar;
+    }
+    
+    ////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////
+    
+    void AudioBuilder::setFormat( int set_samplerate, bool set_stereo )
+    {
+        // no change, just exit
+        if(sampleRate == set_samplerate && stereo == set_stereo)
+            return;
+
+        // otherwise, adapt changes
+        sampleRate = set_samplerate;
+        stereo = set_stereo;
+
+        recalc();
+    }
+    
+    void AudioBuilder::setClockRates( timestamp_t clocks_per_second, timestamp_t clocks_per_frame )
+    {
+        // no change?  just exit
+        if( clocksPerSecond == clocks_per_second && clocksPerFrame == clocks_per_frame )
+            return;
+        
+        clocksPerSecond = clocks_per_second;
+        clocksPerFrame = clocks_per_frame;
+
+        recalc();
+    }
+
+    void AudioBuilder::recalc()
+    {
+        if(clocksPerFrame <= 0 || clocksPerSecond <= 0 || sampleRate <= 0 || (clocksPerFrame > clocksPerSecond) )
+        {
+            timeOverflow = 0;
+            timeShift = 0;
+            timeScalar = 0;
+            bufferSizeInElements = 0;
+            return;
+        }
+
+        static constexpr timestamp_t stopvalue = (Time::Never >> 2);
+
+        // get as many bits of fraction as possible
+        timeOverflow    = 0;
+        timeShift       = -1;
+        do
+        {
+            ++timeShift;
+
+            // do these next calculations in floating point to avoid wrapping errors
+            double c = 1 << (timeShift+5);
+            c /= clocksPerSecond;
+            c *= sampleRate;
+            timeScalar = static_cast<timestamp_t>(c);
+        } while( (clocksPerFrame * timeScalar) < stopvalue );
+
+        //////////////////////
+        // how big do we need to make our buffer
+        bufferSizeInElements  = ((clocksPerFrame * timeScalar) >> (timeShift+5));
+        bufferSizeInElements += 15;         // a little padding for the transitions
+
+        flushTransitionBuffers();
+    }
+
+    void AudioBuilder::flushTransitionBuffers()
+    {
+        outSample[0] = 0;
+        outSample[1] = 0;
+        
+        transitionBuffer[0].clear();
+        transitionBuffer[1].clear();
+
+        transitionBuffer[0].resize( bufferSizeInElements, 0.0f );
+        if(stereo)
+            transitionBuffer[1].resize( bufferSizeInElements, 0.0f );
+
+        timeOverflow = 0;
     }
 
     namespace
@@ -128,7 +242,7 @@ namespace schcore
         sampletime >>= 5;
 
         //  This should never happen... but just in case....
-        if(sampletime >= maxSampleTimestamp)        return;     // transition is too far out... abort!
+        if(sampletime >= bufferSizeInElements)      return;     // transition is too far out... abort!
 
         if(stereo)
         {
