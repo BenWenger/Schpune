@@ -8,13 +8,15 @@
 namespace schcore
 {
     class           CpuBus;
+    class           AudioBuilder;
 
     struct ResetInfo
     {
-        bool        hardReset;
-        bool        suppressIrqs;
+        bool            hardReset;
+        bool            suppressIrqs;
 
-        CpuBus*     cpuBus;
+        CpuBus*         cpuBus;
+        AudioBuilder*   audioBuilder;
     };
 }
 

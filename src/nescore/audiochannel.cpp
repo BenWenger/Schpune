@@ -5,35 +5,53 @@
 
 namespace schcore
 {    
-    void AudioChannel::run(timestamp_t runto, bool doaudio, bool docpu)
+    inline timestamp_t AudioChannel::calcTicksToRun( timestamp_t now, timestamp_t target ) const
     {
-        // add clockRate-1 to dif to round up
-        timestamp_t ticksToRun = (runto - timestamp + (clockRate - 1)) / clockRate;
-        timestamp_t thistime = timestamp;
+        if(now >= target)
+            return 0;
 
+        return (target - now + clockRate - 1) / clockRate;
+    }
+
+    void AudioChannel::run(timestamp_t cputarget, timestamp_t audiotarget)
+    {
+        timestamp_t cputick = calcTicksToRun(cpuTimestamp, cputarget);
+        timestamp_t audtick = calcTicksToRun(audTimestamp, audiotarget);
 
         //  Start by doing an update of 0 steps, since output may have an immediate
         //    change due to a register write
         timestamp_t step = 0;
 
-        while(ticksToRun > 0)
+        while(audtick > 0)
         {
-            int out = doTicks( step, doaudio, docpu );
-            thistime += (step * clockRate);
+            int out = doTicks( step, true, (cputick > 0) );
+
+            audTimestamp += (step * clockRate);
+            if(cputick > 0)             cpuTimestamp += (step * clockRate);
 
             if(out != prevOut)
             {
-                builder->addTransition( thistime, outputLevels[0][out] - outputLevels[0][prevOut],
-                                                  outputLevels[1][out] - outputLevels[1][prevOut] );
+                builder->addTransition( audTimestamp, outputLevels[0][out] - outputLevels[0][prevOut],
+                                                      outputLevels[1][out] - outputLevels[1][prevOut] );
                 prevOut = out;
             }
 
-            ticksToRun -= step;
-            step = std::min( ticksToRun, clocksToNextUpdate() );
+            audtick -= step;
+            if(cputick > 0)             cputick -= step;
+
+            step = std::min( audtick, clocksToNextUpdate() );
+
+            if(cputick > 0)             step = std::min( step, cputick );
         }
 
-        // if this was a CPU run, take the timestamp
-        timestamp = thistime;
+        /////////////////////////////////
+        // So audio has all been updated.  If there is CPU that still needs updating, we can run that all
+        //   in one clump
+        if(cputick > 0)
+        {
+            doTicks( cputick, false, true );
+            cpuTimestamp += (cputick * clockRate);
+        }
     }
 
 

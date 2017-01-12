@@ -5,6 +5,7 @@
 #include "schpunetypes.h"
 #include "subsystem.h"
 #include "apu_pulse.h"
+#include "audiotimestampholder.h"
 
 
 namespace schcore
@@ -13,7 +14,7 @@ namespace schcore
     class CpuBus;
     class AudioBuilder;
 
-    class Apu : public SubSystem
+    class Apu : public SubSystem, public AudioTimestampHolder
     {
     public:
         //////////////////////////////////////////////////
@@ -23,31 +24,37 @@ namespace schcore
         //////////////////////////////////////////////////
         //  Running
         virtual void        run(timestamp_t runto) override;
+        void                fabricateMoreAudio(int count_in_s16s);
+
+        
+        virtual void        subtractFromAudioTimestamp(timestamp_t sub) override    { audTimestamp -= sub;      }
 
     private:
+
+        timestamp_t         calcTicksToRun( timestamp_t now, timestamp_t target ) const;
+        
         void                onWrite(u16 a, u8 v);
         void                onRead(u16 a, u8& v);
-
-        void                miniRun(timestamp_t runto, bool doaudio, bool docpu);
         
         void                clockSeqHalf();
         void                clockSeqQuarter();
-        void                doSeqIrq();
 
         CpuBus*             bus;
         AudioBuilder*       builder;
 
         bool                oddCycle;
-        int                 seqCounter;
+        timestamp_t         seqCounter;
         int                 nextSeqPhase;
-        int                 seqMode;
+        int                 seqMode;                // 0=4-step mode, 1=5-step
 
-        int                 modeResetCounter;
+        timestamp_t         modeResetCounter;
         u8                  newSeqMode;             // mode to be reset to
 
         bool                frameIrqEnabled;
         bool                frameIrqPending;
         irqsource_t         frameIrqBit;
+
+        timestamp_t         audTimestamp;
 
 
         Apu_Pulse           pulses;

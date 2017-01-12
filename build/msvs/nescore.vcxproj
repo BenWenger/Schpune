@@ -128,6 +128,7 @@
     <ClInclude Include="..\..\src\nescore\apu_support.h" />
     <ClInclude Include="..\..\src\nescore\audiobuilder.h" />
     <ClInclude Include="..\..\src\nescore\audiochannel.h" />
+    <ClInclude Include="..\..\src\nescore\audiotimestampholder.h" />
     <ClInclude Include="..\..\src\nescore\cpu.h" />
     <ClInclude Include="..\..\src\nescore\cpubus.h" />
     <ClInclude Include="..\..\src\nescore\cpustate.h" />

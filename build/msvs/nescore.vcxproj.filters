@@ -48,6 +48,9 @@
     <ClInclude Include="..\..\src\nescore\audiobuilder.h">
       <Filter>private</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\nescore\audiotimestampholder.h">
+      <Filter>private</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\nescore\cpubus.cpp">

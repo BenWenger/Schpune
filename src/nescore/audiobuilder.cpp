@@ -1,6 +1,7 @@
 
 #include <algorithm>
 #include "audiobuilder.h"
+#include "audiotimestampholder.h"
 
 namespace schcore
 {
@@ -61,14 +62,11 @@ namespace schcore
     
     ////////////////////////////////////////////////////
     //  Wipe Samples from the transition buffer
-    void AudioBuilder::wipeSamples(int count_in_s16s, timestamp_t timereduction)
+    void AudioBuilder::wipeSamples(int count_in_s16s)
     {
         int count = count_in_s16s;
         if(stereo)
             count /= 2;
-
-        if(timereduction < 0)
-            throw std::runtime_error("Internal Error:  timereduction cannot be negative in AudioBuilder::wipeSamples"); // this should never happen
 
         if(count <= 0)      return;     // This should never happen
 
@@ -81,13 +79,25 @@ namespace schcore
         }
 
         ///////////////////////////////////////
-        //  we need to adjust timeOverflow to account for the changing timestamp and the wiped samples
+        //  we need to adjust timeOverflow to account for the wiped samples,
+        //    and we need to adjust all channels audio timestamps to rebase them
 
-        // we cut exactly how many samples we just wiped
-        timeOverflow -= (count << (timeShift + 5));
+        // cut however many samples we just wiped
+        timeOverflow -= (count << (timeShift+5));
 
-        // now add how ever much we're reducing from the timestamp
-        timeOverflow += (timereduction * timeScalar);
+        // if overflow is less than 0 (likely at this point), change it to be >= 0 so our
+        //   max timestamp is relevant
+        if(timeOverflow < 0)
+        {
+            timestamp_t flip = -timeOverflow;
+            flip += timeScalar - 1;         // round up
+            flip /= timeScalar;
+
+            for(auto& tsh : audioTimestampHolders)
+                tsh->subtractFromAudioTimestamp( flip );
+
+            timeOverflow += (flip * timeScalar);
+        }
     }
     
     int AudioBuilder::samplesAvailableAtTimestamp( timestamp_t time )

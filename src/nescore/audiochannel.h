@@ -4,20 +4,24 @@
 
 #include <vector>
 #include "schpunetypes.h"
-#include "subsystem.h"
+#include "audiotimestampholder.h"
 
 
 namespace schcore
 {
     class AudioBuilder;
 
-    class AudioChannel
+    class AudioChannel : public AudioTimestampHolder
     {
     public:
         virtual                 ~AudioChannel() {}
 
-        void                    run(timestamp_t runto, bool doaudio, bool docpu);
+        // For run... give 'Time::Now' if cpu/aud is not to be run
+        void                    run(timestamp_t cputarget, timestamp_t audiotarget);
+
         void                    setBuilder(AudioBuilder* bldr)          { builder = bldr;       }
+        virtual void            subtractFromAudioTimestamp(timestamp_t sub) override    { audTimestamp -= sub;      }
+        void                    subtractFromCpuTimestamp(timestamp_t sub)               { cpuTimestamp -= sub;      }
 
     protected:
         //  To be implemented by derived classes
@@ -27,10 +31,12 @@ namespace schcore
         // TODO - calculate output levels
 
     private:
+        timestamp_t             calcTicksToRun( timestamp_t now, timestamp_t target ) const;
         std::vector<float>      outputLevels[2];
 
         timestamp_t             clockRate;
-        timestamp_t             timestamp;
+        timestamp_t             audTimestamp;
+        timestamp_t             cpuTimestamp;
 
         int                     prevOut;
         AudioBuilder*           builder;
