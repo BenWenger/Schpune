@@ -27,6 +27,8 @@ namespace schcore
     private:
         void                onWrite(u16 a, u8 v);
         void                onRead(u16 a, u8& v);
+
+        void                miniRun(timestamp_t runto, bool doaudio, bool docpu);
         
         void                clockSeqHalf();
         void                clockSeqQuarter();

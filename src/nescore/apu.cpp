@@ -1,4 +1,5 @@
 
+#include <algorithm>
 #include "apu.h"
 #include "cpubus.h"
 #include "audiobuilder.h"
@@ -50,7 +51,18 @@ namespace schcore
     void Apu::run(timestamp_t runto)
     {
         ////////////////////////
+        timestamp_t maxaudio = std::min( builder->getMaxAllowedTimestamp(), runto );
+
+        // run both doaudio and docpu for as many cycles as we can
+        if( curCyc() < maxaudio ) 
+            miniRun( maxaudio, true, true );
+
+        // run just the CPU up to the given run point
+        if( curCyc() < runto )
+            miniRun( runto, false, true );
     }
+
+
 
 
 }
