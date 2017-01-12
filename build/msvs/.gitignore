@@ -2,3 +2,4 @@
 *.sdf
 *.VC.opendb
 /x64/
+*.VC.db
