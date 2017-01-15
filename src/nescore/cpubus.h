@@ -10,7 +10,7 @@
 
 namespace schcore
 {
-    struct ResetInfo;
+    class ResetInfo;
     class Cpu;
 
     class CpuBus

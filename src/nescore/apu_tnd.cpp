@@ -1,5 +1,7 @@
 
 #include "apu_tnd.h"
+#include "cpubus.h"
+#include "resetinfo.h"
 #include <algorithm>
 
 
@@ -12,6 +14,14 @@ namespace schcore
         { 4, 8, 16, 32, 64, 96, 128, 160, 202, 254, 380, 508, 762, 1016, 2034, 4068 },
         // PAL
         { 4, 8, 14, 30, 60, 88, 118, 148, 188, 236, 354, 472, 708,  944, 1890, 3778 }
+    };
+    
+    const int Apu_Tnd::dmcFreqLut[2][0x10] = 
+    {
+        // NTSC
+        { 428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106,  84,  72,  54 },
+        // PAL
+        { 398, 354, 316, 298, 276, 236, 210, 198, 176, 148, 132, 118,  98,  78,  66,  50 }
     };
 
 
@@ -50,7 +60,28 @@ namespace schcore
             break;
             
             //////////////////////////////////
-            //  DMC - TODO
+            //  DMC
+        case 0x4010:
+            dmcIrqEnabled = (v & 0x80) != 0;
+            if(!dmcIrqEnabled && dmcIrqPending)
+            {
+                dmcIrqPending = false;
+                cpuBus->acknowledgeIrq(dmcIrqBit);
+            }
+
+            dmcLoop = (v & 0x40) != 0;
+            dmcFreqTimer = dmcFreqLut[0][v & 0x0F];         // TODO - catch PAL
+            // TODO - predict IRQ
+            break;
+        case 0x4011:
+            dmcOut = v & 0x7F;
+            break;
+        case 0x4012:
+            dmcAddrLoad =       0xC000 | (v << 6);
+            break;
+        case 0x4013:
+            dmcLenLoad =        (v << 4) + 1;
+            break;
         }
     }
 
@@ -59,20 +90,83 @@ namespace schcore
         tri.length.writeEnable(v & 0x04);
         nse.length.writeEnable(v & 0x08);
 
-        // TODO DMC
+        if(dmcIrqPending)
+        {
+            dmcIrqPending = false;
+            cpuBus->acknowledgeIrq( dmcIrqBit );
+        }
+
+        if(v & 0x10)
+        {
+            if(!dmcpu.len)
+            {
+                // start a new clip
+                //   if dmcaud is completely silent, sync with dmcpu
+                tryToSyncDmc();
+
+                startDmcClip(dmcpu);
+                startDmcClip(dmcaud);
+
+                doDmcFetch(dmcpu,true);
+                doDmcFetch(dmcaud,false);
+
+                // TODO predict IRQ
+            }
+        }
+        else
+        {
+            dmcpu.len = dmcaud.len = 0;
+        }
+    }
+
+    inline void Apu_Tnd::tryToSyncDmc()
+    {
+        // only sync if the dmcaud is totally silent
+        if(dmcaud.audible)                          return;
+        if(dmcPeekSampleBuffer.willBeAudible())     return;
+        if(dmcaud.len)                              return;
+
+        // OK to sync!
+        dmcaud.freqCounter      = dmcpu.freqCounter;
+        dmcaud.bitsRemaining    = dmcpu.bitsRemaining;
+    }
+
+    inline void Apu_Tnd::startDmcClip(DmcData& dat)
+    {
+        dat.len =       dmcLenLoad;
+        dat.addr =      dmcAddrLoad;
+    }
+    
+    inline void Apu_Tnd::doDmcFetch(DmcData& dat, bool isdmcpu)
+    {
+        if(!dat.len)        return;
+
+        dat.supplier->triggerFetch( dat.addr );
+        dat.addr = (dat.addr + 1) | 0x8000;
+
+        if(!--dat.len)
+        {
+            if(dmcLoop)
+                startDmcClip(dat);
+            else if(isdmcpu && dmcIrqEnabled)
+            {
+                dmcIrqPending = true;
+                cpuBus->triggerIrq(dmcIrqBit);
+            }
+        }
     }
 
     void Apu_Tnd::read4015(u8& v)
     {
         if(tri.length.isAudible())  v |= 0x04;
         if(nse.length.isAudible())  v |= 0x08;
-
-        // TODO DMC
+        if(dmcpu.len)               v |= 0x10;
+        if(dmcIrqPending)           v |= 0x80;
     }
 
-    void Apu_Tnd::reset(bool hard)
+    void Apu_Tnd::reset(const ResetInfo& info)
     {
-        if(hard)
+        if(info.hardReset)
         {
             tri.length.hardReset();
             tri.linear.hardReset();
@@ -84,6 +178,25 @@ namespace schcore
             nse.freqTimer = nse.freqTimer = noiseFreqLut[0][0x0F];       // TODO - catch PAL
             nse.shiftMode = 14;
             nse.shifter = 1;
+
+            dmcPeekSampleBuffer.reset(info);
+            cpuBus              = info.cpuBus;
+            dmcOut              = 0;
+            dmcFreqTimer        = dmcFreqLut[0][0];     // TODO - catch PAL
+            dmcAddrLoad         = 0xC000;
+            dmcLenLoad          = 0x0FF1;
+            dmcIrqPending       = false;
+            dmcIrqEnabled       = false;
+            dmcIrqBit           = cpuBus->createIrqCode("DMC");
+            dmcLoop             = false;
+                dmcpu .supplier =                                   &dmcPeekSampleBuffer;     // TODO - replace with DMA unit
+                dmcaud.supplier =                                   &dmcPeekSampleBuffer;
+                dmcpu.freqCounter =     dmcaud.freqCounter =        dmcFreqTimer;
+                dmcpu.addr =            dmcaud.addr =               dmcAddrLoad;
+                dmcpu.len =             dmcaud.len =                dmcLenLoad;
+                dmcpu.outputUnit =      dmcaud.outputUnit =         0;
+                dmcpu.bitsRemaining =   dmcaud.bitsRemaining =      8;
+                dmcpu.audible =         dmcaud.audible =            false;
             
             // TODO -- move this somewhere more appropriate
             outputLevels[0].resize(0x8000);
@@ -103,6 +216,8 @@ namespace schcore
         {
             tri.length.writeEnable(0);
             nse.length.writeEnable(0);
+            dmcpu.len = 0;
+            dmcaud.len = 0;
         }
     }
 
@@ -124,18 +239,16 @@ namespace schcore
         
         if(tri.length.isAudible() && tri.linear.isAudible())        out = std::min( out, tri.freqCounter );
         if(nse.length.isAudible() && nse.decay.getOutput())         out = std::min( out, nse.freqCounter );
-        // TODO - DMC
+        if(dmcaud.audible || dmcPeekSampleBuffer.willBeAudible())   out = std::min( out, dmcaud.freqCounter );
 
         return out;
     }
 
     int Apu_Tnd::doTicks(timestamp_t ticks, bool doaudio, bool docpu)
     {
-        if(!doaudio)
-        {
-            // TODO - clock DMCPU
-            return 0;
-        }
+        if(docpu)               runDmc(dmcpu, ticks, true);
+        if(!doaudio)            return 0;
+
         int out;
 
         ////////////////////////
@@ -164,8 +277,36 @@ namespace schcore
 
         if(nse.length.isAudible() && !(nse.shifter & 0x0001))
             out |= nse.decay.getOutput() << 4;
-
+        
+        ////////////////////////
+        // DMC
+        runDmc(dmcaud, ticks, false);
+        out |= dmcOut << 8;
 
         return out;
+    }
+
+    void Apu_Tnd::runDmc(DmcData& dat, timestamp_t ticks, bool isdmcpu)
+    {
+        dat.freqCounter -= ticks;
+        while(dat.freqCounter <= 0)
+        {
+            dat.freqCounter += dmcFreqTimer;
+            --dat.bitsRemaining;
+
+            if(!isdmcpu && dat.audible)
+            {
+                if(dat.outputUnit & 0x01)   { if(dmcOut >    1)     dmcOut -= 2;    }
+                else                        { if(dmcOut < 0x7E)     dmcOut += 2;    }
+            }
+            dat.outputUnit >>= 1;
+
+            if(!dat.bitsRemaining)
+            {
+                dat.bitsRemaining = 8;
+                dat.supplier->getFetchedByte( dat.outputUnit, dat.audible );
+                doDmcFetch( dat, isdmcpu );
+            }
+        }
     }
 }

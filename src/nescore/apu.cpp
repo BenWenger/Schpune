@@ -257,7 +257,7 @@ namespace schcore
 
         
         pulses.reset( info.hardReset );
-        tnd.reset( info.hardReset );
+        tnd.reset( info );
     }
 
 }

@@ -13,8 +13,9 @@ namespace schcore
     class           AudioBuilder;
     class           CpuTracer;
 
-    struct ResetInfo
+    class ResetInfo
     {
+    public:
         bool            hardReset;
         bool            suppressIrqs;
 

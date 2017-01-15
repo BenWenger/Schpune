@@ -11,7 +11,7 @@
 
 namespace schcore
 {
-    struct ResetInfo;
+    class ResetInfo;
     class CpuBus;
     class AudioBuilder;
 
