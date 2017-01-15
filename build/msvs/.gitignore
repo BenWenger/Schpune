@@ -4,3 +4,5 @@
 /x64/
 *.VC.db
 *.txt
+/tempnsf_dump.bin
+/tempnsf_dump.wav

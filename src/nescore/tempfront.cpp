@@ -6,8 +6,9 @@ namespace schcore
 {
     TempFront::TempFront()  : nsf( new TempNsf() )      {}
     TempFront::~TempFront()                             {}
-
+    
     bool TempFront::load(const char* filename)          { return nsf->load(filename);       }
+    bool TempFront::loadTest(const char* filename)          { return nsf->loadTest(filename);       }
     int TempFront::getTrackCount()                      { return nsf->getTrackCount();      }
     int TempFront::getTrack()                           { return nsf->getTrack();           }
     void TempFront::setTrack(int track)                 { nsf->setTrack(track);             }

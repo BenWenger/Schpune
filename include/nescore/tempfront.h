@@ -22,6 +22,7 @@ namespace schcore
                         TempFront();
                         ~TempFront();
         bool            load(const char* filename);
+        bool            loadTest(const char* filename);
         int             getTrackCount();
         int             getTrack();
         void            setTrack(int track);

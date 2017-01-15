@@ -308,11 +308,11 @@ namespace schcore
             case 0x3E:  adRWAx( &Cpu::ROL );            break;
 
                 /* ROR  */
-            case 0x6A:  adImplied();    ROL(cpu.A);     break;
-            case 0x66:  adRWZp( &Cpu::ROL );            break;
-            case 0x76:  adRWZx( &Cpu::ROL );            break;
-            case 0x6E:  adRWAb( &Cpu::ROL );            break;
-            case 0x7E:  adRWAx( &Cpu::ROL );            break;
+            case 0x6A:  adImplied();    ROR(cpu.A);     break;
+            case 0x66:  adRWZp( &Cpu::ROR );            break;
+            case 0x76:  adRWZx( &Cpu::ROR );            break;
+            case 0x6E:  adRWAb( &Cpu::ROR );            break;
+            case 0x7E:  adRWAx( &Cpu::ROR );            break;
                 
                 /* SBC  */
             case 0xE9:  SBC( adRdIm() );                break;

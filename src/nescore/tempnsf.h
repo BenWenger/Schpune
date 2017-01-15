@@ -22,6 +22,7 @@ namespace schcore
     public:
                         TempNsf();
         bool            load(const char* filename);
+        bool            loadTest(const char* filename);
         int             getTrackCount()                         { return rawPrg.empty() ? 0 : totalTracks;  }
         int             getTrack()                              { return currentTrack;                      }
         void            setTrack(int track);

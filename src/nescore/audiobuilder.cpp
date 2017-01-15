@@ -50,12 +50,11 @@ namespace schcore
                 outSample[0] += transitionBuffer[0][startpos + i];
 
                 // TODO -- add REAL filters here.. this is temporary!
+                outSample[0] -= outSample[0] * 0.01f;
                 s16 v;
                 if     (outSample[0] < -0x7FFF)     v = -0x7FFF;
                 else if(outSample[0] >  0x7FFF)     v =  0x7FFF;
-                else                                v = static_cast<s16>( outSample[0] );
-
-                v -= v >> 10;
+                else                                v = static_cast<s16>( outSample[0] * 0x7FFF );
 
                 audio[i] = v;
             }
@@ -111,7 +110,7 @@ namespace schcore
     {
         auto x = ((time * timeScalar) + timeOverflow) >> (timeShift + 5);
 
-        return static_cast<int>(x) - 1;
+        return std::max(0, static_cast<int>(x) - 1);
     }
 
     timestamp_t AudioBuilder::timestampToProduceSamples( int s16s )

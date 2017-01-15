@@ -131,8 +131,8 @@ namespace schcore
             checkSilence();
         }
         
-        void        writeFLo(u8 v)              { freqReg = (v & 0x0700) | v;               checkSilence();     }
-        void        writeFHi(u8 v)              { freqReg = (v & 0x00FF) | ((v & 7) << 8);  checkSilence();     }
+        void        writeFLo(u8 v)              { freqReg = (freqReg & 0x0700) | v;               checkSilence();     }
+        void        writeFHi(u8 v)              { freqReg = (freqReg & 0x00FF) | ((v & 7) << 8);  checkSilence();     }
 
         void        clock()
         {

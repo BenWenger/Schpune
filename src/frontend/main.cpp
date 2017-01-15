@@ -5,6 +5,8 @@
 #include <Windows.h>
 #include <soundout.h>
 #include <fstream>
+#include <cstdio>
+#include <algorithm>
 
 #include "tempfront.h"
 
@@ -21,6 +23,13 @@ bool                        loaded = false;
 std::ofstream               traceFile;
 bool                        tracing = false;
 const char* const           traceFileName = "tempnsf_trace.txt";
+const char* const           dumpFileName = "tempnsf_dump.bin";
+
+unsigned char               tempdumpbuf[10000];
+
+
+FILE*                       dumpfile = nullptr;
+bool                        dumping = false;
 
 void drawWindow(HWND wnd)
 {
@@ -45,15 +54,39 @@ void drawWindow(HWND wnd)
     {
         textOut( dc, 60, 200, " ** TRACING **" );
     }
+    if(dumping)
+    {
+        textOut( dc, 60, 250, " ** DUMPING **" );
+    }
 
     EndPaint(wnd, &ps);
+}
+
+void toggleDump()
+{
+    if(!dumping)
+    {
+        if(!dumpfile)
+            dumpfile = fopen(dumpFileName, "wb");
+        if(dumpfile)
+        {
+            dumping = true;
+        }
+    }
+    else
+    {
+        dumping = false;
+        fclose(dumpfile);
+        dumpfile = nullptr;
+    }
 }
 
 void toggleTrace()
 {
     if(!tracing)
     {
-        traceFile.open(traceFileName);
+        if(!traceFile.good())
+            traceFile.open(traceFileName);
         if(traceFile.good())
         {
             tracing = true;
@@ -71,12 +104,44 @@ void fillAudio()
 {
     {
         using schcore::s16;
-
         auto lk = snd.lock();
-        int written = nsf.getSamples( lk.getBuffer<s16>(0), lk.getSize(0) / sizeof(s16), lk.getBuffer<s16>(1), lk.getSize(1) / sizeof(s16) );
-        lk.setWritten(written * sizeof(s16));
+        int written = 0;
+        
+
+        if(dumping)
+        {
+            written = nsf.getSamples( reinterpret_cast<s16*>(tempdumpbuf), (lk.getSize(0) + lk.getSize(1)) / sizeof(s16), nullptr, 0 ) * sizeof(s16);
+            if(dumping)
+                fwrite( tempdumpbuf, 1, written, dumpfile );
+            
+            int writa = std::min(lk.getSize(0), written);
+            int writb = std::min(lk.getSize(1), written - writa);
+
+            memcpy( lk.getBuffer(0), tempdumpbuf, writa );
+            memcpy( lk.getBuffer(1), tempdumpbuf + writa, writb );
+        }
+        else
+        {
+            written = nsf.getSamples( lk.getBuffer<s16>(0), lk.getSize(0) / sizeof(s16), lk.getBuffer<s16>(1), lk.getSize(1) / sizeof(s16) ) * sizeof(s16);
+        }
+
+        lk.setWritten(written);
     }
     nsf.doFrame();
+}
+
+void changeTrack(int chg, HWND wnd)
+{
+    int oldtrack = nsf.getTrack();
+    int newtrack = oldtrack + chg;
+    if(newtrack < 1)                    newtrack = 1;
+    if(newtrack > nsf.getTrackCount())  newtrack = nsf.getTrackCount();
+
+    if(newtrack != oldtrack)
+    {
+        nsf.setTrack(newtrack);
+        InvalidateRect(wnd,nullptr,true);
+    }
 }
 
 void loadFile(HWND wnd)
@@ -121,12 +186,25 @@ LRESULT CALLBACK WndProc(HWND wnd, UINT msg, WPARAM w, LPARAM l)
         break;
 
     case WM_KEYDOWN:
-        if(w == VK_ESCAPE)
-            loadFile(wnd);
-        if(w == VK_TAB)
         {
-            toggleTrace();
-            InvalidateRect(wnd,nullptr,true);
+            switch(w)
+            {
+            case VK_ESCAPE:
+                loadFile(wnd);
+                break;
+            case VK_TAB:
+                toggleTrace();
+                InvalidateRect(wnd,nullptr,true);
+                break;
+            case VK_BACK:
+                toggleDump();
+                InvalidateRect(wnd,nullptr,true);
+                break;
+            case VK_LEFT:       changeTrack( -1,wnd);   break;
+            case VK_RIGHT:      changeTrack(  1,wnd);   break;
+            case VK_UP:         changeTrack( 10,wnd);   break;
+            case VK_DOWN:       changeTrack(-10,wnd);   break;
+            }
         }
         break;
     }
@@ -165,13 +243,16 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show)
         if(!runApp)
             break;
 
-        if(loaded && (snd.canWrite()*2) >= nsf.availableSamples())
+        if(loaded && (snd.canWrite() >= (nsf.availableSamples()*2)))
         {
             fillAudio();
         }
         else
             Sleep(10);
     }
+
+    if(dumping)
+        toggleDump();
 
     return 0;
 }

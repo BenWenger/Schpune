@@ -34,9 +34,9 @@ namespace schcore
         if(!file)                                   return false;
 
         u8 hdr[0x80];
-        if( fread(hdr, 1, 0x80, file) != 0x80 )     return false;
+        if( fread(hdr, 1, 0x80, file) != 0x80 ) {   fclose(file);   return false;   }
 
-        if( memcmp(hdr, "NESM\x1A", 5) )            return false;
+        if( memcmp(hdr, "NESM\x1A", 5) )        {   fclose(file);   return false;   }
 
         totalTracks =           hdr[0x06];
         currentTrack =          hdr[0x07];
@@ -61,7 +61,7 @@ namespace schcore
         fseek(file, 0, SEEK_END);
         int prgsize = ftell(file) - 0x80;
         fseek(file, 0x80, SEEK_SET);
-        if(prgsize < 1)                 return false;
+        if(prgsize < 1)                 {   fclose(file);   return false;   }
 
         if(hasBankswap)
         {
@@ -74,7 +74,7 @@ namespace schcore
         }
         else
         {
-            if(loadaddr < 0x8000)       return false;
+            if(loadaddr < 0x8000)       {   fclose(file);   return false;   }
             if(prgsize + loadaddr > 0x10000)
                 prgsize = 0x10000 - loadaddr;
             
@@ -87,12 +87,35 @@ namespace schcore
 
             fread(&rawPrg[loadaddr-0x8000], 1, prgsize, file);
         }
+        fclose(file);
 
         ////////////////////////////////////////////
         // Do a hard reset
         internalReset(true);
 
         setTrack(currentTrack);
+        return true;
+    }
+
+    
+    bool TempNsf::loadTest(const char* filename)
+    {
+        FILE* file = fopen(filename, "rb");
+
+        rawPrg.resize(0x4000);
+        fseek(file, 0x10, SEEK_SET);
+        fread(&rawPrg[0], 1, 0x4000, file);
+        fclose(file);
+        
+        hasBankswap = false;
+        numBanks = 4;
+        bankswapInit[0] = bankswapInit[4] = 0;
+        bankswapInit[1] = bankswapInit[5] = 1;
+        bankswapInit[2] = bankswapInit[6] = 2;
+        bankswapInit[3] = bankswapInit[7] = 3;
+
+        internalReset(true);
+        setTrack(0);
         return true;
     }
 
@@ -209,7 +232,7 @@ namespace schcore
         avail -= siza;
 
         if(sizb > avail)    sizb = avail;
-        builder.generateSamples(0, bufb, sizb);
+        builder.generateSamples(siza, bufb, sizb);
 
         //////////////////
         avail = siza + sizb;
