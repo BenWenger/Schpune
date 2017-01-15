@@ -15,22 +15,34 @@ namespace schcore
 
         virtual void    run(timestamp_t runto) = 0;
 
-        timestamp_t     curCyc() const       { return timestamp;            }
-        timestamp_t     getClockBase() const { return clockBase;            }
+        timestamp_t     curCyc() const                  { return timestamp;             }
+        timestamp_t     getClockBase() const            { return clockBase;             }
+        void            setClockBase(timestamp_t base)  { clockBase = base;             }
+
+        void            subtractFromMainTimestamp(timestamp_t sub)  { timestamp -= sub;     }
+        void            setMainTimestamp(timestamp_t set)           { timestamp = set;      }
 
     protected:
         void            cyc()           { timestamp += clockBase;           }
         void            cyc(int cycs)   { timestamp += cycs * clockBase;    }
-        void            catchUp();      // TODO figure out how to do this
+        void            catchUp()       { run( drivingClock->curCyc() );    }
 
         timestamp_t     unitsToTimestamp(timestamp_t target)
         {
             return ((target - timestamp) + (clockBase - 1)) / clockBase;
         }
 
+        void            subSystem_HardReset(SubSystem* drivingclock, timestamp_t clkbase)
+        {
+            timestamp = 0;              // TODO?  make this region dependent
+            clockBase = clkbase;
+            drivingClock = drivingclock;
+        }
+
     private:
         timestamp_t     timestamp;
         timestamp_t     clockBase;
+        SubSystem*      drivingClock;
     };
 
 

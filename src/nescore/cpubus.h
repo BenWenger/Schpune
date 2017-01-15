@@ -31,7 +31,7 @@ namespace schcore
         //  Primary interfacing with the bus
         u8                  read(u16 a);
         void                write(u16 a, u8 v);
-        int                 peek(u16 a) const;  // 'peek' is effectively a consequence-free read (no side-effects).
+        int                 peek(int a) const;  // 'peek' is effectively a consequence-free read (no side-effects).
                                                 //   return value is < 0 if no value could be read
         
         //////////////////////////////////////////////////
@@ -67,7 +67,7 @@ namespace schcore
             { addReader(pagefirst, pagelast, std::bind(proc, obj, std::placeholders::_1, std::placeholders::_2) );      }
         template <typename C> void  addWriter(int pagefirst, int pagelast, C* obj, void (C::*proc)(u16,u8 ))
             { addWriter(pagefirst, pagelast, std::bind(proc, obj, std::placeholders::_1, std::placeholders::_2) );      }
-        template <typename C> void  addPeeker(int pagefirst, int pagelast, const C* obj, void (C::*proc)(u16) const)
+        template <typename C> void  addPeeker(int pagefirst, int pagelast, const C* obj, int (C::*proc)(u16) const)
             { addPeeker(pagefirst, pagelast, std::bind(proc, obj, std::placeholders::_1) );                             }
 
     private:

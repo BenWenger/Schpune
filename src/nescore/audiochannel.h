@@ -22,6 +22,7 @@ namespace schcore
         void                    setBuilder(AudioBuilder* bldr)          { builder = bldr;       }
         virtual void            subtractFromAudioTimestamp(timestamp_t sub) override    { audTimestamp -= sub;      }
         void                    subtractFromCpuTimestamp(timestamp_t sub)               { cpuTimestamp -= sub;      }
+        void                    setClockRate(timestamp_t rate)                          { clockRate = rate;         }
 
     protected:
         //  To be implemented by derived classes
@@ -32,7 +33,9 @@ namespace schcore
 
     private:
         timestamp_t             calcTicksToRun( timestamp_t now, timestamp_t target ) const;
+    protected:  // TODO
         std::vector<float>      outputLevels[2];
+    private:    // TODO
 
         timestamp_t             clockRate;
         timestamp_t             audTimestamp;

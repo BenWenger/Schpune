@@ -21,6 +21,13 @@ namespace schcore
         outSample[0] = outSample[1] = 0;
     }
 
+    
+    void AudioBuilder::hardReset()
+    {
+        audioTimestampHolders.clear();
+        flushTransitionBuffers();
+    }
+
     ////////////////////////////////////////////////////
     //  Generate audio samples!!!
 

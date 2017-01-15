@@ -19,33 +19,32 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{96BC574F-5B6E-441A-B1D6-54A877AED4BD}</ProjectGuid>
-    <RootNamespace>Schpune</RootNamespace>
+    <ProjectGuid>{2A2BE300-4515-42FF-89EA-CBF531D52CBF}</ProjectGuid>
+    <RootNamespace>frontend</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
-    <ProjectName>nescore</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -71,15 +70,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SolutionDir)..\..\include\nescore;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\..\bin\nescore\$(Configuration)_$(Platform);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(SolutionDir)..\..\include\nescore;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\..\bin\nescore\$(Configuration)_$(Platform);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(SolutionDir)..\..\include\nescore;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\..\bin\nescore\$(Configuration)_$(Platform);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir)..\..\include\nescore;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\..\bin\nescore\$(Configuration)_$(Platform);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -87,6 +90,10 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>nescore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -94,6 +101,10 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>nescore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -106,6 +117,8 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>nescore.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -119,38 +132,12 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>nescore.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\nescore\regioninfo.h" />
-    <ClInclude Include="..\..\include\nescore\schpunetypes.h" />
-    <ClInclude Include="..\..\include\nescore\tempfront.h" />
-    <ClInclude Include="..\..\src\nescore\apu.h" />
-    <ClInclude Include="..\..\src\nescore\apu_pulse.h" />
-    <ClInclude Include="..\..\src\nescore\apu_support.h" />
-    <ClInclude Include="..\..\src\nescore\audiobuilder.h" />
-    <ClInclude Include="..\..\src\nescore\audiochannel.h" />
-    <ClInclude Include="..\..\src\nescore\audiotimestampholder.h" />
-    <ClInclude Include="..\..\src\nescore\cpu.h" />
-    <ClInclude Include="..\..\src\nescore\cpubus.h" />
-    <ClInclude Include="..\..\src\nescore\cpustate.h" />
-    <ClInclude Include="..\..\src\nescore\cputracer.h" />
-    <ClInclude Include="..\..\src\nescore\cpu_addrmodes.h" />
-    <ClInclude Include="..\..\src\nescore\cpu_instructions.h" />
-    <ClInclude Include="..\..\src\nescore\resetinfo.h" />
-    <ClInclude Include="..\..\src\nescore\subsystem.h" />
-    <ClInclude Include="..\..\src\nescore\tempnsf.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\src\nescore\apu.cpp" />
-    <ClCompile Include="..\..\src\nescore\apu_pulse.cpp" />
-    <ClCompile Include="..\..\src\nescore\audiobuilder.cpp" />
-    <ClCompile Include="..\..\src\nescore\audiochannel.cpp" />
-    <ClCompile Include="..\..\src\nescore\cpu.cpp" />
-    <ClCompile Include="..\..\src\nescore\cpubus.cpp" />
-    <ClCompile Include="..\..\src\nescore\cputracer.cpp" />
-    <ClCompile Include="..\..\src\nescore\tempfront.cpp" />
-    <ClCompile Include="..\..\src\nescore\tempnsf.cpp" />
+    <ClCompile Include="..\..\src\frontend\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

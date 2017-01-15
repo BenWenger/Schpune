@@ -14,6 +14,9 @@ namespace schcore
     {
     public:
                                 AudioBuilder();
+
+        void                    hardReset();
+
         void                    addTransition( timestamp_t clocktime, float l, float r );
         int                     generateSamples( int startpos, s16* audio, int count_in_s16s );
         void                    wipeSamples( int count_in_s16s );
@@ -23,14 +26,16 @@ namespace schcore
 
         void                    setFormat( int samplerate, bool stereo );
         void                    setClockRates( timestamp_t clocks_per_second, timestamp_t clocks_per_frame );
-        void                    flushTransitionBuffers();
 
         timestamp_t             getMaxAllowedTimestamp() const  { return clocksPerFrame;        }
         int                     getSampleRate() const           { return sampleRate;            }
         bool                    isStereo() const                { return stereo;                }
 
+        void                    addTimestampHolder(AudioTimestampHolder* holder)        { audioTimestampHolders.push_back(holder);      }
+
     private:
         void                    recalc();
+        void                    flushTransitionBuffers();
         int                     sampleRate;
         timestamp_t             bufferSizeInElements;
         timestamp_t             clocksPerSecond;

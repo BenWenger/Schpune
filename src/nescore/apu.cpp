@@ -1,14 +1,26 @@
 
 #include <algorithm>
 #include "apu.h"
+#include "cpu.h"
 #include "cpubus.h"
 #include "audiobuilder.h"
 #include "resetinfo.h"
 
 namespace schcore
 {
+    ////////////////////////////////////////////////
+    //  Lookup table for length counter
+    const u8 Apu_Length::loadTable[0x20] = 
+    {
+        10,254, 20,  2, 40,  4, 80,  6, 160,  8, 60, 10, 14, 12, 26, 14,
+        12, 16, 24, 18, 48, 20, 96, 22, 192, 24, 72, 26, 16, 28, 32, 30
+    };
+
     namespace
     {
+
+
+
         ////////////////////////////////////////////////
         //  frame sequencer actions
         enum
@@ -121,9 +133,13 @@ namespace schcore
             pulses.read4015(v);
             //tnd.read4015(v);       TODO uncomment once TND exists
 
-            
-            frameIrqPending = false;
-            bus->acknowledgeIrq( frameIrqBit );
+
+            if(frameIrqPending)
+            {
+                v |= 0x40;
+                frameIrqPending = false;
+                bus->acknowledgeIrq( frameIrqBit );
+            }
         }
     }
     
@@ -202,28 +218,44 @@ namespace schcore
 
     void Apu::reset( const ResetInfo& info )
     {
+        if(info.hardReset)
+        {
+            subSystem_HardReset(info.cpu, info.region.apuClockBase);
+            // TODO - clear expansion audio list
 
-        /*
-        CpuBus*             bus;
-        AudioBuilder*       builder;
+            // capture the bus
+            bus = info.cpuBus;
+            bus->addReader(0x4,0x4,this,&Apu::onRead);
+            bus->addWriter(0x4,0x4,this,&Apu::onWrite);
+            frameIrqBit = bus->createIrqCode("APU Frame");
 
-        bool                oddCycle;
-        timestamp_t         seqCounter;
-        int                 nextSeqPhase;
-        int                 seqMode;                // 0=4-step mode, 1=5-step
+            // capture the builder
+            builder = info.audioBuilder;
+            builder->addTimestampHolder( this );
+            builder->addTimestampHolder( &pulses );
+            pulses.setBuilder(builder);
+            // TODO TND
 
-        timestamp_t         modeResetCounter;
-        u8                  newSeqMode;             // mode to be reset to
+            oddCycle        = false;
+            seqCounter      = 0;
+            nextSeqPhase    = 0;
+            seqMode         = 0;
 
-        bool                frameIrqEnabled;
-        bool                frameIrqPending;
-        irqsource_t         frameIrqBit;
+            modeResetCounter = 0;
+            newSeqMode      = 0;
 
-        timestamp_t         audTimestamp;
+            frameIrqEnabled = true;
+            frameIrqPending = false;
+            frameIrqBit     = bus->createIrqCode("APU Frame");
 
+            audTimestamp    = 0;
 
-        Apu_Pulse           pulses;
-        */
+            pulses.setClockRate( info.region.apuClockBase );
+        }
+
+        
+        pulses.reset( info.hardReset );
+        // TODO TND
     }
 
 }

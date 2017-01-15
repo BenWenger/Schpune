@@ -33,6 +33,7 @@ namespace schcore
             aLine = 0;
             dLine = 0;
             wLine = false;
+            cpu = info.cpu;
 
             // reset register IRQs
             irqNames.clear();
@@ -70,8 +71,10 @@ namespace schcore
         dLine = v;
     }
 
-    int CpuBus::peek(u16 a) const
+    int CpuBus::peek(int a) const
     {
+        if(a < 0 || a > 0xFFFF) return -1;
+
         int v = -1;
         for(auto& proc : peekers[a>>12])
         {

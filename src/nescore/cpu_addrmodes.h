@@ -285,6 +285,8 @@ void    adBranch(bool cond)
             if( !wantInterrupt )        pollInterrupt();
             badPageRead( newpc, cpu.PC );
         }
+
+        cpu.PC = newpc;
     }
     else
         rd( cpu.PC++ );

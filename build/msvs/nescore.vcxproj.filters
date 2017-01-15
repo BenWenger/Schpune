@@ -51,6 +51,18 @@
     <ClInclude Include="..\..\src\nescore\audiotimestampholder.h">
       <Filter>private</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\nescore\regioninfo.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\tempnsf.h">
+      <Filter>private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\nescore\tempfront.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\cputracer.h">
+      <Filter>private</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\nescore\cpubus.cpp">
@@ -69,6 +81,15 @@
       <Filter>private</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\nescore\apu.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\nescore\tempnsf.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\nescore\tempfront.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\nescore\cputracer.cpp">
       <Filter>private</Filter>
     </ClCompile>
   </ItemGroup>

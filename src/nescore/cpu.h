@@ -11,6 +11,7 @@ namespace schcore
 {
     struct ResetInfo;
     class CpuBus;
+    class CpuTracer;
 
     class Cpu : public SubSystem
     {
@@ -18,6 +19,12 @@ namespace schcore
         //////////////////////////////////////////////////
         //  Resetting
         void                reset(const ResetInfo& info);
+
+
+        //////////////////////////////////////////////////
+        //  Stuff for NSFs
+        void                primeNsf(u8 A, u8 X, u16 PC);
+        void                unjam()                             { cpuJammed = false;            }
 
         //////////////////////////////////////////////////
         //  Running
@@ -39,12 +46,14 @@ namespace schcore
         u8                  pull();
         void                push(u8 v);
 
+        CpuTracer*          tracer;
         CpuBus*             bus;
         CpuState            cpu;
 
         void                pollInterrupt();
         bool                wantInterrupt;
         bool                wantReset;
+        bool                cpuJammed;
 
         void                performInterrupt(bool sw);
 

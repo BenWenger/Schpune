@@ -2,6 +2,7 @@
 #include "cpu.h"
 #include "cpubus.h"
 #include "resetinfo.h"
+#include "cputracer.h"
 
 namespace schcore
 {
@@ -24,15 +25,30 @@ namespace schcore
         cyc();
         // TODO - check for events and perform them
     }
+
+    void Cpu::primeNsf(u8 A, u8 X, u16 PC)
+    {
+        cpu.A = A;
+        cpu.X = X;
+        cpu.PC = PC;
+        cpu.SP = 0xFF;
+        wantReset = wantInterrupt = false;
+        cpuJammed = false;
+    }
     
     ////////////////////////////////////////////////////
     //  Reset
     void Cpu::reset(const ResetInfo& info)
     {
+        cpuJammed = false;
         wantInterrupt = wantReset = true;
 
         if(info.hardReset)
         {
+            tracer = info.cpuTracer;
+            bus = info.cpuBus;
+
+            subSystem_HardReset(info.cpu, info.region.cpuClockBase);
             cpu.A = 0;
             cpu.X = 0;
             cpu.Y = 0;
@@ -101,6 +117,11 @@ namespace schcore
     //  Run!
     void Cpu::run(timestamp_t runto)
     {
+        if(cpuJammed && (curCyc() < runto))
+        {
+            setMainTimestamp(runto);
+        }
+
         while( curCyc() < runto )
         {
             /////////////////////////////////////
@@ -110,6 +131,9 @@ namespace schcore
                 performInterrupt(false);
                 continue;
             }
+
+            if( *tracer )
+                tracer->traceCpuLine( cpu );
 
             /////////////////////////////////////
             // No interrupt, do an instruction
@@ -318,6 +342,14 @@ namespace schcore
             case 0x84:  adWrZp( cpu.Y );                break;
             case 0x94:  adWrZx( cpu.Y );                break;
             case 0x8C:  adWrAb( cpu.Y );                break;
+
+
+
+                //////////////////////
+            case 0xF2:
+                cpuJammed = true;
+                setMainTimestamp(runto);
+                break;
             }
         }
     }

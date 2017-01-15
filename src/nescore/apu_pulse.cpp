@@ -40,8 +40,8 @@ namespace schcore
 
     void Apu_Pulse::write4015(u8 v)
     {
-        dat[0].length.writeEnable(0x01);
-        dat[1].length.writeEnable(0x02);
+        dat[0].length.writeEnable(v & 0x01);
+        dat[1].length.writeEnable(v & 0x02);
     }
 
     void Apu_Pulse::read4015(u8& v)
@@ -99,6 +99,18 @@ namespace schcore
                 i.dutyMode = 0;
                 i.dutyPhase = 0;
                 i.freqCounter = 1;
+            }
+
+            // TODO -- move this somewhere more appropriate
+            float full = 0.3f;
+            outputLevels[0].resize(0x100);
+            outputLevels[1].resize(0x100);
+            for(int i = 0; i < 0x100; ++i)
+            {
+                float lev = ( i     & 0x0F) * full / 15.0f;
+                lev +=      ((i>>4) & 0x0F) * full / 15.0f;
+                outputLevels[0][i] = lev;
+                outputLevels[1][i] = lev;
             }
         }
         else
