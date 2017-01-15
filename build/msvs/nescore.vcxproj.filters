@@ -63,6 +63,9 @@
     <ClInclude Include="..\..\src\nescore\cputracer.h">
       <Filter>private</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\nescore\apu_tnd.h">
+      <Filter>private</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\nescore\cpubus.cpp">
@@ -90,6 +93,9 @@
       <Filter>private</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\nescore\cputracer.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\nescore\apu_tnd.cpp">
       <Filter>private</Filter>
     </ClCompile>
   </ItemGroup>

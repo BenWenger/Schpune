@@ -130,6 +130,7 @@
     <ClInclude Include="..\..\src\nescore\apu.h" />
     <ClInclude Include="..\..\src\nescore\apu_pulse.h" />
     <ClInclude Include="..\..\src\nescore\apu_support.h" />
+    <ClInclude Include="..\..\src\nescore\apu_tnd.h" />
     <ClInclude Include="..\..\src\nescore\audiobuilder.h" />
     <ClInclude Include="..\..\src\nescore\audiochannel.h" />
     <ClInclude Include="..\..\src\nescore\audiotimestampholder.h" />
@@ -146,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\nescore\apu.cpp" />
     <ClCompile Include="..\..\src\nescore\apu_pulse.cpp" />
+    <ClCompile Include="..\..\src\nescore\apu_tnd.cpp" />
     <ClCompile Include="..\..\src\nescore\audiobuilder.cpp" />
     <ClCompile Include="..\..\src\nescore\audiochannel.cpp" />
     <ClCompile Include="..\..\src\nescore\cpu.cpp" />

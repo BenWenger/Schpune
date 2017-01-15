@@ -69,13 +69,13 @@ namespace schcore
     void Apu::clockSeqHalf()
     {
         pulses.clockSeqHalf();
-        // tnd.clockSeqHalf();      // TODO uncomment when TND is ready
+        tnd.clockSeqHalf();
     }
 
     void Apu::clockSeqQuarter()
     {
         pulses.clockSeqQuarter();
-        // tnd.clockSeqQuarter();      // TODO uncomment when TND is ready
+        tnd.clockSeqQuarter();
     }
 
 
@@ -95,14 +95,14 @@ namespace schcore
         case 0x400C: case 0x400D: case 0x400E: case 0x400F:
         case 0x4010: case 0x4011: case 0x4012: case 0x4013:
             catchUp();
-            //tnd.writeMain(a,v);       TODO uncomment once TND exists
+            tnd.writeMain(a,v);
             break;
 
 
         case 0x4015:
             catchUp();
             pulses.write4015(v);
-            //tnd.write4015(v);       TODO uncomment once TND exists
+            tnd.write4015(v);
             break;
 
         case 0x4017:
@@ -131,7 +131,7 @@ namespace schcore
             catchUp();
             v &= ~0x20;
             pulses.read4015(v);
-            //tnd.read4015(v);       TODO uncomment once TND exists
+            tnd.read4015(v);
 
 
             if(frameIrqPending)
@@ -163,7 +163,7 @@ namespace schcore
 
             // run all channels up to this point
             pulses.run(curCyc(), audTimestamp);
-            // TODO -- add TND when ready
+            tnd.run(curCyc(), audTimestamp);
             // TODO -- add expansion audio when ready
             
             ///////////////////////////////////////
@@ -233,8 +233,9 @@ namespace schcore
             builder = info.audioBuilder;
             builder->addTimestampHolder( this );
             builder->addTimestampHolder( &pulses );
+            builder->addTimestampHolder( &tnd );
             pulses.setBuilder(builder);
-            // TODO TND
+            tnd.setBuilder(builder);
 
             oddCycle        = false;
             seqCounter      = 0;
@@ -249,13 +250,14 @@ namespace schcore
             frameIrqBit     = bus->createIrqCode("APU Frame");
 
             audTimestamp    = 0;
-
+            
             pulses.setClockRate( info.region.apuClockBase );
+            tnd.setClockRate( info.region.apuClockBase );
         }
 
         
         pulses.reset( info.hardReset );
-        // TODO TND
+        tnd.reset( info.hardReset );
     }
 
 }

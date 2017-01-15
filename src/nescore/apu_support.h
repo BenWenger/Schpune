@@ -39,7 +39,7 @@ namespace schcore
     {
     public:
         void                writeLoad(u8 v)     { control = (v & 0x80) != 0;   load = v & 0x7F;     }
-        void                writeHigh(u8 v)     { reload = true;                                    }
+        void                writeHigh()         { reload = true;                                    }
         
         bool                isAudible() const   { return counter != 0;                              }
 

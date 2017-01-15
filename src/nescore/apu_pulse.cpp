@@ -102,13 +102,12 @@ namespace schcore
             }
 
             // TODO -- move this somewhere more appropriate
-            float full = 0.3f;
             outputLevels[0].resize(0x100);
             outputLevels[1].resize(0x100);
             for(int i = 0; i < 0x100; ++i)
             {
-                float lev = ( i     & 0x0F) * full / 15.0f;
-                lev +=      ((i>>4) & 0x0F) * full / 15.0f;
+
+                float lev = (  ( i     & 0x0F) + ((i>>4) & 0x0F)  ) * 0.00752f * 0.8f;
                 outputLevels[0][i] = lev;
                 outputLevels[1][i] = lev;
             }

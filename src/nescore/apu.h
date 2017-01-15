@@ -5,6 +5,7 @@
 #include "schpunetypes.h"
 #include "subsystem.h"
 #include "apu_pulse.h"
+#include "apu_tnd.h"
 #include "audiotimestampholder.h"
 
 
@@ -59,6 +60,7 @@ namespace schcore
 
 
         Apu_Pulse           pulses;
+        Apu_Tnd             tnd;
     };
 
 
