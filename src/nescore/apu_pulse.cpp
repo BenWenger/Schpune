@@ -89,6 +89,8 @@ namespace schcore
     {
         if(hard)
         {
+            channelHardReset();
+
             dat[0].sweep.hardReset(false);
             dat[1].sweep.hardReset(true );
 

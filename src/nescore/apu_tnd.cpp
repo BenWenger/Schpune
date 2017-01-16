@@ -2,6 +2,7 @@
 #include "apu_tnd.h"
 #include "cpubus.h"
 #include "resetinfo.h"
+#include "dmaunit.h"
 #include <algorithm>
 
 
@@ -168,6 +169,8 @@ namespace schcore
     {
         if(info.hardReset)
         {
+            channelHardReset();
+
             tri.length.hardReset();
             tri.linear.hardReset();
             tri.freqCounter = tri.freqTimer = 0x07FF;
@@ -189,7 +192,7 @@ namespace schcore
             dmcIrqEnabled       = false;
             dmcIrqBit           = cpuBus->createIrqCode("DMC");
             dmcLoop             = false;
-                dmcpu .supplier =                                   &dmcPeekSampleBuffer;     // TODO - replace with DMA unit
+                dmcpu .supplier =                                   info.dmaUnit;
                 dmcaud.supplier =                                   &dmcPeekSampleBuffer;
                 dmcpu.freqCounter =     dmcaud.freqCounter =        dmcFreqTimer;
                 dmcpu.addr =            dmcaud.addr =               dmcAddrLoad;
@@ -296,8 +299,8 @@ namespace schcore
 
             if(!isdmcpu && dat.audible)
             {
-                if(dat.outputUnit & 0x01)   { if(dmcOut >    1)     dmcOut -= 2;    }
-                else                        { if(dmcOut < 0x7E)     dmcOut += 2;    }
+                if(dat.outputUnit & 0x01)   { if(dmcOut < 0x7E)     dmcOut += 2;    }
+                else                        { if(dmcOut >    1)     dmcOut -= 2;    }
             }
             dat.outputUnit >>= 1;
 

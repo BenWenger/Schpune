@@ -128,6 +128,7 @@ namespace schcore
         info.cpuTracer =            &tracer;
         info.cpu =                  &cpu;
         info.cpuBus =               &bus;
+        info.dmaUnit =              &dmaUnit;
         info.hardReset =            hard;
         info.suppressIrqs =         true;
         
@@ -145,6 +146,7 @@ namespace schcore
         builder.setClockRates( clock_cycsPerSecond, clock_cycsPerFrame );
 
         bus.reset( info );
+        dmaUnit.reset( info );
         cpu.reset( info );
         apu.reset( info );
 

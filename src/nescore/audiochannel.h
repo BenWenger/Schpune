@@ -24,6 +24,8 @@ namespace schcore
         void                    subtractFromCpuTimestamp(timestamp_t sub)               { cpuTimestamp -= sub;      }
         void                    setClockRate(timestamp_t rate)                          { clockRate = rate;         }
 
+        void                    channelHardReset()                                      { prevOut = 0;  audTimestamp = cpuTimestamp = 0;        }
+
     protected:
         //  To be implemented by derived classes
         virtual int             doTicks(timestamp_t ticks, bool doaudio, bool docpu) = 0;

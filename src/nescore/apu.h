@@ -31,6 +31,9 @@ namespace schcore
         virtual void        subtractFromAudioTimestamp(timestamp_t sub) override    { audTimestamp -= sub;      }
         timestamp_t         getAudTimestamp() const                                 { return audTimestamp;      }
 
+        
+        virtual void        subtractFromMainTimestamp(timestamp_t sub) override;
+
     private:
 
         timestamp_t         calcTicksToRun( timestamp_t now, timestamp_t target ) const;

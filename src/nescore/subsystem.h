@@ -19,7 +19,7 @@ namespace schcore
         timestamp_t     getClockBase() const            { return clockBase;             }
         void            setClockBase(timestamp_t base)  { clockBase = base;             }
 
-        void            subtractFromMainTimestamp(timestamp_t sub)  { timestamp -= sub;     }
+        virtual void    subtractFromMainTimestamp(timestamp_t sub)  { timestamp -= sub;     }
         void            setMainTimestamp(timestamp_t set)           { timestamp = set;      }
 
     protected:

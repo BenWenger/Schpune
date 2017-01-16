@@ -14,6 +14,7 @@
 #include "cpubus.h"
 #include "audiobuilder.h"
 #include "cputracer.h"
+#include "dmaunit.h"
 
 namespace schcore
 {
@@ -63,6 +64,7 @@ namespace schcore
         CpuBus              bus;
         AudioBuilder        builder;
         CpuTracer           tracer;
+        DmaUnit             dmaUnit;
 
         int                 totalTracks;
         int                 currentTrack;

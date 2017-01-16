@@ -12,6 +12,7 @@ namespace schcore
     class           CpuBus;
     class           AudioBuilder;
     class           CpuTracer;
+    class           DmaUnit;
 
     class ResetInfo
     {
@@ -23,6 +24,7 @@ namespace schcore
         Cpu*            cpu;
         CpuBus*         cpuBus;
         AudioBuilder*   audioBuilder;
+        DmaUnit*        dmaUnit;
 
         RegionInfo      region;
     };

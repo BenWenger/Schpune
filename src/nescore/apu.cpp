@@ -18,9 +18,6 @@ namespace schcore
 
     namespace
     {
-
-
-
         ////////////////////////////////////////////////
         //  frame sequencer actions
         enum
@@ -77,7 +74,13 @@ namespace schcore
         pulses.clockSeqQuarter();
         tnd.clockSeqQuarter();
     }
-
+    
+    void Apu::subtractFromMainTimestamp(timestamp_t sub)
+    {
+        SubSystem::subtractFromMainTimestamp(sub);
+        pulses.subtractFromCpuTimestamp(sub);
+        tnd.subtractFromCpuTimestamp(sub);
+    }
 
     //////////////////////////////////////////////////////////
     //   Reg access
