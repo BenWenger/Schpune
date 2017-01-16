@@ -12,6 +12,7 @@ namespace schcore
     class ResetInfo;
     class CpuBus;
     class CpuTracer;
+    class EventManager;
 
     class Cpu : public SubSystem
     {
@@ -48,6 +49,7 @@ namespace schcore
 
         CpuTracer*          tracer;
         CpuBus*             bus;
+        EventManager*       eventManager;
         CpuState            cpu;
 
         void                pollInterrupt();

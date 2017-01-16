@@ -15,6 +15,7 @@
 #include "audiobuilder.h"
 #include "cputracer.h"
 #include "dmaunit.h"
+#include "eventmanager.h"
 
 namespace schcore
 {
@@ -65,6 +66,7 @@ namespace schcore
         AudioBuilder        builder;
         CpuTracer           tracer;
         DmaUnit             dmaUnit;
+        EventManager        eventManager;
 
         int                 totalTracks;
         int                 currentTrack;

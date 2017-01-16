@@ -127,8 +127,10 @@ namespace schcore
         info.audioBuilder =         &builder;
         info.cpuTracer =            &tracer;
         info.cpu =                  &cpu;
+        info.apu =                  &apu;
         info.cpuBus =               &bus;
         info.dmaUnit =              &dmaUnit;
+        info.eventManager =         &eventManager;
         info.hardReset =            hard;
         info.suppressIrqs =         true;
         
@@ -149,6 +151,7 @@ namespace schcore
         dmaUnit.reset( info );
         cpu.reset( info );
         apu.reset( info );
+        eventManager.reset( info );
 
         if(hard)
         {

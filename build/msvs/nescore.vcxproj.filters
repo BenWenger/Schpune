@@ -72,6 +72,9 @@
     <ClInclude Include="..\..\src\nescore\dmaunit.h">
       <Filter>private</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\nescore\eventmanager.h">
+      <Filter>private</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\nescore\cpubus.cpp">
@@ -108,6 +111,9 @@
       <Filter>private</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\nescore\dmaunit.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\nescore\eventmanager.cpp">
       <Filter>private</Filter>
     </ClCompile>
   </ItemGroup>

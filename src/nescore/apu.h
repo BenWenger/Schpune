@@ -14,6 +14,7 @@ namespace schcore
     class ResetInfo;
     class CpuBus;
     class AudioBuilder;
+    class EventManager;
 
     class Apu : public SubSystem, public AudioTimestampHolder
     {
@@ -37,6 +38,7 @@ namespace schcore
     private:
 
         timestamp_t         calcTicksToRun( timestamp_t now, timestamp_t target ) const;
+        void                predictNextEvent();
         
         void                onWrite(u16 a, u8 v);
         void                onRead(u16 a, u8& v);
@@ -46,6 +48,7 @@ namespace schcore
 
         CpuBus*             bus;
         AudioBuilder*       builder;
+        EventManager*       eventManager;
 
         bool                oddCycle;
         timestamp_t         seqCounter;

@@ -3,6 +3,7 @@
 #include "cpubus.h"
 #include "resetinfo.h"
 #include "cputracer.h"
+#include "eventmanager.h"
 
 namespace schcore
 {
@@ -22,8 +23,10 @@ namespace schcore
 
     void Cpu::consumeCycle()
     {
+        if(cpuJammed)       return;
+
         cyc();
-        // TODO - check for events and perform them
+        eventManager->check(curCyc());
     }
 
     void Cpu::primeNsf(u8 A, u8 X, u16 PC)
@@ -47,6 +50,7 @@ namespace schcore
         {
             tracer = info.cpuTracer;
             bus = info.cpuBus;
+            eventManager = info.eventManager;
 
             subSystem_HardReset(info.cpu, info.region.cpuClockBase);
             cpu.A = 0;

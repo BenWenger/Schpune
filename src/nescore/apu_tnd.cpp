@@ -3,26 +3,21 @@
 #include "cpubus.h"
 #include "resetinfo.h"
 #include "dmaunit.h"
+#include "eventmanager.h"
+#include "apu.h"
 #include <algorithm>
 
 
 namespace schcore
 {
     
-    const u16 Apu_Tnd::noiseFreqLut[2][0x10] = 
-    {
-        // NTSC
-        { 4, 8, 16, 32, 64, 96, 128, 160, 202, 254, 380, 508, 762, 1016, 2034, 4068 },
-        // PAL
-        { 4, 8, 14, 30, 60, 88, 118, 148, 188, 236, 354, 472, 708,  944, 1890, 3778 }
+    const u16 Apu_Tnd::noiseFreqLut[2][0x10] = {
+        { 4, 8, 16, 32, 64, 96, 128, 160, 202, 254, 380, 508, 762, 1016, 2034, 4068 },          // NTSC
+        { 4, 8, 14, 30, 60, 88, 118, 148, 188, 236, 354, 472, 708,  944, 1890, 3778 }           // PAL
     };
-    
-    const int Apu_Tnd::dmcFreqLut[2][0x10] = 
-    {
-        // NTSC
-        { 428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106,  84,  72,  54 },
-        // PAL
-        { 398, 354, 316, 298, 276, 236, 210, 198, 176, 148, 132, 118,  98,  78,  66,  50 }
+    const int Apu_Tnd::dmcFreqLut[2][0x10] = {
+        { 428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106,  84,  72,  54 },     // NTSC
+        { 398, 354, 316, 298, 276, 236, 210, 198, 176, 148, 132, 118,  98,  78,  66,  50 }      // PAL
     };
 
 
@@ -72,7 +67,8 @@ namespace schcore
 
             dmcLoop = (v & 0x40) != 0;
             dmcFreqTimer = dmcFreqLut[0][v & 0x0F];         // TODO - catch PAL
-            // TODO - predict IRQ
+            
+            predictNextEvent();     // time of next fetch may have changed, predict next event
             break;
         case 0x4011:
             dmcOut = v & 0x7F;
@@ -111,7 +107,7 @@ namespace schcore
                 doDmcFetch(dmcpu,true);
                 doDmcFetch(dmcaud,false);
 
-                // TODO predict IRQ
+                predictNextEvent();     // length became nonzero, predict next event
             }
         }
         else
@@ -184,6 +180,8 @@ namespace schcore
 
             dmcPeekSampleBuffer.reset(info);
             cpuBus              = info.cpuBus;
+            eventManager        = info.eventManager;
+            apuHost             = info.apu;
             dmcOut              = 0;
             dmcFreqTimer        = dmcFreqLut[0][0];     // TODO - catch PAL
             dmcAddrLoad         = 0xC000;
@@ -309,7 +307,34 @@ namespace schcore
                 dat.bitsRemaining = 8;
                 dat.supplier->getFetchedByte( dat.outputUnit, dat.audible );
                 doDmcFetch( dat, isdmcpu );
+
+                if(isdmcpu)
+                    predictNextEvent();
             }
         }
+    }
+
+    void Apu_Tnd::predictNextEvent()
+    {
+        //////////////////////////////////////////
+        //  DMC has 2 noteworthy events:  DMA cycle stealing, and DMC IRQ
+        //
+        //  fortunately, the IRQ is performed at the same time as the cycle stealing (it happens when the last
+        //     sample byte is fetched), therefore we only need to report the cycle stealing event.
+
+
+        //  cycle stealing will happen only if the dmcpu has a nonzero length
+        if(!dmcpu.len)      return;
+
+        // next stolen cycle will happen when all remaining bits get shifted out
+        timestamp_t ticks = dmcpu.freqCounter;
+        if(dmcpu.bitsRemaining > 1)
+            ticks += dmcFreqTimer * (dmcpu.bitsRemaining-1);
+
+        // scale that up to an actual timestamp
+        ticks *= apuHost->getClockBase();
+        ticks += apuHost->curCyc();
+
+        eventManager->addEvent( ticks, EventType::evt_apu );
     }
 }

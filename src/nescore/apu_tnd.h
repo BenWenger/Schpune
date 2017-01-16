@@ -14,6 +14,8 @@ namespace schcore
     //   This class is for Triangle/Noise/DMC (hence 'TND')
     //  Since the output of one impacts the output of the others
     class ResetInfo;
+    class EventManager;
+    class Apu;
 
     class Apu_Tnd : public AudioChannel
     {
@@ -63,6 +65,8 @@ namespace schcore
         //  Dmc
         Dmc_PeekSampleBuffer    dmcPeekSampleBuffer;
         CpuBus*                 cpuBus;
+        EventManager*           eventManager;
+        Apu*                    apuHost;
         u8                      dmcOut;
         int                     dmcFreqTimer;
         u16                     dmcAddrLoad;
@@ -89,6 +93,8 @@ namespace schcore
         void                    startDmcClip(DmcData& dat);
         void                    doDmcFetch(DmcData& dat, bool isdmcpu);
         void                    runDmc(DmcData& dat, timestamp_t ticks, bool isdmcpu);
+
+        void                    predictNextEvent();
     };
 
 

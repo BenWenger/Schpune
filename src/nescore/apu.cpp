@@ -5,6 +5,7 @@
 #include "cpubus.h"
 #include "audiobuilder.h"
 #include "resetinfo.h"
+#include "eventmanager.h"
 
 namespace schcore
 {
@@ -39,7 +40,7 @@ namespace schcore
         const int FrSeqPhases[2][8] =
         {
             // 4-step mode
-            { FSQ,      FSH,        FSQ,    FrSeq_Irq,      FSA,        FrSeq_Irq | FrSeq_End       },
+            { FSQ,      FSH,        FSQ,    FrSeq_Irq,      FSA,        FrSeq_Irq | FrSeq_End       },      // last entry must have FrSeq_Irq in it or predictNextEvent will break
             // 5-step mode
             { FSQ,      FSH,        FSQ,    FSH,            FrSeq_End                               }
         };
@@ -120,9 +121,8 @@ namespace schcore
 
             newSeqMode = v;
             modeResetCounter = (oddCycle ? 3 : 2);      // TODO -- might have these backwards!  verify!
-
-            // TODO -- predict next IRQ
-
+            
+            predictNextEvent();
             break;
         }
     }
@@ -142,6 +142,7 @@ namespace schcore
                 v |= 0x40;
                 frameIrqPending = false;
                 bus->acknowledgeIrq( frameIrqBit );
+                predictNextEvent();
             }
         }
     }
@@ -226,6 +227,8 @@ namespace schcore
             subSystem_HardReset(info.cpu, info.region.apuClockBase);
             // TODO - clear expansion audio list
 
+            eventManager = info.eventManager;
+
             // capture the bus
             bus = info.cpuBus;
             bus->addReader(0x4,0x4,this,&Apu::onRead);
@@ -261,6 +264,64 @@ namespace schcore
         
         pulses.reset( info.hardReset );
         tnd.reset( info );
+        predictNextEvent();
+    }
+
+    ///////////////////////////////////////////////////
+    //  IRQ prediction
+
+    void Apu::predictNextEvent()
+    {
+        if(frameIrqPending)     return;     // if IRQ is already pending, no need to check for next one
+        if(!frameIrqEnabled)    return;     // if IRQs aren't enabled, no need to check for them
+        
+        // The 'delay' counter after writing to $4017 complicates this a bit, because we
+        //   have to check the current mode, then we have to check the mode we switch to
+
+        // So first, record the current mode
+        timestamp_t ticks = 0;
+        timestamp_t cntr = seqCounter;
+        int nextphase = nextSeqPhase;
+
+        // If a reset is pending -- check the time before it resets
+        if(modeResetCounter > 0)
+        {
+            // IRQs only exist in 4-step mode
+            //   Also, we only have to check ahead one phase
+            //   and only if that phase will trigger before the mode reset occurs
+            if(!seqMode && (seqCounter <= modeResetCounter) && (FrSeqPhases[0][nextSeqPhase] & FrSeq_Irq))
+            {
+                // it'll happen in 'seqCounter' ticks!
+                ticks = (seqCounter * getClockBase()) + curCyc();
+                eventManager->addEvent(ticks, EventType::evt_apu);
+                return;
+            }
+
+            // otherwise, it won't happen before the reset.  Switch the mode we're checking to the new mode
+            if(newSeqMode & 0x80)       return;     // won't happen in 5-step mode
+
+            ticks = modeResetCounter;
+            cntr = FrSeqTimes[0][0];
+            nextphase = 0;
+        }
+
+        // IRQ is for sure going to happen eventually (unless they get disabled or mode changes or whatever -- 
+        //   but we don't care about that for this prediction)
+        //
+        // So start walking through all the phases until you find an IRQ
+        while(true)
+        {
+            ticks += cntr;
+            if(FrSeqPhases[0][nextphase] & FrSeq_Irq)       break;      // found it!
+            ++nextphase;
+            cntr = FrSeqTimes[0][nextphase];
+        }
+
+        // 'ticks' is the number of cycles that need to happen before the IRQ.  convert that to a timestamp
+        ticks *= getClockBase();
+        ticks += curCyc();
+
+        eventManager->addEvent(ticks, EventType::evt_apu);
     }
 
 }

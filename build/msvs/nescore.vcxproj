@@ -142,6 +142,7 @@
     <ClInclude Include="..\..\src\nescore\cpu_instructions.h" />
     <ClInclude Include="..\..\src\nescore\dmaunit.h" />
     <ClInclude Include="..\..\src\nescore\dmc_supplier.h" />
+    <ClInclude Include="..\..\src\nescore\eventmanager.h" />
     <ClInclude Include="..\..\src\nescore\resetinfo.h" />
     <ClInclude Include="..\..\src\nescore\subsystem.h" />
     <ClInclude Include="..\..\src\nescore\tempnsf.h" />
@@ -157,6 +158,7 @@
     <ClCompile Include="..\..\src\nescore\cputracer.cpp" />
     <ClCompile Include="..\..\src\nescore\dmaunit.cpp" />
     <ClCompile Include="..\..\src\nescore\dmc_supplier.cpp" />
+    <ClCompile Include="..\..\src\nescore\eventmanager.cpp" />
     <ClCompile Include="..\..\src\nescore\tempfront.cpp" />
     <ClCompile Include="..\..\src\nescore\tempnsf.cpp" />
   </ItemGroup>
