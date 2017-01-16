@@ -14,6 +14,9 @@ namespace schcore
         
         timestamp_t         masterCyclesPerSecond;
         timestamp_t         masterCyclesPerFrame;
+
+        enum class ApuTables
+        { ntsc=0, pal=1 }   apuTables;
     };
 }
 

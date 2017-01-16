@@ -34,6 +34,36 @@ namespace schcore
         void                    addTimestampHolder(AudioTimestampHolder* holder)        { audioTimestampHolders.push_back(holder);      }
 
     private:
+        class LowPassFilter
+        {
+        public:
+            void                setBase(float b);
+            void                reset();
+            void                setSamplerate(int samplerate);
+            float               samp(float in);
+
+        private:
+            float               prev_out = 0;
+            float               k = 0;
+            float               base = 0;
+        };
+
+        class HighPassFilter
+        {
+        public:
+            void                setBase(float b);
+            void                reset();
+            void                setSamplerate(int samplerate);
+            float               samp(float in);
+
+        private:
+            float               prev_in = 0;
+            float               prev_out = 0;
+            float               k = 0;
+            float               base = 0;
+        };
+
+
         void                    recalc();
         void                    flushTransitionBuffers();
         int                     sampleRate;
@@ -49,6 +79,10 @@ namespace schcore
         float                   outSample[2];
         std::vector<float>      transitionBuffer[2];        // [0] = left, [1] = right
         bool                    stereo;
+        
+        LowPassFilter           lp[2];
+        HighPassFilter          hp1[2];
+        HighPassFilter          hp2[2];
 
         std::vector<AudioTimestampHolder*>  audioTimestampHolders;
     };

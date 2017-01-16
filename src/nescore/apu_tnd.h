@@ -67,6 +67,7 @@ namespace schcore
         CpuBus*                 cpuBus;
         EventManager*           eventManager;
         Apu*                    apuHost;
+        int                     region = 0;
         u8                      dmcOut;
         int                     dmcFreqTimer;
         u16                     dmcAddrLoad;

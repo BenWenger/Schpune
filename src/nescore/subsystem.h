@@ -34,7 +34,7 @@ namespace schcore
 
         void            subSystem_HardReset(SubSystem* drivingclock, timestamp_t clkbase)
         {
-            timestamp = 0;              // TODO?  make this region dependent
+            timestamp = 0;
             clockBase = clkbase;
             drivingClock = drivingclock;
         }

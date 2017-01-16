@@ -48,7 +48,7 @@ namespace schcore
             break;
         case 0x400E:
             nse.shiftMode =     (v & 0x80) ? 9 : 14;
-            nse.freqTimer =     noiseFreqLut[0][v & 0x0F];           // TODO - catch PAL
+            nse.freqTimer =     noiseFreqLut[region][v & 0x0F];
             break;
         case 0x400F:
             nse.length.writeLoad(v);
@@ -66,7 +66,7 @@ namespace schcore
             }
 
             dmcLoop = (v & 0x40) != 0;
-            dmcFreqTimer = dmcFreqLut[0][v & 0x0F];         // TODO - catch PAL
+            dmcFreqTimer = dmcFreqLut[region][v & 0x0F];
             
             predictNextEvent();     // time of next fetch may have changed, predict next event
             break;
@@ -167,6 +167,8 @@ namespace schcore
         {
             channelHardReset();
 
+            region = (info.region.apuTables == RegionInfo::ApuTables::pal);
+
             tri.length.hardReset();
             tri.linear.hardReset();
             tri.freqCounter = tri.freqTimer = 0x07FF;
@@ -174,7 +176,7 @@ namespace schcore
 
             nse.decay.hardReset();
             nse.length.hardReset();
-            nse.freqTimer = nse.freqTimer = noiseFreqLut[0][0x0F];       // TODO - catch PAL
+            nse.freqTimer = nse.freqTimer = noiseFreqLut[region][0x0F];
             nse.shiftMode = 14;
             nse.shifter = 1;
 
@@ -183,7 +185,7 @@ namespace schcore
             eventManager        = info.eventManager;
             apuHost             = info.apu;
             dmcOut              = 0;
-            dmcFreqTimer        = dmcFreqLut[0][0];     // TODO - catch PAL
+            dmcFreqTimer        = dmcFreqLut[region][0];
             dmcAddrLoad         = 0xC000;
             dmcLenLoad          = 0x0FF1;
             dmcIrqPending       = false;

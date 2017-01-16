@@ -139,6 +139,7 @@ namespace schcore
         info.region.cpuClockBase =  1;
         info.region.masterCyclesPerSecond = clock_cycsPerSecond;
         info.region.masterCyclesPerFrame  = clock_cycsPerFrame;
+        info.region.apuTables =     RegionInfo::ApuTables::ntsc;
 
         
         ///////////////////////////////////////////

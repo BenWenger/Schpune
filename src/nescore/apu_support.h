@@ -27,7 +27,7 @@ namespace schcore
         void                hardReset()         { counter = 0; halted = enabled = false;            }
 
     private:
-        static const u8     loadTable[0x20];        // TODO fill this array
+        static const u8     loadTable[0x20];
         u8                  counter;
         bool                halted;
         bool                enabled;

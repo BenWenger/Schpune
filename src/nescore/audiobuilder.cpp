@@ -7,6 +7,16 @@ namespace schcore
 {
     AudioBuilder::AudioBuilder()
     {
+        for(int i = 0; i < 2; ++i)
+        {
+            lp[i].setBase( 0.1693384875f );
+            hp1[i].setBase( 0.00363916875f );
+            hp2[i].setBase( 0.00015159375f );
+            
+            lp[i].setSamplerate(48000);
+            hp1[i].setSamplerate(48000);
+            hp2[i].setSamplerate(48000);
+        }
         sampleRate = 48000;
         stereo = false;
 
@@ -31,6 +41,16 @@ namespace schcore
     ////////////////////////////////////////////////////
     //  Generate audio samples!!!
 
+    namespace
+    {
+        inline s16 tosamp(float f)
+        {
+            if(f >  1.0f)       return  0x7FFF;
+            if(f < -1.0f)       return -0x7FFF;
+            return static_cast<s16>( f * 0x7FFF );
+        }
+    }
+
     int AudioBuilder::generateSamples(int startpos, s16* audio, int count_in_s16s)
     {
         int maxtopull = bufferSizeInElements - startpos;
@@ -39,7 +59,14 @@ namespace schcore
 
         if(stereo)
         {
-            // TODO
+            for(int i = 0; i < actual; ++i)
+            {
+                outSample[0] += transitionBuffer[0][startpos + i];
+                outSample[1] += transitionBuffer[1][startpos + i];
+                
+                audio[(i*2)+0] = tosamp( hp2[0].samp( hp1[0].samp( lp[0].samp( outSample[0] ) ) ) );
+                audio[(i*2)+1] = tosamp( hp2[1].samp( hp1[1].samp( lp[1].samp( outSample[1] ) ) ) );
+            }
 
             return actual * 2;
         }
@@ -49,14 +76,7 @@ namespace schcore
             {
                 outSample[0] += transitionBuffer[0][startpos + i];
 
-                // TODO -- add REAL filters here.. this is temporary!
-                outSample[0] -= outSample[0] * 0.01f;
-                s16 v;
-                if     (outSample[0] < -0x7FFF)     v = -0x7FFF;
-                else if(outSample[0] >  0x7FFF)     v =  0x7FFF;
-                else                                v = static_cast<s16>( outSample[0] * 0x7FFF );
-
-                audio[i] = v;
+                audio[i] = tosamp( hp2[0].samp( hp1[0].samp( lp[0].samp( outSample[0] ) ) ) );
             }
 
             return actual;
@@ -136,6 +156,13 @@ namespace schcore
         sampleRate = set_samplerate;
         stereo = set_stereo;
 
+        for(int i = 0; i < 2; ++i)
+        {
+            lp[i].setSamplerate(sampleRate);
+            hp1[i].setSamplerate(sampleRate);
+            hp2[i].setSamplerate(sampleRate);
+        }
+
         recalc();
     }
     
@@ -188,11 +215,15 @@ namespace schcore
 
     void AudioBuilder::flushTransitionBuffers()
     {
-        outSample[0] = 0;
-        outSample[1] = 0;
-        
-        transitionBuffer[0].clear();
-        transitionBuffer[1].clear();
+        for(int i = 0; i < 2; ++i)
+        {
+            outSample[i] = 0;
+            lp[i].reset();
+            hp1[i].reset();
+            hp2[i].reset();
+
+            transitionBuffer[i].clear();
+        }
 
         transitionBuffer[0].resize( bufferSizeInElements, 0.0f );
         if(stereo)
@@ -260,21 +291,61 @@ namespace schcore
         //  This should never happen... but just in case....
         if(sampletime >= bufferSizeInElements)      return;     // transition is too far out... abort!
 
+        float t;
         if(stereo)
         {
+            float err_l = 0;
+            float err_r = 0;
             for(int i = 0; i < 13; ++i)
             {
-                transitionBuffer[0][ sampletime + i ] += l * set[i];
-                transitionBuffer[1][ sampletime + i ] += r * set[i];
+                t = l*set[i];           err_l += t;
+                transitionBuffer[0][ sampletime + i ] += t;
+
+                t = r*set[i];           err_r += t;
+                transitionBuffer[1][ sampletime + i ] += t;
             }
+            transitionBuffer[0][sampletime+7] += l - err_l;
+            transitionBuffer[1][sampletime+7] += r - err_r;
         }
         else
         {
+            float err = 0;
             for(int i = 0; i < 13; ++i)
             {
-                transitionBuffer[0][ sampletime + i ] += l * set[i];
+                t = l*set[i];
+                err += t;
+                transitionBuffer[0][ sampletime + i ] += t;
             }
+            transitionBuffer[0][sampletime+7] += l - err;
         }
     }
+    
+    ///////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////
+    //  Filter stuffs
 
+    void AudioBuilder::LowPassFilter::setBase(float b)      { base = b;     }
+    void AudioBuilder::LowPassFilter::reset()               { prev_out = 0; }
+    void AudioBuilder::LowPassFilter::setSamplerate(int samplerate)
+    {
+        k = 1.0f - std::pow( base, 48000.0f / samplerate );
+    }
+    inline float AudioBuilder::LowPassFilter::samp(float in)
+    {
+        return prev_out = prev_out + ((in - prev_out) * k);
+    }
+    
+    void AudioBuilder::HighPassFilter::setBase(float b)      { base = b;                }
+    void AudioBuilder::HighPassFilter::reset()               { prev_out = prev_in = 0;  }
+    void AudioBuilder::HighPassFilter::setSamplerate(int samplerate)
+    {
+        k = 1.0f - (base * 48000 / samplerate);
+    }
+    inline float AudioBuilder::HighPassFilter::samp(float in)
+    {
+        prev_out = (prev_out * k) + in - prev_in;
+        prev_in = in;
+        return prev_out;
+    }
 }
