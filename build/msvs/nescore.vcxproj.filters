@@ -75,6 +75,9 @@
     <ClInclude Include="..\..\src\nescore\eventmanager.h">
       <Filter>private</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\nescore\audiosettings.h">
+      <Filter>public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\nescore\cpubus.cpp">

@@ -4,7 +4,9 @@
 #include "audiobuilder.h"
 
 namespace schcore
-{    
+{
+    const float AudioChannel::baseNativeOutputLevel = 1.3f;
+
     inline timestamp_t AudioChannel::calcTicksToRun( timestamp_t now, timestamp_t target ) const
     {
         if(now >= target)
@@ -54,5 +56,28 @@ namespace schcore
         }
     }
 
+    ////////////////////////////////////////////
+    
+    void AudioChannel::updateSettings(const AudioSettings& settings, ChannelId chanid)
+    {
+        recalcOutputLevels( settings, chanid, outputLevels );
+    }
+    
+    std::pair<float,float> AudioChannel::getVolMultipliers(const AudioSettings& settings, ChannelId chanid)
+    {
+        std::pair<float,float>  out;
+
+        out.first = out.second = settings.chans[chanid].vol;
+
+        if(settings.stereo)
+        {
+            float pan = settings.chans[chanid].pan;
+
+            if(pan < 0)     out.second *= 1.0f + pan;
+            if(pan > 0)     out.first  *= 1.0f - pan;
+        }
+
+        return out;
+    }
 
 }

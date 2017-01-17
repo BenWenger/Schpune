@@ -200,20 +200,6 @@ namespace schcore
                 dmcpu.outputUnit =      dmcaud.outputUnit =         0;
                 dmcpu.bitsRemaining =   dmcaud.bitsRemaining =      8;
                 dmcpu.audible =         dmcaud.audible =            false;
-            
-            // TODO -- move this somewhere more appropriate
-            outputLevels[0].resize(0x8000);
-            outputLevels[1].resize(0x8000);
-            for(int i = 0; i < 0x8000; ++i)
-            {
-                int t = (i & 0x000F);
-                int n = (i >> 4) & 0x0F;
-                int d = (i >> 8) & 0x7F;
-                float lev = (0.00851f * t) + (0.00494f * n) + (0.00335f * d);
-                lev *= 0.8f;
-                outputLevels[0][i] = lev;
-                outputLevels[1][i] = lev;
-            }
         }
         else
         {
@@ -338,5 +324,57 @@ namespace schcore
         ticks += apuHost->curCyc();
 
         eventManager->addEvent( ticks, EventType::evt_apu );
+    }
+
+    
+    
+    void Apu_Tnd::recalcOutputLevels(const AudioSettings& settings, ChannelId chanid, std::vector<float> (&levels)[2])
+    {
+        levels[0].resize(0x8000);
+        levels[1].resize(0x8000);
+
+        /*
+                                       159.79
+tnd_out = -------------------------------------------------------------
+                                    1
+           ----------------------------------------------------- + 100
+            (triangle / 8227) + (noise / 12241) + (dmc / 22638)
+        */
+
+        float mvol = static_cast<float>( settings.masterVol * baseNativeOutputLevel );
+        
+        auto tri = getVolMultipliers( settings, ChannelId::triangle );
+        auto nse = getVolMultipliers( settings, ChannelId::noise );
+        auto dmc = getVolMultipliers( settings, ChannelId::dmc );
+        
+        float t;
+        for(int i = 0; i < 0x8000; ++i)
+        {
+            // L
+            t       = (i & 0x000F) * tri.first / 8227;
+            t      += ((i & 0x00F0) >> 4) * nse.first / 12241;
+            t      += ( i >> 8 ) * dmc.first / 22638;
+            if(t != 0)
+            {
+                t = 1 / t;
+                t += 100;
+                t = 159.79 / t;
+                t *= mvol;
+            }
+            levels[0][i] = t;
+                
+            // R
+            t       = (i & 0x000F) * tri.second / 8227;
+            t      += ((i & 0x00F0) >> 4) * nse.second / 12241;
+            t      += ( i >> 8 ) * dmc.second / 22638;
+            if(t != 0)
+            {
+                t = 1 / t;
+                t += 100;
+                t = 159.79 / t;
+                t *= mvol;
+            }
+            levels[1][i] = t;
+        }
     }
 }

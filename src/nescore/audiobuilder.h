@@ -9,6 +9,7 @@
 namespace schcore
 {
     class AudioTimestampHolder;
+    class Apu;
 
     class AudioBuilder
     {
@@ -24,14 +25,17 @@ namespace schcore
         int                     samplesAvailableAtTimestamp( timestamp_t time );        // returns how many samples will be available at given [audio] timestamp
         timestamp_t             timestampToProduceSamples( int s16s );                  // returns what [audio] timestamp you need to run to to get this many samples
 
-        void                    setFormat( int samplerate, bool stereo );
         void                    setClockRates( timestamp_t clocks_per_second, timestamp_t clocks_per_frame );
 
         timestamp_t             getMaxAllowedTimestamp() const  { return clocksPerFrame;        }
         int                     getSampleRate() const           { return sampleRate;            }
         bool                    isStereo() const                { return stereo;                }
 
+    private:
+        // Interface for the APU
+        friend class Apu;
         void                    addTimestampHolder(AudioTimestampHolder* holder)        { audioTimestampHolders.push_back(holder);      }
+        void                    setFormat( int samplerate, bool stereo );
 
     private:
         class LowPassFilter

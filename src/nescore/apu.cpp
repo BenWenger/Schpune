@@ -84,6 +84,44 @@ namespace schcore
     }
 
     //////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////
+
+    Apu::Apu()
+    {
+        builder                     = nullptr;
+        audSettings.masterVol       = 1.0f;
+        audSettings.sampleRate      = 48000;
+        audSettings.stereo          = false;
+        for(auto& i : audSettings.chans)
+        {
+            i.vol                   = 1.0f;
+            i.pan                   = 0.0;
+        }
+
+        setAudioSettings(audSettings);
+    }
+
+    void Apu::setAudioSettings(const AudioSettings& settings)
+    {
+        audSettings = settings;
+
+        // enforce that pan is within proper range
+        for(auto& i : audSettings.chans)
+        {
+            if(i.pan < -1.0f)       i.pan = -1.0f;
+            if(i.pan >  1.0f)       i.pan =  1.0f;
+        }
+
+        if(builder)
+            builder->setFormat( audSettings.sampleRate, audSettings.stereo );
+        
+        pulses.updateSettings( audSettings, ChannelId::pulse0 );
+        tnd.updateSettings( audSettings, ChannelId::triangle );
+
+        // TODO - forward to expansion audio
+    }
+
+    //////////////////////////////////////////////////////////
     //   Reg access
     void Apu::onWrite(u16 a, u8 v)
     {
@@ -237,6 +275,7 @@ namespace schcore
 
             // capture the builder
             builder = info.audioBuilder;
+            builder->setFormat( audSettings.sampleRate, audSettings.stereo );
             builder->addTimestampHolder( this );
             builder->addTimestampHolder( &pulses );
             builder->addTimestampHolder( &tnd );

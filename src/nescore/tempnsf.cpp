@@ -145,7 +145,6 @@ namespace schcore
         ///////////////////////////////////////////
         if(hard)
             builder.hardReset();
-        builder.setFormat( 48000, false );
         builder.setClockRates( clock_cycsPerSecond, clock_cycsPerFrame );
 
         bus.reset( info );

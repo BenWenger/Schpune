@@ -3,13 +3,16 @@
 #define SCHPUNE_NESCORE_AUDIOCHANNEL_H_INCLUDED
 
 #include <vector>
+#include <utility>
 #include "schpunetypes.h"
 #include "audiotimestampholder.h"
+#include "audiosettings.h"
 
 
 namespace schcore
 {
     class AudioBuilder;
+    struct AudioSettings;
 
     class AudioChannel : public AudioTimestampHolder
     {
@@ -26,18 +29,22 @@ namespace schcore
 
         void                    channelHardReset()                                      { prevOut = 0;  audTimestamp = cpuTimestamp = 0;        }
 
+        void                    updateSettings(const AudioSettings& settings, ChannelId chanid);
+
     protected:
         //  To be implemented by derived classes
         virtual int             doTicks(timestamp_t ticks, bool doaudio, bool docpu) = 0;
         virtual timestamp_t     clocksToNextUpdate() = 0;
+        virtual void            recalcOutputLevels(const AudioSettings& settings, ChannelId chanid, std::vector<float> (&levels)[2]) = 0;
 
-        // TODO - calculate output levels
+        // Used by derived classes
+        static const float              baseNativeOutputLevel;
+        static std::pair<float,float>   getVolMultipliers(const AudioSettings& settings, ChannelId chanid);
+
 
     private:
         timestamp_t             calcTicksToRun( timestamp_t now, timestamp_t target ) const;
-    protected:  // TODO
         std::vector<float>      outputLevels[2];
-    private:    // TODO
 
         timestamp_t             clockRate;
         timestamp_t             audTimestamp;

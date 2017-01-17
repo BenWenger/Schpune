@@ -7,6 +7,7 @@
 #include "apu_pulse.h"
 #include "apu_tnd.h"
 #include "audiotimestampholder.h"
+#include "audiosettings.h"
 
 
 namespace schcore
@@ -19,9 +20,16 @@ namespace schcore
     class Apu : public SubSystem, public AudioTimestampHolder
     {
     public:
+                            Apu();
+
         //////////////////////////////////////////////////
         //  Resetting
         void                reset(const ResetInfo& info);
+
+        //////////////////////////////////////////////////
+        //  Output configuration
+        AudioSettings       getAudioSettings() const                                { return audSettings;      }
+        void                setAudioSettings(const AudioSettings& settings);
 
         //////////////////////////////////////////////////
         //  Running
@@ -67,6 +75,8 @@ namespace schcore
 
         Apu_Pulse           pulses;
         Apu_Tnd             tnd;
+
+        AudioSettings       audSettings;
     };
 
 

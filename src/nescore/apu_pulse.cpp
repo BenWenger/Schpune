@@ -102,22 +102,76 @@ namespace schcore
                 i.dutyPhase = 0;
                 i.freqCounter = 1;
             }
-
-            // TODO -- move this somewhere more appropriate
-            outputLevels[0].resize(0x100);
-            outputLevels[1].resize(0x100);
-            for(int i = 0; i < 0x100; ++i)
-            {
-
-                float lev = (  ( i     & 0x0F) + ((i>>4) & 0x0F)  ) * 0.00752f * 0.8f;
-                outputLevels[0][i] = lev;
-                outputLevels[1][i] = lev;
-            }
         }
         else
         {
             dat[0].length.writeEnable(0);
             dat[1].length.writeEnable(0);
+        }
+    }
+    
+    void Apu_Pulse::recalcOutputLevels(const AudioSettings& settings, ChannelId chanid, std::vector<float> (&levels)[2])
+    {
+        levels[0].resize(0x100);
+        levels[1].resize(0x100);
+
+        /*
+                          95.88
+pulse_out = ------------------------------------
+             (8128 / (pulse1 + pulse2)) + 100
+
+             at max output, pulse_out = 0.25848310567936736161035226455787
+        */
+
+        static const float normalMaxOutput = 0.25848310567936736161035226455787f;
+        float mvol = static_cast<float>( settings.masterVol * baseNativeOutputLevel );
+        
+        auto p_0 = getVolMultipliers( settings, ChannelId::pulse0 );
+        auto p_1 = getVolMultipliers( settings, ChannelId::pulse1 );
+        
+        float t;
+
+        if(settings.nonLinearPulse)
+        {
+            //  Non-linear pulse is more accurate, but has aliasing
+            for(int i = 0; i < 0x100; ++i)
+            {
+                // L
+                t       = (i & 0x0F) * p_0.first;
+                t      += ( i >> 4 ) * p_1.first;
+                if(t != 0)
+                {
+                    t = (8128 / t) + 100;
+                    t = mvol * 95.88f / t;
+                }
+                levels[0][i] = t;
+                
+                // R
+                t       = (i & 0x0F) * p_0.second;
+                t      += ( i >> 4 ) * p_1.second;
+                if(t != 0)
+                {
+                    t = (8128 / t) + 100;
+                    t = mvol * 95.88f / t;
+                }
+                levels[1][i] = t;
+            }
+        }
+        else
+        {
+            // Linear pulse removes aliasing, but not accurate (aliasing existed on real system)
+            for(int i = 0; i < 0x100; ++i)
+            {
+                // L
+                t       = (i & 0x0F) * p_0.first / 15.0f;
+                t      += ( i >> 4 ) * p_1.first / 15.0f;
+                levels[0][i] = t * normalMaxOutput * mvol;
+                
+                // R
+                t       = (i & 0x0F) * p_0.second / 15.0f;
+                t      += ( i >> 4 ) * p_1.second / 15.0f;
+                levels[1][i] = t * normalMaxOutput * mvol;
+            }
         }
     }
 }

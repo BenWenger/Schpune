@@ -124,6 +124,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\nescore\audiosettings.h" />
     <ClInclude Include="..\..\include\nescore\regioninfo.h" />
     <ClInclude Include="..\..\include\nescore\schpunetypes.h" />
     <ClInclude Include="..\..\include\nescore\tempfront.h" />
