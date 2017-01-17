@@ -28,7 +28,7 @@ namespace schcore
     {
     }
 
-    bool TempNsf::load(const char* filename)
+    bool TempNsf::load(const char* filename, bool stereo)
     {
         FILE* file = fopen(filename, "rb");
         if(!file)                                   return false;
@@ -92,6 +92,13 @@ namespace schcore
         ////////////////////////////////////////////
         // Do a hard reset
         internalReset(true);
+        
+
+            auto set = apu.getAudioSettings();
+            set.chans[ChannelId::pulse0].pan = -1.0f;
+            set.chans[ChannelId::pulse1].pan =  1.0f;
+            set.stereo = stereo;
+            apu.setAudioSettings(set);
 
         setTrack(currentTrack);
         return true;
@@ -220,17 +227,17 @@ namespace schcore
 
         cpu.unjam();
 
-        return availableSamples();
+        return availableAudio();
     }
 
-    int TempNsf::availableSamples()
+    int TempNsf::availableAudio()
     {
-        return builder.samplesAvailableAtTimestamp( apu.getAudTimestamp() );
+        return builder.audioAvailableAtTimestamp( apu.getAudTimestamp() );
     }
     
     int TempNsf::getSamples(s16* bufa, int siza, s16* bufb, int sizb)
     {
-        int avail = availableSamples();
+        int avail = availableAudio();
 
         if(siza > avail)    siza = avail;
         builder.generateSamples(0, bufa, siza);

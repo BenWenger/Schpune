@@ -19,11 +19,11 @@ namespace schcore
         void                    hardReset();
 
         void                    addTransition( timestamp_t clocktime, float l, float r );
-        int                     generateSamples( int startpos, s16* audio, int count_in_s16s );
-        void                    wipeSamples( int count_in_s16s );
+        int                     generateSamples( int startbytepos, s16* audio, int sizeinbytes );
+        void                    wipeSamples( int sizeinbytes );
 
-        int                     samplesAvailableAtTimestamp( timestamp_t time );        // returns how many samples will be available at given [audio] timestamp
-        timestamp_t             timestampToProduceSamples( int s16s );                  // returns what [audio] timestamp you need to run to to get this many samples
+        int                     audioAvailableAtTimestamp( timestamp_t time );          // returns how many bytes of audio will be available at given [audio] timestamp
+        timestamp_t             timestampToProduceBytes( int bytes );                   // returns what [audio] timestamp you need to run to to get this many bytes of audio
 
         void                    setClockRates( timestamp_t clocks_per_second, timestamp_t clocks_per_frame );
 

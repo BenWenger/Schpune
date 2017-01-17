@@ -23,14 +23,14 @@ namespace schcore
     {
     public:
                         TempNsf();
-        bool            load(const char* filename);
+        bool            load(const char* filename, bool stereo);
         bool            loadTest(const char* filename);
         int             getTrackCount()                         { return rawPrg.empty() ? 0 : totalTracks;  }
         int             getTrack()                              { return currentTrack;                      }
         void            setTrack(int track);
 
         int             doFrame();                                                  // returns number of available samples (in s16s)
-        int             availableSamples();
+        int             availableAudio();
         int             getSamples(s16* bufa, int siza, s16* bufb, int sizb);
 
         void            setTracer(std::ostream* stream);

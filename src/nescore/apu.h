@@ -34,7 +34,7 @@ namespace schcore
         //////////////////////////////////////////////////
         //  Running
         virtual void        run(timestamp_t runto) override;
-        void                fabricateMoreAudio(int count_in_s16s);
+        void                fabricateMoreAudio(int bytes);
 
         
         virtual void        subtractFromAudioTimestamp(timestamp_t sub) override    { audTimestamp -= sub;      }

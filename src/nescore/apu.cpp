@@ -249,9 +249,14 @@ namespace schcore
         }// end while loop
     }
     
-    void Apu::fabricateMoreAudio(int count_in_s16s)
+    void Apu::fabricateMoreAudio(int bytes)
     {
-        auto ts = builder->timestampToProduceSamples( count_in_s16s );
+        auto ts = builder->timestampToProduceBytes( bytes );
+        
+        pulses.run(Time::Now, ts);
+        tnd.run(Time::Now, ts);
+
+        // TODO - add expansion audio
     }
 
 

@@ -51,10 +51,12 @@ namespace schcore
         }
     }
 
-    int AudioBuilder::generateSamples(int startpos, s16* audio, int count_in_s16s)
+    int AudioBuilder::generateSamples(int startbytepos, s16* audio, int sizeinbytes)
     {
+        auto startpos = startbytepos / (stereo ? 4 : 2);
+
         int maxtopull = bufferSizeInElements - startpos;
-        int desired = stereo ? (count_in_s16s / 2) : count_in_s16s;
+        int desired = sizeinbytes / (stereo ? 4 : 2);       // convert bytes->samples
         int actual = std::min(maxtopull, desired);
 
         if(stereo)
@@ -67,8 +69,7 @@ namespace schcore
                 audio[(i*2)+0] = tosamp( hp2[0].samp( hp1[0].samp( lp[0].samp( outSample[0] ) ) ) );
                 audio[(i*2)+1] = tosamp( hp2[1].samp( hp1[1].samp( lp[1].samp( outSample[1] ) ) ) );
             }
-
-            return actual * 2;
+            actual *= 4;        // convert samples->bytes
         }
         else
         {
@@ -78,21 +79,17 @@ namespace schcore
 
                 audio[i] = tosamp( hp2[0].samp( hp1[0].samp( lp[0].samp( outSample[0] ) ) ) );
             }
-
-            return actual;
+            actual *= 2;        // convert samples->bytes
         }
 
-        // should never reach here
-        return 0;
+        return actual;
     }
     
     ////////////////////////////////////////////////////
     //  Wipe Samples from the transition buffer
-    void AudioBuilder::wipeSamples(int count_in_s16s)
+    void AudioBuilder::wipeSamples(int sizeinbytes)
     {
-        int count = count_in_s16s;
-        if(stereo)
-            count /= 2;
+        int count = sizeinbytes / (stereo ? 4 : 2);     // convert bytes->samples
 
         if(count <= 0)      return;     // This should never happen
 
@@ -126,20 +123,22 @@ namespace schcore
         }
     }
     
-    int AudioBuilder::samplesAvailableAtTimestamp( timestamp_t time )
+    int AudioBuilder::audioAvailableAtTimestamp( timestamp_t time )
     {
         auto x = ((time * timeScalar) + timeOverflow) >> (timeShift + 5);
 
-        return std::max(0, static_cast<int>(x) - 1);
+        --x;
+        x *= (stereo ? 4 : 2);      // convert to bytes
+
+        return std::max(0, static_cast<int>(x));
     }
 
-    timestamp_t AudioBuilder::timestampToProduceSamples( int s16s )
+    timestamp_t AudioBuilder::timestampToProduceBytes( int bytes )
     {
-        timestamp_t samps = s16s;
-        if(stereo)      samps /= 2;
+        timestamp_t samps = bytes / (stereo ? 4 : 2);       // bytes->samples
         ++samps;
 
-        return ((samps << (timeShift + 5)) - timeOverflow) / timeScalar;
+        return std::min( getMaxAllowedTimestamp(), ((samps << (timeShift + 5)) - timeOverflow) / timeScalar );
     }
     
     ////////////////////////////////////////////////////////

@@ -15,9 +15,11 @@ void textOut(HDC dc, int x, int y, const char* str)
     TextOutA(dc, x, y, str, std::strlen(str));
 }
 
+const bool inStereo =       false;
+
 const char* const           classname = "Temp NSF Player";
 schcore::TempFront          nsf;
-SoundOut                    snd(48000, false, 200);
+SoundOut                    snd(48000, inStereo, 200);
 bool                        runApp = true;
 bool                        loaded = false;
 std::ofstream               traceFile;
@@ -30,6 +32,7 @@ unsigned char               tempdumpbuf[10000];
 
 FILE*                       dumpfile = nullptr;
 bool                        dumping = false;
+
 
 void drawWindow(HWND wnd)
 {
@@ -110,7 +113,7 @@ void fillAudio()
 
         if(dumping)
         {
-            written = nsf.getSamples( reinterpret_cast<s16*>(tempdumpbuf), (lk.getSize(0) + lk.getSize(1)) / sizeof(s16), nullptr, 0 ) * sizeof(s16);
+            written = nsf.getSamples( reinterpret_cast<s16*>(tempdumpbuf), lk.getSize(0) + lk.getSize(1), nullptr, 0 );
             if(dumping)
                 fwrite( tempdumpbuf, 1, written, dumpfile );
             
@@ -122,7 +125,7 @@ void fillAudio()
         }
         else
         {
-            written = nsf.getSamples( lk.getBuffer<s16>(0), lk.getSize(0) / sizeof(s16), lk.getBuffer<s16>(1), lk.getSize(1) / sizeof(s16) ) * sizeof(s16);
+            written = nsf.getSamples( lk.getBuffer<s16>(0), lk.getSize(0), lk.getBuffer<s16>(1), lk.getSize(1) );
         }
 
         lk.setWritten(written);
@@ -160,7 +163,7 @@ void loadFile(HWND wnd)
     ofn.nMaxFile =          500;
 
     if(GetOpenFileNameA(&ofn))
-        loaded = nsf.load(filebuf);
+        loaded = nsf.load(filebuf, inStereo);
 
     InvalidateRect(wnd,NULL,true);
 
@@ -243,7 +246,7 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show)
         if(!runApp)
             break;
 
-        if(loaded && (snd.canWrite() >= (nsf.availableSamples()*2)))
+        if(loaded && (snd.canWrite() >= nsf.availableAudio()))
         {
             fillAudio();
         }
