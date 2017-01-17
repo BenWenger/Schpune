@@ -71,15 +71,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SolutionDir)..\..\include\nescore;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)..\..\bin\$(ProjectName)\$(Configuration)_$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)..\..\obj\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(SolutionDir)..\..\include\nescore;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)..\..\bin\$(ProjectName)\$(Configuration)_$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)..\..\obj\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(SolutionDir)..\..\include\nescore;$(IncludePath)</IncludePath>
+    <IntDir>$(SolutionDir)..\..\obj\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
+    <OutDir>$(SolutionDir)..\..\bin\$(ProjectName)\$(Configuration)_$(Platform)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir)..\..\include\nescore;$(IncludePath)</IncludePath>
+    <IntDir>$(SolutionDir)..\..\obj\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
+    <OutDir>$(SolutionDir)..\..\bin\$(ProjectName)\$(Configuration)_$(Platform)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -144,6 +152,8 @@
     <ClInclude Include="..\..\src\nescore\dmaunit.h" />
     <ClInclude Include="..\..\src\nescore\dmc_supplier.h" />
     <ClInclude Include="..\..\src\nescore\eventmanager.h" />
+    <ClInclude Include="..\..\src\nescore\ppu.h" />
+    <ClInclude Include="..\..\src\nescore\ppubus.h" />
     <ClInclude Include="..\..\src\nescore\resetinfo.h" />
     <ClInclude Include="..\..\src\nescore\subsystem.h" />
     <ClInclude Include="..\..\src\nescore\tempnsf.h" />
@@ -160,6 +170,7 @@
     <ClCompile Include="..\..\src\nescore\dmaunit.cpp" />
     <ClCompile Include="..\..\src\nescore\dmc_supplier.cpp" />
     <ClCompile Include="..\..\src\nescore\eventmanager.cpp" />
+    <ClCompile Include="..\..\src\nescore\ppu.cpp" />
     <ClCompile Include="..\..\src\nescore\tempfront.cpp" />
     <ClCompile Include="..\..\src\nescore\tempnsf.cpp" />
   </ItemGroup>

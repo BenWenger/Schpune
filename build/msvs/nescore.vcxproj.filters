@@ -78,6 +78,12 @@
     <ClInclude Include="..\..\include\nescore\audiosettings.h">
       <Filter>public</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\nescore\ppu.h">
+      <Filter>private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\ppubus.h">
+      <Filter>private</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\nescore\cpubus.cpp">
@@ -117,6 +123,9 @@
       <Filter>private</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\nescore\eventmanager.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\nescore\ppu.cpp">
       <Filter>private</Filter>
     </ClCompile>
   </ItemGroup>
