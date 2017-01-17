@@ -346,11 +346,107 @@ namespace schcore
             case 0x84:  adWrZp( cpu.Y );                break;
             case 0x94:  adWrZx( cpu.Y );                break;
             case 0x8C:  adWrAb( cpu.Y );                break;
+                
+                /////////////////////////////////////
+                // Unofficial ops
+                
+                /* One offs */
+ case 0x0B: case 0x2B:  ANC( adRdIm() );                break;  /* ANC  */
+            case 0x4B:  ALR( adRdIm() );                break;  /* ALR  */
+            case 0x6B:  ARR( adRdIm() );                break;  /* ARR  */
+            case 0xCB:  AXS( adRdIm() );                break;  /* AXS  */
+            case 0xBB:  LAS( adRdAy() );                break;  /* LAS  */
+            case 0xEB:  SBC( adRdIm() );                break;  /* alternative SBC  */
+            case 0x9E:  adWrAy_xxx( cpu.X );            break;  /* SHX  */
+            case 0x9C:  adWrAx_xxx( cpu.Y );            break;  /* SHY  */
+            case 0x8B:  XAA( adRdIm() );                break;  /* XAA  */
 
+            case 0x9B:  cpu.SP = cpu.A & cpu.X; ( cpu.SP );     break;  /* TAS  */
+                
+                /* AHX  */
+            case 0x9F:  adWrAy_xxx( cpu.A & cpu.X );    break;
+            case 0x93:  adWrIy_xxx( cpu.A & cpu.X );    break;
 
+                /* DCP  */
+            case 0xC7:  adRWZp( &Cpu::DCP );            break;
+            case 0xD7:  adRWZx( &Cpu::DCP );            break;
+            case 0xCF:  adRWAb( &Cpu::DCP );            break;
+            case 0xDF:  adRWAx( &Cpu::DCP );            break;
+            case 0xDB:  adRWAy( &Cpu::DCP );            break;
+            case 0xC3:  adRWIx( &Cpu::DCP );            break;
+            case 0xD3:  adRWIy( &Cpu::DCP );            break;
+                
+                /* ISC  */
+            case 0xE7:  adRWZp( &Cpu::ISC );            break;
+            case 0xF7:  adRWZx( &Cpu::ISC );            break;
+            case 0xEF:  adRWAb( &Cpu::ISC );            break;
+            case 0xFF:  adRWAx( &Cpu::ISC );            break;
+            case 0xFB:  adRWAy( &Cpu::ISC );            break;
+            case 0xE3:  adRWIx( &Cpu::ISC );            break;
+            case 0xF3:  adRWIy( &Cpu::ISC );            break;
 
-                //////////////////////
-            case 0xF2:
+                /* LAX  */
+            case 0xAB:  LAX( adRdIm() );                break;
+            case 0xA7:  LAX( adRdZp() );                break;
+            case 0xB7:  LAX( adRdZy() );                break;
+            case 0xAF:  LAX( adRdAb() );                break;
+            case 0xBF:  LAX( adRdAy() );                break;
+            case 0xA3:  LAX( adRdIx() );                break;
+            case 0xB3:  LAX( adRdIy() );                break;
+
+                /* NOP  */
+            case 0x1A: case 0x3A: case 0x5A: case 0x7A: case 0xDA: case 0xFA:   adImplied();break;
+            case 0x04: case 0x44: case 0x64:                                    adRdZp();   break;
+            case 0x14: case 0x34: case 0x54: case 0x74: case 0xD4: case 0xF4:   adRdZx();   break;
+            case 0x80: case 0x82: case 0x89: case 0xC2: case 0xE2:              adRdIm();   break;
+            case 0x0C:                                                          adRdAb();   break;
+            case 0x1C: case 0x3C: case 0x5C: case 0x7C: case 0xDC: case 0xFC:   adRdAx();   break;
+                
+                /* RLA  */
+            case 0x27:  adRWZp( &Cpu::RLA );            break;
+            case 0x37:  adRWZx( &Cpu::RLA );            break;
+            case 0x2F:  adRWAb( &Cpu::RLA );            break;
+            case 0x3F:  adRWAx( &Cpu::RLA );            break;
+            case 0x3B:  adRWAy( &Cpu::RLA );            break;
+            case 0x23:  adRWIx( &Cpu::RLA );            break;
+            case 0x33:  adRWIy( &Cpu::RLA );            break;
+                
+                /* RRA  */
+            case 0x67:  adRWZp( &Cpu::RRA );            break;
+            case 0x77:  adRWZx( &Cpu::RRA );            break;
+            case 0x6F:  adRWAb( &Cpu::RRA );            break;
+            case 0x7F:  adRWAx( &Cpu::RRA );            break;
+            case 0x7B:  adRWAy( &Cpu::RRA );            break;
+            case 0x63:  adRWIx( &Cpu::RRA );            break;
+            case 0x73:  adRWIy( &Cpu::RRA );            break;
+
+                /* SAX  */
+            case 0x87:  adWrZp( cpu.A & cpu.X );        break;
+            case 0x97:  adWrZy( cpu.A & cpu.X );        break;
+            case 0x8F:  adWrAb( cpu.A & cpu.X );        break;
+            case 0x83:  adWrIx( cpu.A & cpu.X );        break;
+                
+                /* SLO  */
+            case 0x07:  adRWZp( &Cpu::SLO );            break;
+            case 0x17:  adRWZx( &Cpu::SLO );            break;
+            case 0x0F:  adRWAb( &Cpu::SLO );            break;
+            case 0x1F:  adRWAx( &Cpu::SLO );            break;
+            case 0x1B:  adRWAy( &Cpu::SLO );            break;
+            case 0x03:  adRWIx( &Cpu::SLO );            break;
+            case 0x13:  adRWIy( &Cpu::SLO );            break;
+                
+                /* SRE  */
+            case 0x47:  adRWZp( &Cpu::SRE );            break;
+            case 0x57:  adRWZx( &Cpu::SRE );            break;
+            case 0x4F:  adRWAb( &Cpu::SRE );            break;
+            case 0x5F:  adRWAx( &Cpu::SRE );            break;
+            case 0x5B:  adRWAy( &Cpu::SRE );            break;
+            case 0x43:  adRWIx( &Cpu::SRE );            break;
+            case 0x53:  adRWIy( &Cpu::SRE );            break;
+
+                /* STP  */
+            case 0x02: case 0x12: case 0x22: case 0x32: case 0x42: case 0x52:
+            case 0x62: case 0x72: case 0x92: case 0xB2: case 0xD2: case 0xF2:
                 cpuJammed = true;
                 setMainTimestamp(runto);
                 break;

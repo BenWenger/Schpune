@@ -33,9 +33,9 @@
 ///////////////////////////////////////////
 ///////////////////////////////////////////
 //  Support
-inline void badPageRead(u16 a, u16 t)
+inline u8 badPageRead(u16 a, u16 t)
 {
-    rd( (t & 0xFF00) | (a & 0x00FF) );
+    return rd( (t & 0xFF00) | (a & 0x00FF) );
 }
 
 inline void conditionalBadPageRead(u16 a, u16 t)
@@ -151,6 +151,17 @@ void    adWrAr(u8 v, u8 r)
 void    adWrAx(u8 v)        { adWrAr(v, cpu.X);             }
 void    adWrAy(u8 v)        { adWrAr(v, cpu.Y);             }
 
+// Absolute Indexed mode (with conflicts)
+void    adWrAr_xxx(u8 v, u8 r)
+{
+    u16 t =                 rd(cpu.PC++);
+    t |=                    rd(cpu.PC++) << 8;      u16 a = t + r;
+    v &= badPageRead(a,t);
+    pollInterrupt();        wr(a,v);
+}
+void    adWrAx_xxx(u8 v)    { adWrAr_xxx(v, cpu.X);         }
+void    adWrAy_xxx(u8 v)    { adWrAr_xxx(v, cpu.Y);         }
+
 // Indirect X mode
 void    adWrIx(u8 v)
 {
@@ -168,6 +179,16 @@ void    adWrIy(u8 v)
     u16 t =                 rd(p++);
     t |=                    rd(p) << 8;     u16 a = t + cpu.Y;
     badPageRead(a,t);
+    pollInterrupt();        wr(a,v);
+}
+
+// Indirect Y mode (with conflicts)
+void    adWrIy_xxx(u8 v)
+{
+    u8 p =                  rd(cpu.PC++);
+    u16 t =                 rd(p++);
+    t |=                    rd(p) << 8;     u16 a = t + cpu.Y;
+    v &= badPageRead(a,t);
     pollInterrupt();        wr(a,v);
 }
 

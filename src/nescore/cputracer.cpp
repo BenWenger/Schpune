@@ -26,52 +26,50 @@ namespace schcore
             In,         // Indirect
             Ix,         // Indirect, X
             Iy,         // Indirect, Y
-            Rl,         // Relative
-
-            __ = Ip
+            Rl          // Relative
         };
 
         const int AddrModes[0x100] = {
     /*      x0 x1 x2 x3  x4 x5 x6 x7   x8 x9 xA xB  xC xD xE xF       */
-    /* 0x */Im,Ix,__,__, __,Zp,Zp,__,  Ip,Im,Ac,__, __,Ab,Ab,__,/* 0x */
-    /* 1x */Rl,Iy,__,__, __,Zx,Zx,__,  Ip,Ay,__,__, __,Ax,Ax,__,/* 1x */
-    /* 2x */Ab,Ix,__,__, Zp,Zp,Zp,__,  Ip,Im,Ac,__, Ab,Ab,Ab,__,/* 2x */
-    /* 3x */Rl,Iy,__,__, __,Zx,Zx,__,  Ip,Ay,__,__, __,Ax,Ax,__,/* 3x */
-    /* 4x */Ip,Ix,__,__, __,Zp,Zp,__,  Ip,Im,Ac,__, Ab,Ab,Ab,__,/* 4x */
-    /* 5x */Rl,Iy,__,__, __,Zx,Zx,__,  Ip,Ay,__,__, __,Ax,Ax,__,/* 5x */
-    /* 6x */Ip,Ix,__,__, __,Zp,Zp,__,  Ip,Im,Ac,__, In,Ab,Ab,__,/* 6x */
-    /* 7x */Rl,Iy,__,__, __,Zx,Zx,__,  Ip,Ay,__,__, __,Ax,Ax,__,/* 7x */
+    /* 0x */Im,Ix,Ip,Ix, Zp,Zp,Zp,Zp,  Ip,Im,Ac,Im, Ab,Ab,Ab,Ab,/* 0x */
+    /* 1x */Rl,Iy,Ip,Iy, Zx,Zx,Zx,Zx,  Ip,Ay,Ip,Ay, Ax,Ax,Ax,Ax,/* 1x */
+    /* 2x */Ab,Ix,Ip,Ix, Zp,Zp,Zp,Zp,  Ip,Im,Ac,Im, Ab,Ab,Ab,Ab,/* 2x */
+    /* 3x */Rl,Iy,Ip,Iy, Zx,Zx,Zx,Zx,  Ip,Ay,Ip,Ay, Ax,Ax,Ax,Ax,/* 3x */
+    /* 4x */Ip,Ix,Ip,Ix, Zp,Zp,Zp,Zp,  Ip,Im,Ac,Im, Ab,Ab,Ab,Ab,/* 4x */
+    /* 5x */Rl,Iy,Ip,Iy, Zx,Zx,Zx,Zx,  Ip,Ay,Ip,Ay, Ax,Ax,Ax,Ax,/* 5x */
+    /* 6x */Ip,Ix,Ip,Ix, Zp,Zp,Zp,Zp,  Ip,Im,Ac,Im, In,Ab,Ab,Ab,/* 6x */
+    /* 7x */Rl,Iy,Ip,Iy, Zx,Zx,Zx,Zx,  Ip,Ay,Ip,Ay, Ax,Ax,Ax,Ax,/* 7x */
     /*      x0 x1 x2 x3  x4 x5 x6 x7   x8 x9 xA xB  xC xD xE xF       */
-    /* 8x */__,Ix,__,__, Zp,Zp,Zp,__,  Ip,__,Ip,__, Ab,Ab,Ab,__,/* 8x */
-    /* 9x */Rl,Iy,__,__, Zx,Zx,Zy,__,  Ip,Ay,Ip,__, __,Ax,__,__,/* 9x */
-    /* Ax */Im,Ix,Im,__, Zp,Zp,Zp,__,  Ip,Im,Ip,__, Ab,Ab,Ab,__,/* Ax */
-    /* Bx */Rl,Iy,__,__, Zx,Zx,Zy,__,  Ip,Ay,Ip,__, Ax,Ax,Ay,__,/* Bx */
-    /* Cx */Im,Ix,__,__, Zp,Zp,Zp,__,  Ip,Im,Ip,__, Ab,Ab,Ab,__,/* Cx */
-    /* Dx */Rl,Iy,__,__, __,Zx,Zx,__,  Ip,Ay,__,__, __,Ax,Ax,__,/* Dx */
-    /* Ex */Im,Ix,__,__, Zp,Zp,Zp,__,  Ip,Im,Ip,__, Ab,Ab,Ab,__,/* Ex */
-    /* Fx */Rl,Iy,__,__, __,Zx,Zx,__,  Ip,Ay,__,__, __,Ax,Ax,__ /* Fx */
+    /* 8x */Im,Ix,Im,Ix, Zp,Zp,Zp,Zp,  Ip,Im,Ip,Im, Ab,Ab,Ab,Ab,/* 8x */
+    /* 9x */Rl,Iy,Ip,Iy, Zx,Zx,Zy,Zy,  Ip,Ay,Ip,Ay, Ax,Ax,Ay,Ay,/* 9x */
+    /* Ax */Im,Ix,Im,Ix, Zp,Zp,Zp,Zp,  Ip,Im,Ip,Im, Ab,Ab,Ab,Ab,/* Ax */
+    /* Bx */Rl,Iy,Ip,Iy, Zx,Zx,Zy,Zy,  Ip,Ay,Ip,Ay, Ax,Ax,Ay,Ay,/* Bx */
+    /* Cx */Im,Ix,Im,Ix, Zp,Zp,Zp,Zp,  Ip,Im,Ip,Im, Ab,Ab,Ab,Ab,/* Cx */
+    /* Dx */Rl,Iy,Ip,Iy, Zx,Zx,Zx,Zx,  Ip,Ay,Ip,Ay, Ax,Ax,Ax,Ax,/* Dx */
+    /* Ex */Im,Ix,Im,Ix, Zp,Zp,Zp,Zp,  Ip,Im,Ip,Im, Ab,Ab,Ab,Ab,/* Ex */
+    /* Fx */Rl,Iy,Ip,Iy, Zx,Zx,Zx,Zx,  Ip,Ay,Ip,Ay, Ax,Ax,Ax,Ax /* Fx */
     /*      x0 x1 x2 x3  x4 x5 x6 x7   x8 x9 xA xB  xC xD xE xF       */
         };
 
         const char* const InstNames[0x100] = {
 /*        x0      x1      x2      x3      x4      x5      x6      x7        x8      x9      xA      xB      xC      xD      xE      xF          */
-/* 0x */" BRK "," ORA ","{ ? }","{ ? }","{ ? }"," ORA "," ASL ","{ ? }",  " PHP "," ORA "," ASL ","{ ? }","{ ? }"," ORA "," ASL ","{ ? }",/* 0x */
-/* 1x */" BPL "," ORA ","{ ? }","{ ? }","{ ? }"," ORA "," ASL ","{ ? }",  " CLC "," ORA ","{ ? }","{ ? }","{ ? }"," ORA "," ASL ","{ ? }",/* 1x */
-/* 2x */" JSR "," AND ","{ ? }","{ ? }"," BIT "," AND "," ROL ","{ ? }",  " PLP "," AND "," ROL ","{ ? }"," BIT "," AND "," ROL ","{ ? }",/* 2x */
-/* 3x */" BMI "," AND ","{ ? }","{ ? }","{ ? }"," AND "," ROL ","{ ? }",  " SEC "," AND ","{ ? }","{ ? }","{ ? }"," AND "," ROL ","{ ? }",/* 3x */
-/* 4x */" RTI "," EOR ","{ ? }","{ ? }","{ ? }"," EOR "," LSR ","{ ? }",  " PHA "," EOR "," LSR ","{ ? }"," JMP "," EOR "," LSR ","{ ? }",/* 4x */
-/* 5x */" BVC "," EOR ","{ ? }","{ ? }","{ ? }"," EOR "," LSR ","{ ? }",  " CLI "," EOR ","{ ? }","{ ? }","{ ? }"," EOR "," LSR ","{ ? }",/* 5x */
-/* 6x */" RTS "," ADC ","{ ? }","{ ? }","{ ? }"," ADC "," ROR ","{ ? }",  " PLA "," ADC "," ROR ","{ ? }"," JMP "," ADC "," ROR ","{ ? }",/* 6x */
-/* 7x */" BVS "," ADC ","{ ? }","{ ? }","{ ? }"," ADC "," ROR ","{ ? }",  " SEI "," ADC ","{ ? }","{ ? }","{ ? }"," ADC "," ROR ","{ ? }",/* 7x */
+/* 0x */" BRK "," ORA ","{STP}","{SLO}","{NOP}"," ORA "," ASL ","{SLO}",  " PHP "," ORA "," ASL ","{ANC}","{NOP}"," ORA "," ASL ","{SLO}",/* 0x */
+/* 1x */" BPL "," ORA ","{STP}","{SLO}","{NOP}"," ORA "," ASL ","{SLO}",  " CLC "," ORA ","{NOP}","{SLO}","{NOP}"," ORA "," ASL ","{SLO}",/* 1x */
+/* 2x */" JSR "," AND ","{STP}","{RLA}"," BIT "," AND "," ROL ","{RLA}",  " PLP "," AND "," ROL ","{ANC}"," BIT "," AND "," ROL ","{RLA}",/* 2x */
+/* 3x */" BMI "," AND ","{STP}","{RLA}","{NOP}"," AND "," ROL ","{RLA}",  " SEC "," AND ","{NOP}","{RLA}","{NOP}"," AND "," ROL ","{RLA}",/* 3x */
+/* 4x */" RTI "," EOR ","{STP}","{SRE}","{NOP}"," EOR "," LSR ","{SRE}",  " PHA "," EOR "," LSR ","{ALR}"," JMP "," EOR "," LSR ","{SRE}",/* 4x */
+/* 5x */" BVC "," EOR ","{STP}","{SRE}","{NOP}"," EOR "," LSR ","{SRE}",  " CLI "," EOR ","{NOP}","{SRE}","{NOP}"," EOR "," LSR ","{SRE}",/* 5x */
+/* 6x */" RTS "," ADC ","{STP}","{RRA}","{NOP}"," ADC "," ROR ","{RRA}",  " PLA "," ADC "," ROR ","{ARR}"," JMP "," ADC "," ROR ","{RRA}",/* 6x */
+/* 7x */" BVS "," ADC ","{STP}","{RRA}","{NOP}"," ADC "," ROR ","{RRA}",  " SEI "," ADC ","{NOP}","{RRA}","{NOP}"," ADC "," ROR ","{RRA}",/* 7x */
 /*        x0      x1      x2      x3      x4      x5      x6      x7        x8      x9      xA      xB      xC      xD      xE      xF          */
-/* 8x */"{ ? }"," STA ","{ ? }","{ ? }"," STY "," STA "," STX ","{ ? }",  " DEY ","{ ? }"," TXA ","{ ? }"," STY "," STA "," STX ","{ ? }",/* 8x */
-/* 9x */" BCC "," STA ","{ ? }","{ ? }"," STY "," STA "," STX ","{ ? }",  " TYA "," STA "," TXS ","{ ? }","{ ? }"," STA ","{ ? }","{ ? }",/* 9x */
-/* Ax */" LDY "," LDA "," LDX ","{ ? }"," LDY "," LDA "," LDX ","{ ? }",  " TAY "," LDA "," TAX ","{ ? }"," LDY "," LDA "," LDX ","{ ? }",/* Ax */
-/* Bx */" BCS "," LDA ","{ ? }","{ ? }"," LDY "," LDA "," LDX ","{ ? }",  " CLV "," LDA "," TSX ","{ ? }"," LDY "," LDA "," LDX ","{ ? }",/* Bx */
-/* Cx */" CPY "," CMP ","{ ? }","{ ? }"," CPY "," CMP "," DEC ","{ ? }",  " INY "," CMP "," DEX ","{ ? }"," CPY "," CMP "," DEC ","{ ? }",/* Cx */
-/* Dx */" BNE "," CMP ","{ ? }","{ ? }","{ ? }"," CMP "," DEC ","{ ? }",  " CLD "," CMP ","{ ? }","{ ? }","{ ? }"," CMP "," DEC ","{ ? }",/* Dx */
-/* Ex */" CPX "," SBC ","{ ? }","{ ? }"," CPX "," SBC "," INC ","{ ? }",  " INX "," SBC "," NOP ","{ ? }"," CPX "," SBC "," INC ","{ ? }",/* Ex */
-/* Fx */" BEQ "," SBC ","{STP}","{ ? }","{ ? }"," SBC "," INC ","{ ? }",  " SED "," SBC ","{ ? }","{ ? }","{ ? }"," SBC "," INC ","{ ? }" /* Fx */
+/* 8x */"{NOP}"," STA ","{NOP}","{SAX}"," STY "," STA "," STX ","{SAX}",  " DEY ","{NOP}"," TXA ","{XAA}"," STY "," STA "," STX ","{SAX}",/* 8x */
+/* 9x */" BCC "," STA ","{STP}","{AHX}"," STY "," STA "," STX ","{SAX}",  " TYA "," STA "," TXS ","{TAS}","{SHY}"," STA ","{SHX}","{AHX}",/* 9x */
+/* Ax */" LDY "," LDA "," LDX ","{LAX}"," LDY "," LDA "," LDX ","{LAX}",  " TAY "," LDA "," TAX ","{LAX}"," LDY "," LDA "," LDX ","{LAX}",/* Ax */
+/* Bx */" BCS "," LDA ","{STP}","{LAX}"," LDY "," LDA "," LDX ","{LAX}",  " CLV "," LDA "," TSX ","{LAS}"," LDY "," LDA "," LDX ","{LAX}",/* Bx */
+/* Cx */" CPY "," CMP ","{NOP}","{DCP}"," CPY "," CMP "," DEC ","{DCP}",  " INY "," CMP "," DEX ","{AXS}"," CPY "," CMP "," DEC ","{DCP}",/* Cx */
+/* Dx */" BNE "," CMP ","{STP}","{DCP}","{NOP}"," CMP "," DEC ","{DCP}",  " CLD "," CMP ","{NOP}","{DCP}","{NOP}"," CMP "," DEC ","{DCP}",/* Dx */
+/* Ex */" CPX "," SBC ","{NOP}","{ISC}"," CPX "," SBC "," INC ","{ISC}",  " INX "," SBC "," NOP ","{SBC}"," CPX "," SBC "," INC ","{ISC}",/* Ex */
+/* Fx */" BEQ "," SBC ","{STP}","{ISC}","{NOP}"," SBC "," INC ","{ISC}",  " SED "," SBC ","{NOP}","{ISC}","{NOP}"," SBC "," INC ","{ISC}" /* Fx */
 /*        x0      x1      x2      x3      x4      x5      x6      x7        x8      x9      xA      xB      xC      xD      xE      xF          */
         };
 

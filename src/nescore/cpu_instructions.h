@@ -61,6 +61,26 @@ void LDY(u8 v)  { cpu.NZ( cpu.Y  = v );     }
 void ORA(u8 v)  { cpu.NZ( cpu.A |= v );     }
 void SBC(u8 v)  { ADC(~v);                  }
 
+// -- unofficial
+void ARR(u8 v)
+{
+    AND(v);
+    ROR(cpu.A);
+    cpu.setC(cpu.A & 0x40);
+    cpu.setV( ((cpu.A << 1) ^ cpu.A) & 0x40 );
+}
+void AXS(u8 v)
+{
+    int sum = (cpu.A & cpu.X) - v;
+    cpu.setC(sum >= 0);
+    cpu.NZ(static_cast<u8>(sum));
+}
+
+void ALR(u8 v)  { AND(v);   LSR(cpu.A);                                     }
+void ANC(u8 v)  { AND(v);   cpu.setC(cpu.getN());                           }
+void LAS(u8 v)  { cpu.NZ( cpu.A = cpu.X = cpu.SP = (cpu.X & cpu.SP & v) );  }
+void LAX(u8 v)  { cpu.NZ( cpu.A = cpu.X = v );                              }
+void XAA(u8 v)  { cpu.A = cpu.X;    AND(v);                                 }
 
 ///////////////////////////////////////////
 ///////////////////////////////////////////
@@ -98,6 +118,14 @@ void ROR(u8& v)
 
 void DEC(u8& v) { cpu.NZ( --v );            }
 void INC(u8& v) { cpu.NZ( ++v );            }
+
+// -- unofficial
+void DCP(u8& v) { DEC(v);   CMP(v);         }
+void ISC(u8& v) { INC(v);   SBC(v);         }
+void RLA(u8& v) { ROL(v);   AND(v);         }
+void RRA(u8& v) { ROR(v);   ADC(v);         }
+void SLO(u8& v) { ASL(v);   ORA(v);         }
+void SRE(u8& v) { LSR(v);   EOR(v);         }
 
 
 ///////////////////////////////////////////
