@@ -41,7 +41,7 @@ namespace schcore
         timestamp_t         getAudTimestamp() const                                 { return audTimestamp;      }
 
         
-        virtual void        subtractFromMainTimestamp(timestamp_t sub) override;
+        virtual void        endFrame(timestamp_t subadjust) override;
 
     private:
 

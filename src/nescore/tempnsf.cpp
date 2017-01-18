@@ -222,8 +222,8 @@ namespace schcore
         cpu.run( clock_cycsPerFrame );
         apu.run( clock_cycsPerFrame );
         
-        cpu.subtractFromMainTimestamp( clock_cycsPerFrame );
-        apu.subtractFromMainTimestamp( clock_cycsPerFrame );
+        cpu.endFrame( clock_cycsPerFrame );
+        apu.endFrame( clock_cycsPerFrame );
 
         cpu.unjam();
 

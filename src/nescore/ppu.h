@@ -20,8 +20,14 @@ namespace schcore
         void                reset(const ResetInfo& info);
 
         //////////////////////////////////////////////////
+        //  Detecting the length of the frame we just ran (for timestamp adjustment)
+        timestamp_t         getLastFrameLength() const;
+        timestamp_t         getApproxFrameLength() const;
+
+        //////////////////////////////////////////////////
         //  Running
         virtual void        run(timestamp_t runto) override;
+        virtual void        endFrame(timestamp_t subadjust) override;
 
     private:
         void                predictNextEvent();
@@ -30,22 +36,26 @@ namespace schcore
         void                onRead(u16 a, u8& v);
 
         ///////////////////////////////////////
+        timestamp_t         lastFrameLength;
+
+        ///////////////////////////////////////
         //  scanline -1 is the pre-render scanline
         //  lines 0-239 are rendered lines
         //  line 240 is the post-render 'idle' scanline
         //  line 241 = "VBlank", scanCyc is ignored, and the VBlank timers are used instead
 
-        static const int    pre_line = -1;
-        static const int    post_line = 240;
-        static const int    vblank_line = 241;
+        static const int    line_pre = -1;
+        static const int    line_post = 240;
+        static const int    line_vbl = 241;
+
+        u8                  regBus;
 
         int                 scanline;
-        int                 scanCyc;
-        timestamp_t         vblankCycles;
-        timestamp_t         safeOamCycles;
-            // when scanline == vblank_line
-        timestamp_t         safeOamCounter;
-        timestamp_t         vblankCounter;
+        timestamp_t         scanCyc;
+        timestamp_t         vblankCycles;   // total number of cycles in vblank
+        timestamp_t         safeOamCycles;  // total number of cycles in vblank where writing to OAM is safe (must be <= vblankCycles)
+        bool                oddFrame;
+        bool                oddCycSkipped;
 
         bool                nmiEnabled;
         int                 spriteSize;     // 8 or 16
@@ -59,7 +69,8 @@ namespace schcore
         u8                  pltMask;        // 0x30 for monochrome, 0x3F for color
         bool                renderOn;
 
-        u8                  status;         // $2002 status
+        u8                  statusByte;     // $2002 status
+        bool                suppressNmi;    // edge case NMI suppression
 
         u8                  oamAddr;        // $2003
         u8                  oam[0x100];
@@ -72,8 +83,20 @@ namespace schcore
         u8                  fineX;
 
         u8                  palette[0x20];
-
+        
+        CpuBus*             cpuBus = nullptr;
         PpuBus*             ppuBus = nullptr;
+
+        u16                 outputBuffer[240 * 256];
+        u16*                pixel;
+
+        ///////////////////////////////////////////////////////
+        //  running!
+        timestamp_t         run_vblank(timestamp_t ticks);
+        timestamp_t         run_postRenderLine(timestamp_t ticks);
+        timestamp_t         run_preRenderLine_Off(timestamp_t ticks);
+        timestamp_t         run_line_On(timestamp_t ticks);
+        timestamp_t         run_renderLine_Off(timestamp_t ticks);
     };
 
 

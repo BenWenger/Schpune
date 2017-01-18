@@ -76,9 +76,9 @@ namespace schcore
         tnd.clockSeqQuarter();
     }
     
-    void Apu::subtractFromMainTimestamp(timestamp_t sub)
+    void Apu::endFrame(timestamp_t sub)
     {
-        SubSystem::subtractFromMainTimestamp(sub);
+        subtractFromMainTimestamp(sub);
         pulses.subtractFromCpuTimestamp(sub);
         tnd.subtractFromCpuTimestamp(sub);
     }

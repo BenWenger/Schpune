@@ -25,11 +25,14 @@ namespace schcore
         //////////////////////////////////////////////////
         //  Stuff for NSFs
         void                primeNsf(u8 A, u8 X, u16 PC);
-        void                unjam()                             { cpuJammed = false;            }
+        void                unjam()                                     { cpuJammed = false;            }
 
         //////////////////////////////////////////////////
         //  Running
         virtual void        run(timestamp_t runto) override;
+
+        
+        virtual void        endFrame(timestamp_t subadjust) override    { subtractFromMainTimestamp(subadjust);     }
 
     private:
         //////////////////////////////////////////
