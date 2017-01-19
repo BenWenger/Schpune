@@ -31,9 +31,6 @@ namespace schcore
         //  Running
         virtual void        run(timestamp_t runto) override;
 
-        
-        virtual void        endFrame(timestamp_t subadjust) override    { subtractFromMainTimestamp(subadjust);     }
-
     private:
         //////////////////////////////////////////
         //  Interface for CpuBus:  consuming a cycle

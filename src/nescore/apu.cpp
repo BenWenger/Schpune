@@ -78,7 +78,7 @@ namespace schcore
     
     void Apu::endFrame(timestamp_t sub)
     {
-        subtractFromMainTimestamp(sub);
+        SubSystem::endFrame(sub);
         pulses.subtractFromCpuTimestamp(sub);
         tnd.subtractFromCpuTimestamp(sub);
     }

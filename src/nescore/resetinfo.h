@@ -10,7 +10,9 @@ namespace schcore
 {
     class           Apu;
     class           Cpu;
+    class           Ppu;
     class           CpuBus;
+    class           PpuBus;
     class           AudioBuilder;
     class           CpuTracer;
     class           DmaUnit;
@@ -25,8 +27,10 @@ namespace schcore
 
         CpuTracer*      cpuTracer;
         Cpu*            cpu;
+        Ppu*            ppu;
         Apu*            apu;
         CpuBus*         cpuBus;
+        PpuBus*         ppuBus;
         AudioBuilder*   audioBuilder;
         DmaUnit*        dmaUnit;
         EventManager*   eventManager;

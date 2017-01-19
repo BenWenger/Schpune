@@ -29,6 +29,7 @@ namespace schcore
 
     private:
         SubSystem*                  apu;
+        SubSystem*                  ppu;
         std::map<timestamp_t, int>  events;
         timestamp_t                 nextEvent;
     };

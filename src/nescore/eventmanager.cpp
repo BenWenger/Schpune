@@ -3,6 +3,7 @@
 #include "subsystem.h"
 #include "resetinfo.h"
 #include "apu.h"
+#include "ppu.h"
 
 namespace schcore
 {
@@ -12,6 +13,7 @@ namespace schcore
         if(info.hardReset)
         {
             apu =           info.apu;
+            ppu =           info.ppu;
 
             events.clear();
             nextEvent = Time::Never;
@@ -53,6 +55,7 @@ namespace schcore
 
                 // TODO -- add all subsystems here
                 if(i->second & EventType::evt_apu)      apu->run(checktime);
+                if(i->second & EventType::evt_ppu)      ppu->run(checktime);
 
                 ///////////////////////
                 i = events.erase(i);

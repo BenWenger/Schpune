@@ -11,6 +11,7 @@ namespace schcore
     class ResetInfo;
     class CpuBus;
     class PpuBus;
+    class EventManager;
 
     class Ppu : public SubSystem
     {
@@ -21,23 +22,21 @@ namespace schcore
 
         //////////////////////////////////////////////////
         //  Detecting the length of the frame we just ran (for timestamp adjustment)
-        timestamp_t         getLastFrameLength() const;
-        timestamp_t         getApproxFrameLength() const;
+        timestamp_t         getMaxFrameLength() const;
+        timestamp_t         finalizeFrame();                        // returns the number of cycles actually executed in the frame (to adjust all timestamps)
 
         //////////////////////////////////////////////////
         //  Running
         virtual void        run(timestamp_t runto) override;
-        virtual void        endFrame(timestamp_t subadjust) override;
+
+        const u16*          getVideo() const            { return outputBuffer;      }
 
     private:
         void                predictNextEvent();
         
         void                onWrite(u16 a, u8 v);
         void                onRead(u16 a, u8& v);
-
-        ///////////////////////////////////////
-        timestamp_t         lastFrameLength;
-
+        
         ///////////////////////////////////////
         //  scanline -1 is the pre-render scanline
         //  lines 0-239 are rendered lines
@@ -86,9 +85,24 @@ namespace schcore
         
         CpuBus*             cpuBus = nullptr;
         PpuBus*             ppuBus = nullptr;
+        EventManager*       eventManager = nullptr;
 
         u16                 outputBuffer[240 * 256];
         u16*                pixel;
+
+        //  output shifters
+        u16                 chrLoShift;
+        u16                 chrHiShift;
+
+        bool                spr0Hit;
+        u8                  ntFetch;
+        u8                  atFetch;
+        u8                  chrLoFetch;
+        u8                  chrHiFetch;
+        
+        void                incX();
+        void                incY();
+        void                resetX();
 
         ///////////////////////////////////////////////////////
         //  running!

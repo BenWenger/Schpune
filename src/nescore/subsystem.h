@@ -19,11 +19,10 @@ namespace schcore
         timestamp_t     getClockBase() const            { return clockBase;             }
         void            setClockBase(timestamp_t base)  { clockBase = base;             }
 
-        virtual void    endFrame(timestamp_t subadjust) = 0;
+        virtual void    endFrame(timestamp_t subadjust) { timestamp -= subadjust;       }
         void            setMainTimestamp(timestamp_t set)           { timestamp = set;      }
 
     protected:
-        void            subtractFromMainTimestamp(timestamp_t sub)  { timestamp -= sub;     }
         void            cyc()           { timestamp += clockBase;           }
         void            cyc(int cycs)   { timestamp += cycs * clockBase;    }
         void            catchUp()       { run( drivingClock->curCyc() );    }
