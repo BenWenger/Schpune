@@ -133,6 +133,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\nescore\audiosettings.h" />
+    <ClInclude Include="..\..\include\nescore\nesfile.h" />
     <ClInclude Include="..\..\include\nescore\regioninfo.h" />
     <ClInclude Include="..\..\include\nescore\schpunetypes.h" />
     <ClInclude Include="..\..\include\nescore\tempfront.h" />
@@ -170,6 +171,7 @@
     <ClCompile Include="..\..\src\nescore\dmaunit.cpp" />
     <ClCompile Include="..\..\src\nescore\dmc_supplier.cpp" />
     <ClCompile Include="..\..\src\nescore\eventmanager.cpp" />
+    <ClCompile Include="..\..\src\nescore\nesfile.cpp" />
     <ClCompile Include="..\..\src\nescore\ppu.cpp" />
     <ClCompile Include="..\..\src\nescore\tempfront.cpp" />
     <ClCompile Include="..\..\src\nescore\tempnsf.cpp" />

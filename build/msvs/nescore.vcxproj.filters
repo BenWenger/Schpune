@@ -84,6 +84,9 @@
     <ClInclude Include="..\..\src\nescore\ppubus.h">
       <Filter>private</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\nescore\nesfile.h">
+      <Filter>public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\nescore\cpubus.cpp">
@@ -126,6 +129,9 @@
       <Filter>private</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\nescore\ppu.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\nescore\nesfile.cpp">
       <Filter>private</Filter>
     </ClCompile>
   </ItemGroup>
