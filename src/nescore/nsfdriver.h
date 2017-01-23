@@ -2,14 +2,19 @@
 #ifndef SCHPUNE_NESCORE_NSFDRIVER_H_INCLUDED
 #define SCHPUNE_NESCORE_NSFDRIVER_H_INCLUDED
 
+#include <memory>
+#include <vector>
 #include "cartridge.h"
 
 namespace schcore
 {
+    class ExAudio;
+
     class NsfDriver : public Cartridge
     {
     public:
                         NsfDriver();
+                        ~NsfDriver();
 
         void            changeTrack();
         u16             getTrackStartAddr() const        { return driverCodeAddr;               }
@@ -35,6 +40,8 @@ namespace schcore
         void            onWriteBankswap(u16 a, u8 v);
 
         Apu*                    apu;
+
+        std::vector<std::unique_ptr<ExAudio>>   expansion;
     };
 
 }

@@ -17,11 +17,14 @@ namespace schcore
         cartReset(info);
     }
 
-    void Cartridge::setPrgCallbacks(int readablestart, int readablestop, int writablestart, int writablestop)
+    void Cartridge::setPrgCallbacks(int readablestart, int readablestop, int writablestart, int writablestop, bool addprgram)
     {
         cpuBus->addPeeker( readablestart, readablestop, this, &Cartridge::onPeekPrg );
         cpuBus->addReader( readablestart, readablestop, this, &Cartridge::onReadPrg );
         cpuBus->addWriter( writablestart, writablestop, this, &Cartridge::onWritePrg );
+
+        if(addprgram && !loadedFile->prgRamChips.empty())
+            swapPrg_8k( 6, 0, true );
     }
 
     void Cartridge::clearPrgRam(u8 v)
@@ -43,9 +46,27 @@ namespace schcore
         ppu->catchUp();
     }
 
-    void Cartridge::swapPrg_4k(int slot, int page)
+    void Cartridge::swapPrg_4k(int slot, int page, bool ram)
     {
-        prgPages[slot & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page);
+        if(ram && !loadedFile->prgRamChips.empty())
+            prgPages[slot & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page);
+        else
+            prgPages[slot & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page);
+    }
+
+    void Cartridge::swapPrg_8k(int slot, int page, bool ram)
+    {
+        page <<= 1;
+        if(ram && !loadedFile->prgRamChips.empty())
+        {
+            prgPages[ slot    & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page);
+            prgPages[(slot+1) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+1);
+        }
+        else
+        {
+            prgPages[ slot    & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page);
+            prgPages[(slot+1) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+1);
+        }
     }
 
     

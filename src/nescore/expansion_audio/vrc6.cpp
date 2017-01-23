@@ -19,9 +19,9 @@ namespace schcore
             saw.hardReset();
 
             apu = info.apu;
-            apu->addExAudioChannel( &pulse[0] );
-            apu->addExAudioChannel( &pulse[1] );
-            apu->addExAudioChannel( &saw );
+            apu->addExAudioChannel( ChannelId::vrc6_pulse0,  &pulse[0] );
+            apu->addExAudioChannel( ChannelId::vrc6_pulse1, &pulse[1] );
+            apu->addExAudioChannel( ChannelId::vrc6_saw, &saw );
 
             info.cpuBus->addWriter( 0x9, 0xB, this, &Vrc6Audio::onWrite );
         }
@@ -92,7 +92,7 @@ namespace schcore
         case 1:     freqTimer = (freqTimer & 0x0F00) | v;
                     break;
 
-        case 2:     freqTimer = (freqTimer & 0x0F00) | ((v & 0x0F) << 4);
+        case 2:     freqTimer = (freqTimer & 0x00FF) | ((v & 0x0F) << 8);
                     enabled = (v & 0x80) != 0;
 
                     if(!enabled)
@@ -166,7 +166,7 @@ namespace schcore
         case 1:     freqTimer = (freqTimer & 0x0F00) | v;
                     break;
 
-        case 2:     freqTimer = (freqTimer & 0x0F00) | ((v & 0x0F) << 4);
+        case 2:     freqTimer = (freqTimer & 0x00FF) | ((v & 0x0F) << 8);
                     enabled = (v & 0x80) != 0;
 
                     if(!enabled)

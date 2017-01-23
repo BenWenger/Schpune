@@ -8,6 +8,7 @@
 #include "apu_tnd.h"
 #include "audiotimestampholder.h"
 #include "audiosettings.h"
+#include <map>
 
 
 namespace schcore
@@ -28,7 +29,7 @@ namespace schcore
         
         //////////////////////////////////////////////////
         //  Expansion audio
-        void                addExAudioChannel(AudioChannel* channel);
+        void                addExAudioChannel(ChannelId id, AudioChannel* channel, bool apply_clock_rate = true);
 
         //////////////////////////////////////////////////
         //  Output configuration
@@ -84,6 +85,8 @@ namespace schcore
         Apu_Tnd             tnd;
 
         AudioSettings       audSettings;
+
+        std::map<ChannelId, AudioChannel*>  exAudioChannels;
     };
 
 

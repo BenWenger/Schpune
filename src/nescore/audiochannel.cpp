@@ -79,5 +79,21 @@ namespace schcore
 
         return out;
     }
+    
+    ////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
+    
+    void AudioChannel::doLinearOutputLevels(const AudioSettings& settings, ChannelId chanid, std::vector<float> (&levels)[2], int maxstep, float baseoutput)
+    {
+        auto mul = getVolMultipliers( settings, chanid );
+        levels[0].resize(maxstep+1);
+        levels[1].resize(maxstep+1);
+
+        for(int i = 0; i <= maxstep; ++i)
+        {
+            levels[0][i] = i * baseoutput * mul.first  / maxstep;
+            levels[1][i] = i * baseoutput * mul.second / maxstep;
+        }
+    }
 
 }

@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <utility>
+#include <map>
 #include "schpunetypes.h"
 #include "audiotimestampholder.h"
 #include "audiosettings.h"
@@ -55,6 +56,8 @@ namespace schcore
 
         int                     prevOut;
         AudioBuilder*           builder;
+
+        std::map<ChannelId, AudioChannel*>  exAudio;
     };
 
 

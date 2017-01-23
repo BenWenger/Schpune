@@ -88,7 +88,20 @@ namespace schcore
         pulses.makeSilent();
         tnd.makeSilent();
 
-        // TODO - expansion channels
+        for(auto& i : exAudioChannels)
+            i.second->makeSilent();
+    }
+
+    void Apu::addExAudioChannel(ChannelId id, AudioChannel* chan, bool apply_clock_rate)
+    {
+        if(apply_clock_rate)
+            chan->setClockRate( getClockBase() );
+
+        chan->setBuilder( builder );
+        builder->addTimestampHolder(chan);
+        chan->updateSettings( audSettings, id );
+        
+        exAudioChannels[id] = chan;
     }
 
     //////////////////////////////////////////////////////////
@@ -126,7 +139,10 @@ namespace schcore
         pulses.updateSettings( audSettings, ChannelId::pulse0 );
         tnd.updateSettings( audSettings, ChannelId::triangle );
 
-        // TODO - forward to expansion audio
+        for(auto& i : exAudioChannels)
+        {
+            i.second->updateSettings( audSettings, i.first );
+        }
     }
 
     //////////////////////////////////////////////////////////
@@ -214,7 +230,8 @@ namespace schcore
             // run all channels up to this point
             pulses.run(curCyc(), audTimestamp);
             tnd.run(curCyc(), audTimestamp);
-            // TODO -- add expansion audio when ready
+            for(auto& i : exAudioChannels)
+                i.second->run( curCyc(), audTimestamp );
             
             ///////////////////////////////////////
             ///////////////////////////////////////
@@ -263,8 +280,9 @@ namespace schcore
         
         pulses.run(Time::Now, ts);
         tnd.run(Time::Now, ts);
-
-        // TODO - add expansion audio
+        
+        for(auto& i : exAudioChannels)
+            i.second->run( Time::Now, ts );
     }
 
 
@@ -276,7 +294,7 @@ namespace schcore
         if(info.hardReset)
         {
             subSystem_HardReset(info.cpu, info.region.apuClockBase);
-            // TODO - clear expansion audio list
+            exAudioChannels.clear();
 
             eventManager = info.eventManager;
 

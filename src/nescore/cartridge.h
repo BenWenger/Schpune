@@ -33,7 +33,7 @@ namespace schcore
 
         ////////////////////////////////////////////////
         //  Useful on reset
-        void            setPrgCallbacks(int readablestart, int readablestop, int writablestart, int writablestop);
+        void            setPrgCallbacks(int readablestart, int readablestop, int writablestart, int writablestop, bool addprgram = true);
         void            clearPrgRam(u8 v = 0);
 
         ////////////////////////////////////////////////
@@ -43,7 +43,8 @@ namespace schcore
 
         ////////////////////////////////////////////////
         //  Bankswapping
-        void            swapPrg_4k(int slot, int page);
+        void            swapPrg_4k(int slot, int page, bool ram = false);
+        void            swapPrg_8k(int slot, int page, bool ram = false);
 
 
 

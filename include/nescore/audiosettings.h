@@ -19,6 +19,10 @@ namespace schcore
         triangle,
         noise,
         dmc,
+        
+        vrc6_pulse0,
+        vrc6_pulse1,
+        vrc6_saw,
 
 
         count           // must be last

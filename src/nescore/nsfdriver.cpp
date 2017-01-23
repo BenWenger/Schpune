@@ -2,6 +2,8 @@
 #include "nsfdriver.h"
 #include "cpubus.h"
 #include "apu.h"
+#include "expansion_audio/exaudio.h"
+#include "expansion_audio/vrc6.h"
 
 namespace schcore
 {
@@ -22,6 +24,10 @@ namespace schcore
         u16 stpaddr = driverCodeAddr + 0x08;
         driverCode[0x0D] = static_cast<u8>( stpaddr );
         driverCode[0x0E] = static_cast<u8>( stpaddr >> 8 );
+    }
+
+    NsfDriver::~NsfDriver()
+    {
     }
 
     inline bool NsfDriver::isFdsTune() const
@@ -61,6 +67,10 @@ namespace schcore
             for(int i = 0; i < 10; ++i)
                 bankswappingValues[i] = static_cast<u8>( i + offset );
         }
+
+        // expansion audio?
+        expansion.clear();
+        if(file.extraAudio & NesFile::Audio_Vrc6)   expansion.emplace_back( std::make_unique<Vrc6Audio>(false) );
     }
 
     void NsfDriver::cartReset(const ResetInfo& info)
@@ -79,6 +89,9 @@ namespace schcore
             if(loadedFile->nsf_hasBankswitching)
                 info.cpuBus->addWriter( 0x5, 0x5, this, &NsfDriver::onWriteBankswap );
         }
+
+        for(auto& i : expansion)
+            i->reset(info);
     }
 
     void NsfDriver::doNsfPrgSwap(int slot, u8 v)
