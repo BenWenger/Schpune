@@ -25,6 +25,10 @@ namespace schcore
         //////////////////////////////////////////////////
         //  Resetting
         void                reset(const ResetInfo& info);
+        
+        //////////////////////////////////////////////////
+        //  Expansion audio
+        void                addExAudioChannel(AudioChannel* channel);
 
         //////////////////////////////////////////////////
         //  Output configuration

@@ -7,6 +7,9 @@
     <Filter Include="private">
       <UniqueIdentifier>{19a9c183-f503-4945-8e92-6bc86fce0b48}</UniqueIdentifier>
     </Filter>
+    <Filter Include="private\expansion_audio">
+      <UniqueIdentifier>{f2871fe7-7904-4836-b696-31231707cc80}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\nescore\schpunetypes.h">
@@ -99,6 +102,12 @@
     <ClInclude Include="..\..\include\nescore\mapperdesc.h">
       <Filter>public</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\nescore\expansion_audio\vrc6.h">
+      <Filter>private\expansion_audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\expansion_audio\exaudio.h">
+      <Filter>private\expansion_audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\nescore\cpubus.cpp">
@@ -151,6 +160,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\nescore\cartridge.cpp">
       <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\nescore\expansion_audio\vrc6.cpp">
+      <Filter>private\expansion_audio</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

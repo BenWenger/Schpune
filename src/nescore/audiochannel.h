@@ -22,7 +22,7 @@ namespace schcore
         // For run... give 'Time::Now' if cpu/aud is not to be run
         void                    run(timestamp_t cputarget, timestamp_t audiotarget);
 
-        void                    setBuilder(AudioBuilder* bldr)          { builder = bldr;       }
+        void                    setBuilder(AudioBuilder* bldr)                          { builder = bldr;           }
         virtual void            subtractFromAudioTimestamp(timestamp_t sub) override    { audTimestamp -= sub;      }
         void                    subtractFromCpuTimestamp(timestamp_t sub)               { cpuTimestamp -= sub;      }
         void                    setClockRate(timestamp_t rate)                          { clockRate = rate;         }
@@ -38,6 +38,7 @@ namespace schcore
         virtual int             doTicks(timestamp_t ticks, bool doaudio, bool docpu) = 0;
         virtual timestamp_t     clocksToNextUpdate() = 0;
         virtual void            recalcOutputLevels(const AudioSettings& settings, ChannelId chanid, std::vector<float> (&levels)[2]) = 0;
+        static void             doLinearOutputLevels(const AudioSettings& settings, ChannelId chanid, std::vector<float> (&levels)[2], int maxstep, float baseoutput);
 
         // Used by derived classes
         static const float              baseNativeOutputLevel;
