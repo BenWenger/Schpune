@@ -6,17 +6,18 @@
 #include <iostream>
 #include <string>
 #include "schpunetypes.h"
+#include "memorychip.h"
+#include "mapperdesc.h"
 
 namespace schcore
 {
     class NesFile
     {
     public:
-        // PRG and CHR
-        std::vector<u8>                         prgRom;
-        std::vector<u8>                         chrRom;
-        unsigned                                prgRamSize = 0;
-        unsigned                                chrRamSize = 0;
+        std::vector<MemoryChip>                 prgRomChips;
+        std::vector<MemoryChip>                 prgRamChips;
+        std::vector<MemoryChip>                 chrRomChips;
+        std::vector<MemoryChip>                 chrRamChips;
 
         // Mirroring
         enum class Mirror
@@ -24,7 +25,7 @@ namespace schcore
         bool                                    hasBattery = false;
 
         // Mapper
-        int                                     inesMapperNumber = 0;
+        MapperId                                mapper;
 
         enum class Region
         {   NTSC, PAL, Either, Unknown  }       region = Region::Unknown;
@@ -46,12 +47,16 @@ namespace schcore
         int                                     extraAudio = 0;
 
         // other nsf stuff
-        bool                                    hasBankswitching = false;
-        u8                                      bankswitchBytes[8] = {};
+        bool                                    nsf_hasBankswitching = false;
+        u8                                      nsf_bankswitchBytes[8] = {};
         int                                     trackCount = 0;
         int                                     startTrack = 0;
+        u16                                     loadAddr = 0;
         u16                                     initAddr = 0;
         u16                                     playAddr = 0;
+        std::string                             nameOfGame;
+        std::string                             nameOfArtist;
+        std::string                             nameOfCopyright;
 
         ////////////////////////////////////////
         //  File loading

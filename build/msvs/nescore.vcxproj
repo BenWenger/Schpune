@@ -133,10 +133,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\nescore\audiosettings.h" />
+    <ClInclude Include="..\..\include\nescore\mapperdesc.h" />
+    <ClInclude Include="..\..\include\nescore\memorychip.h" />
+    <ClInclude Include="..\..\include\nescore\nes.h" />
+    <ClInclude Include="..\..\include\nescore\error.h" />
     <ClInclude Include="..\..\include\nescore\nesfile.h" />
     <ClInclude Include="..\..\include\nescore\regioninfo.h" />
     <ClInclude Include="..\..\include\nescore\schpunetypes.h" />
-    <ClInclude Include="..\..\include\nescore\tempfront.h" />
     <ClInclude Include="..\..\src\nescore\apu.h" />
     <ClInclude Include="..\..\src\nescore\apu_pulse.h" />
     <ClInclude Include="..\..\src\nescore\apu_support.h" />
@@ -144,6 +147,7 @@
     <ClInclude Include="..\..\src\nescore\audiobuilder.h" />
     <ClInclude Include="..\..\src\nescore\audiochannel.h" />
     <ClInclude Include="..\..\src\nescore\audiotimestampholder.h" />
+    <ClInclude Include="..\..\src\nescore\cartridge.h" />
     <ClInclude Include="..\..\src\nescore\cpu.h" />
     <ClInclude Include="..\..\src\nescore\cpubus.h" />
     <ClInclude Include="..\..\src\nescore\cpustate.h" />
@@ -153,11 +157,11 @@
     <ClInclude Include="..\..\src\nescore\dmaunit.h" />
     <ClInclude Include="..\..\src\nescore\dmc_supplier.h" />
     <ClInclude Include="..\..\src\nescore\eventmanager.h" />
+    <ClInclude Include="..\..\src\nescore\nsfdriver.h" />
     <ClInclude Include="..\..\src\nescore\ppu.h" />
     <ClInclude Include="..\..\src\nescore\ppubus.h" />
     <ClInclude Include="..\..\src\nescore\resetinfo.h" />
     <ClInclude Include="..\..\src\nescore\subsystem.h" />
-    <ClInclude Include="..\..\src\nescore\tempnsf.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\nescore\apu.cpp" />
@@ -165,16 +169,18 @@
     <ClCompile Include="..\..\src\nescore\apu_tnd.cpp" />
     <ClCompile Include="..\..\src\nescore\audiobuilder.cpp" />
     <ClCompile Include="..\..\src\nescore\audiochannel.cpp" />
+    <ClCompile Include="..\..\src\nescore\cartridge.cpp" />
     <ClCompile Include="..\..\src\nescore\cpu.cpp" />
     <ClCompile Include="..\..\src\nescore\cpubus.cpp" />
     <ClCompile Include="..\..\src\nescore\cputracer.cpp" />
     <ClCompile Include="..\..\src\nescore\dmaunit.cpp" />
     <ClCompile Include="..\..\src\nescore\dmc_supplier.cpp" />
     <ClCompile Include="..\..\src\nescore\eventmanager.cpp" />
+    <ClCompile Include="..\..\src\nescore\nes.cpp" />
     <ClCompile Include="..\..\src\nescore\nesfile.cpp" />
+    <ClCompile Include="..\..\src\nescore\nsfdriver.cpp" />
     <ClCompile Include="..\..\src\nescore\ppu.cpp" />
-    <ClCompile Include="..\..\src\nescore\tempfront.cpp" />
-    <ClCompile Include="..\..\src\nescore\tempnsf.cpp" />
+    <ClCompile Include="..\..\src\nescore\ppubus.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

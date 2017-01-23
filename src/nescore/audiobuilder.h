@@ -16,7 +16,7 @@ namespace schcore
     public:
                                 AudioBuilder();
 
-        void                    hardReset();
+        void                    hardReset( timestamp_t clocks_per_second, timestamp_t clocks_per_frame );
 
         void                    addTransition( timestamp_t clocktime, float l, float r );
         int                     generateSamples( int startbytepos, s16* audio, int sizeinbytes );

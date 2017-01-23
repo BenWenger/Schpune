@@ -8,7 +8,7 @@
 #include <cstdio>
 #include <algorithm>
 
-#include "tempfront.h"
+#include "nes.h"
 
 void textOut(HDC dc, int x, int y, const char* str)
 {
@@ -18,7 +18,8 @@ void textOut(HDC dc, int x, int y, const char* str)
 const bool inStereo =       false;
 
 const char* const           classname = "Temp NSF Player";
-schcore::TempFront          nsf;
+//schcore::TempFront          nsf;
+schcore::Nes                nes;
 SoundOut                    snd(48000, inStereo, 200);
 bool                        runApp = true;
 bool                        loaded = false;
@@ -49,7 +50,8 @@ void drawWindow(HWND wnd)
     else
     {
         char buf[80];
-        sprintf( buf, "Track %d of %d", nsf.getTrack(), nsf.getTrackCount() );
+        //sprintf( buf, "Track %d of %d", nsf.getTrack(), nsf.getTrackCount() );
+        sprintf( buf, "Track %d of %d", nes.nsf_getTrack(), nes.nsf_getTrackCount() );
         textOut( dc, 40, 80, buf );
     }
 
@@ -88,18 +90,20 @@ void toggleTrace()
 {
     if(!tracing)
     {
-        if(!traceFile.good())
+        if(!traceFile.is_open())
             traceFile.open(traceFileName);
-        if(traceFile.good())
+        if(traceFile.is_open() && traceFile.good())
         {
             tracing = true;
-            nsf.setTracer( &traceFile );
+            //nsf.setTracer( &traceFile );   TODO -- implement this
+            nes.setTracer( &traceFile );
         }
     }
     else
     {
         tracing = false;
-        nsf.setTracer(nullptr);
+        //nsf.setTracer(nullptr);
+        nes.setTracer( nullptr );
     }
 }
 
@@ -113,7 +117,8 @@ void fillAudio()
 
         if(dumping)
         {
-            written = nsf.getSamples( reinterpret_cast<s16*>(tempdumpbuf), lk.getSize(0) + lk.getSize(1), nullptr, 0 );
+            //written = nsf.getSamples( reinterpret_cast<s16*>(tempdumpbuf), lk.getSize(0) + lk.getSize(1), nullptr, 0 );
+            written = nes.getAudio( tempdumpbuf, lk.getSize(0) + lk.getSize(1), nullptr, 0 );
             if(dumping)
                 fwrite( tempdumpbuf, 1, written, dumpfile );
             
@@ -122,27 +127,31 @@ void fillAudio()
 
             memcpy( lk.getBuffer(0), tempdumpbuf, writa );
             memcpy( lk.getBuffer(1), tempdumpbuf + writa, writb );
+            written = 0;
         }
         else
         {
-            written = nsf.getSamples( lk.getBuffer<s16>(0), lk.getSize(0), lk.getBuffer<s16>(1), lk.getSize(1) );
+            //written = nsf.getSamples( lk.getBuffer<s16>(0), lk.getSize(0), lk.getBuffer<s16>(1), lk.getSize(1) );
+            written = nes.getAudio( lk.getBuffer(0), lk.getSize(0), lk.getBuffer(1), lk.getSize(1) );
         }
 
         lk.setWritten(written);
     }
-    nsf.doFrame();
+    //nsf.doFrame();
+    nes.doFrame();
 }
 
 void changeTrack(int chg, HWND wnd)
 {
-    int oldtrack = nsf.getTrack();
+    //int oldtrack = nsf.getTrack();
+    int oldtrack = nes.nsf_getTrack();
     int newtrack = oldtrack + chg;
-    if(newtrack < 1)                    newtrack = 1;
-    if(newtrack > nsf.getTrackCount())  newtrack = nsf.getTrackCount();
+    if(newtrack < 1)                        newtrack = 1;
+    if(newtrack > nes.nsf_getTrackCount())  newtrack = nes.nsf_getTrackCount();
 
     if(newtrack != oldtrack)
     {
-        nsf.setTrack(newtrack);
+        nes.nsf_setTrack(newtrack);
         InvalidateRect(wnd,nullptr,true);
     }
 }
@@ -163,14 +172,25 @@ void loadFile(HWND wnd)
     ofn.nMaxFile =          500;
 
     if(GetOpenFileNameA(&ofn))
-        loaded = nsf.load(filebuf, inStereo);
+    {
+        try
+        {
+            nes.loadFile(filebuf);
+            loaded = true;
+        }
+        catch(std::exception& e)
+        {
+            loaded = false;
+            MessageBoxA(wnd, e.what(), "File load error", MB_OK);
+        }
+    }
 
     InvalidateRect(wnd,NULL,true);
 
     if(loaded)
     {
         snd.stop(true);
-        nsf.doFrame();
+        nes.doFrame();
         fillAudio();
         snd.play();
     }
@@ -246,7 +266,7 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show)
         if(!runApp)
             break;
 
-        if(loaded && (snd.canWrite() >= nsf.availableAudio()))
+        if(loaded && (snd.canWrite() >= nes.getAvailableAudioSize()))
         {
             fillAudio();
         }

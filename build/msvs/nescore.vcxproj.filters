@@ -54,12 +54,6 @@
     <ClInclude Include="..\..\include\nescore\regioninfo.h">
       <Filter>public</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\nescore\tempnsf.h">
-      <Filter>private</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\nescore\tempfront.h">
-      <Filter>public</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\nescore\cputracer.h">
       <Filter>private</Filter>
     </ClInclude>
@@ -87,6 +81,24 @@
     <ClInclude Include="..\..\include\nescore\nesfile.h">
       <Filter>public</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\nescore\nes.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\nescore\error.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\cartridge.h">
+      <Filter>private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\nsfdriver.h">
+      <Filter>private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\nescore\memorychip.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\nescore\mapperdesc.h">
+      <Filter>public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\nescore\cpubus.cpp">
@@ -105,12 +117,6 @@
       <Filter>private</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\nescore\apu.cpp">
-      <Filter>private</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\nescore\tempnsf.cpp">
-      <Filter>private</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\nescore\tempfront.cpp">
       <Filter>private</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\nescore\cputracer.cpp">
@@ -132,6 +138,18 @@
       <Filter>private</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\nescore\nesfile.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\nescore\nes.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\nescore\ppubus.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\nescore\nsfdriver.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\nescore\cartridge.cpp">
       <Filter>private</Filter>
     </ClCompile>
   </ItemGroup>

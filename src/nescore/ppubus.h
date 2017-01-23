@@ -17,6 +17,8 @@ namespace schcore
     public:
         void        write(u16 a, u8 v);
         u8          read(u16 a);
+
+        void        reset(const ResetInfo& info);
     };
 
 

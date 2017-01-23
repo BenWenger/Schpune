@@ -3,7 +3,6 @@
 #define SCHPUNE_NESCORE_SUBSYSTEM_H_INCLUDED
 
 #include "schpunetypes.h"
-#include "cpustate.h"
 
 
 namespace schcore
@@ -15,17 +14,18 @@ namespace schcore
 
         virtual void    run(timestamp_t runto) = 0;
 
-        timestamp_t     curCyc() const                  { return timestamp;             }
-        timestamp_t     getClockBase() const            { return clockBase;             }
-        void            setClockBase(timestamp_t base)  { clockBase = base;             }
+        timestamp_t     curCyc() const                      { return timestamp;             }
+        timestamp_t     getClockBase() const                { return clockBase;             }
+        void            setClockBase(timestamp_t base)      { clockBase = base;             }
 
-        virtual void    endFrame(timestamp_t subadjust) { timestamp -= subadjust;       }
-        void            setMainTimestamp(timestamp_t set)           { timestamp = set;      }
+        virtual void    endFrame(timestamp_t subadjust)     { timestamp -= subadjust;       }
+        void            setMainTimestamp(timestamp_t set)   { timestamp = set;      }
+        
+        void            catchUp()                           { run( drivingClock->curCyc() );    }
 
     protected:
         void            cyc()           { timestamp += clockBase;           }
         void            cyc(int cycs)   { timestamp += cycs * clockBase;    }
-        void            catchUp()       { run( drivingClock->curCyc() );    }
 
         timestamp_t     unitsToTimestamp(timestamp_t target)
         {

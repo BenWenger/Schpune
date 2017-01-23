@@ -16,6 +16,7 @@ namespace schcore
     class           AudioBuilder;
     class           CpuTracer;
     class           DmaUnit;
+    class           NesFile;
 
     class           EventManager;
 
@@ -34,6 +35,7 @@ namespace schcore
         AudioBuilder*   audioBuilder;
         DmaUnit*        dmaUnit;
         EventManager*   eventManager;
+        NesFile*        nesfile;
 
         RegionInfo      region;
     };

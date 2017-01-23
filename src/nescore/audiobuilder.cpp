@@ -32,8 +32,9 @@ namespace schcore
     }
 
     
-    void AudioBuilder::hardReset()
+    void AudioBuilder::hardReset(timestamp_t clocks_per_second, timestamp_t clocks_per_frame)
     {
+        setClockRates(clocks_per_second, clocks_per_frame);
         audioTimestampHolders.clear();
         flushTransitionBuffers();
     }
