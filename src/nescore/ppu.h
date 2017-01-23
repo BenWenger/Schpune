@@ -4,6 +4,7 @@
 
 #include "schpunetypes.h"
 #include "subsystem.h"
+#include "memorychip.h"
 
 
 namespace schcore
@@ -18,6 +19,7 @@ namespace schcore
     public:
         //////////////////////////////////////////////////
         //  Resetting
+                            Ppu();
         void                reset(const ResetInfo& info);
 
         //////////////////////////////////////////////////
@@ -29,7 +31,9 @@ namespace schcore
         //  Running
         virtual void        run(timestamp_t runto) override;
 
-        const u16*          getVideo() const            { return outputBuffer;      }
+
+        const u16*          getVideo() const            { return outputBuffer;          }
+        ChipPage            getNt(int v)                { return nametables[v != 0];    }
 
     private:
         void                predictNextEvent();
@@ -82,6 +86,8 @@ namespace schcore
         u8                  fineX;
 
         u8                  palette[0x20];
+        u8                  rawNametables[0x0800];
+        ChipPage            nametables[2];
         
         CpuBus*             cpuBus = nullptr;
         PpuBus*             ppuBus = nullptr;

@@ -11,8 +11,12 @@ namespace schcore
     void Cartridge::reset(const ResetInfo& info)
     {
         cpuBus = info.cpuBus;
-        ppuBus = info.ppuBus;
         subSystem_HardReset( info.cpu, info.region.cpuClockBase );
+        if(info.hardReset)
+        {
+            info.ppuBus->setIoDevice(this);
+            mir_hdr();
+        }
 
         cartReset(info);
     }
@@ -46,6 +50,8 @@ namespace schcore
         ppu->catchUp();
     }
 
+    /////////////////////////////////////////////
+    // PRG
     void Cartridge::swapPrg_4k(int slot, int page, bool ram)
     {
         apu->catchUp();
@@ -116,9 +122,96 @@ namespace schcore
         }
     }
 
-    
+    ///////////////////////////////////////
+    //  CHR
+    void Cartridge::swapChr_1k(int slot, int page, bool ram)
+    {
+        if(loadedFile->prgRomChips.empty()) ram = true;
+        if(loadedFile->prgRamChips.empty()) ram = false;
+        auto& chip = (ram ? loadedFile->chrRamChips.front() : loadedFile->chrRomChips.front());
+
+        ppu->catchUp();
+        chrPages[slot & 0x07] = chip.get1kPage(page);
+    }
+    void Cartridge::swapChr_2k(int slot, int page, bool ram)
+    {
+        if(loadedFile->prgRomChips.empty()) ram = true;
+        if(loadedFile->prgRamChips.empty()) ram = false;
+        auto& chip = (ram ? loadedFile->chrRamChips.front() : loadedFile->chrRomChips.front());
+
+        ppu->catchUp();
+        page <<= 1;
+        chrPages[ slot    & 0x07] = chip.get1kPage(page);
+        chrPages[(slot+1) & 0x07] = chip.get1kPage(page+1);
+    }
+    void Cartridge::swapChr_4k(int slot, int page, bool ram)
+    {
+        if(loadedFile->prgRomChips.empty()) ram = true;
+        if(loadedFile->prgRamChips.empty()) ram = false;
+        auto& chip = (ram ? loadedFile->chrRamChips.front() : loadedFile->chrRomChips.front());
+
+        ppu->catchUp();
+        page <<= 2;
+        chrPages[ slot    & 0x07] = chip.get1kPage(page);
+        chrPages[(slot+1) & 0x07] = chip.get1kPage(page+1);
+        chrPages[(slot+2) & 0x07] = chip.get1kPage(page+2);
+        chrPages[(slot+3) & 0x07] = chip.get1kPage(page+3);
+    }
+    void Cartridge::swapChr_8k(int slot, int page, bool ram)
+    {
+        if(loadedFile->prgRomChips.empty()) ram = true;
+        if(loadedFile->prgRamChips.empty()) ram = false;
+        auto& chip = (ram ? loadedFile->chrRamChips.front() : loadedFile->chrRomChips.front());
+
+        ppu->catchUp();
+        page <<= 2;
+        chrPages[ slot    & 0x07] = chip.get1kPage(page);
+        chrPages[(slot+1) & 0x07] = chip.get1kPage(page+1);
+        chrPages[(slot+2) & 0x07] = chip.get1kPage(page+2);
+        chrPages[(slot+3) & 0x07] = chip.get1kPage(page+3);
+        chrPages[(slot+4) & 0x07] = chip.get1kPage(page+4);
+        chrPages[(slot+5) & 0x07] = chip.get1kPage(page+5);
+        chrPages[(slot+6) & 0x07] = chip.get1kPage(page+6);
+        chrPages[(slot+7) & 0x07] = chip.get1kPage(page+7);
+    }
+
+    ////////////////////////////////////////////////
+    //  Mirroring
+    void Cartridge::mir_horz()
+    {
+        ppu->catchUp();
+        ntPages[0] = ntPages[1] = ppu->getNt(0);
+        ntPages[2] = ntPages[3] = ppu->getNt(1);
+    }
+    void Cartridge::mir_vert()
+    {
+        ppu->catchUp();
+        ntPages[0] = ntPages[2] = ppu->getNt(0);
+        ntPages[1] = ntPages[3] = ppu->getNt(1);
+    }
+    void Cartridge::mir_hdr()
+    {
+        switch(loadedFile->headerMirroring)
+        {
+        default:
+        case NesFile::Mirror::Horz:     mir_horz();     break;
+        case NesFile::Mirror::Vert:     mir_vert();     break;
+        }
+    }
+
     void Cartridge::onReadPrg(u16 a, u8& v)     { prgPages[a>>12].memRead(a,v);         }
     void Cartridge::onWritePrg(u16 a, u8 v)     { prgPages[a>>12].memWrite(a,v);        }
     int  Cartridge::onPeekPrg(u16 a) const      { return prgPages[a>>12].memPeek(a);    }
+    
+    void Cartridge::onPpuWrite(u16 a, u8 v)
+    {
+        if(a & 0x2000)      ntPages[(a >> 10) & 3].memWrite(a,v);
+        else                chrPages[(a >> 10) & 7].memWrite(a,v);
+    }
+    void Cartridge::onPpuRead(u16 a, u8& v)
+    {
+        if(a & 0x2000)      ntPages[(a >> 10) & 3].memRead(a,v);
+        else                chrPages[(a >> 10) & 7].memRead(a,v);
+    }
 }
 

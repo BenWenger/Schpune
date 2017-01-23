@@ -6,14 +6,14 @@
 #include "resetinfo.h"
 #include "nesfile.h"
 #include "error.h"
+#include "ppubus.h"
 
 namespace schcore
 {
     class Apu;
     class Ppu;
     class CpuBus;
-    class PpuBus;
-    class Cartridge : public SubSystem
+    class Cartridge : public SubSystem, public PpuIo
     {
     public:
         virtual ~Cartridge() { }
@@ -25,6 +25,10 @@ namespace schcore
             loadedFile = &file;
             cartLoad(file);
         }
+        
+        // PpuIo stuff -- can override
+        virtual     void onPpuWrite(u16 a, u8 v) override;
+        virtual     void onPpuRead(u16 a, u8& v) override;
         
     protected:
         NesFile*        loadedFile;
@@ -64,7 +68,6 @@ namespace schcore
         int             onPeekPrg(u16 a) const;
         void            onWritePrg(u16 a, u8 v);
         CpuBus*         cpuBus;
-        PpuBus*         ppuBus;
         Apu*            apu;
         Ppu*            ppu;
         ChipPage        prgPages[0x10];

@@ -11,6 +11,16 @@
 
 namespace schcore
 {
+    Ppu::Ppu()
+    {
+        nametables[0].mem = &rawNametables[0x0000];
+        nametables[1].mem = &rawNametables[0x0400];
+        
+        nametables[0].readable = nametables[1].readable =
+        nametables[0].writable = nametables[1].writable = &ChipPage::alwaysTrue;
+
+        nametables[0].mask = nametables[1].mask = 0x03FF;
+    }
 
     /////////////////////////////////////////////////////////////////////
     //  Resetting

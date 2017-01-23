@@ -10,6 +10,7 @@ namespace schcore
 {
     struct ChipPage
     {
+        static const bool alwaysTrue  = true;
         static const bool alwaysFalse = false;
 
         u8*             mem =       nullptr;

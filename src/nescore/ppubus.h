@@ -12,6 +12,14 @@ namespace schcore
 {
     class ResetInfo;
 
+    class PpuIo
+    {
+    public:
+        virtual     ~PpuIo() {}
+        virtual     void onPpuWrite(u16 a, u8 v) = 0;
+        virtual     void onPpuRead(u16 a, u8& v) = 0;
+    };
+
     class PpuBus
     {
     public:
@@ -19,6 +27,11 @@ namespace schcore
         u8          read(u16 a);
 
         void        reset(const ResetInfo& info);
+
+        void        setIoDevice(PpuIo* device)      { ioDevice = device;        }
+
+    private:
+        PpuIo*      ioDevice;
     };
 
 
