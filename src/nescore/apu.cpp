@@ -83,6 +83,14 @@ namespace schcore
         tnd.subtractFromCpuTimestamp(sub);
     }
 
+    void Apu::silenceAllChannels()
+    {
+        pulses.makeSilent();
+        tnd.makeSilent();
+
+        // TODO - expansion channels
+    }
+
     //////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////
 

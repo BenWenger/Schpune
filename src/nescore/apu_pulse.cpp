@@ -38,6 +38,12 @@ namespace schcore
         }
     }
 
+    void Apu_Pulse::makeSilent()
+    {
+        dat[0].length.writeEnable(0);
+        dat[1].length.writeEnable(0);
+    }
+
     void Apu_Pulse::write4015(u8 v)
     {
         dat[0].length.writeEnable(v & 0x01);

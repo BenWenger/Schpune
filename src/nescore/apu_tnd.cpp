@@ -19,7 +19,14 @@ namespace schcore
         { 428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106,  84,  72,  54 },     // NTSC
         { 398, 354, 316, 298, 276, 236, 210, 198, 176, 148, 132, 118,  98,  78,  66,  50 }      // PAL
     };
+    
 
+    void Apu_Tnd::makeSilent()
+    {
+        tri.length.writeEnable(0);
+        nse.length.writeEnable(0);
+        dmcpu.len = dmcaud.len = 0;
+    }
 
     void Apu_Tnd::writeMain(u16 a, u8 v)
     {
@@ -81,6 +88,7 @@ namespace schcore
             break;
         }
     }
+    
 
     void Apu_Tnd::write4015(u8 v)
     {

@@ -1,6 +1,7 @@
 
 #include "nsfdriver.h"
 #include "cpubus.h"
+#include "apu.h"
 
 namespace schcore
 {
@@ -66,6 +67,8 @@ namespace schcore
     {
         if(info.hardReset)
         {
+            apu = info.apu;
+
             if(isFdsTune())     setPrgCallbacks(0x6,0xF,0x6,0xF);
             else                setPrgCallbacks(0x6,0xF,0x6,0x7);
             
@@ -98,6 +101,9 @@ namespace schcore
         // wipe PRG RAM only if this isn't an FDS tune (FDS PRG RAM will get wiped on bankswapping)
         if( !isFdsTune() )
             clearPrgRam();
+
+        // silence all the channels
+        apu->silenceAllChannels();
 
         // Do all the PRG swapping
         for(int i = 0; i < 10; ++i)

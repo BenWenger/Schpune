@@ -33,6 +33,8 @@ namespace schcore
         void            onReadNsfDriver(u16 a, u8& v);
         int             onPeekNsfDriver(u16 a) const;
         void            onWriteBankswap(u16 a, u8 v);
+
+        Apu*                    apu;
     };
 
 }

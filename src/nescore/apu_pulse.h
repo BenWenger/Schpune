@@ -24,6 +24,8 @@ namespace schcore
         void                    reset(bool hard);
         void                    clockSeqHalf();
         void                    clockSeqQuarter();
+        
+        virtual void            makeSilent() override;
 
     protected:
         virtual int             doTicks(timestamp_t ticks, bool doaudio, bool docpu) override;

@@ -31,6 +31,8 @@ namespace schcore
 
         void                    updateSettings(const AudioSettings& settings, ChannelId chanid);
 
+        virtual void            makeSilent() = 0;       // for when NSF tracks are changed, all channels need to be turned off somehow
+
     protected:
         //  To be implemented by derived classes
         virtual int             doTicks(timestamp_t ticks, bool doaudio, bool docpu) = 0;

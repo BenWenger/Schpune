@@ -31,6 +31,8 @@ namespace schcore
         AudioSettings       getAudioSettings() const                                { return audSettings;      }
         void                setAudioSettings(const AudioSettings& settings);
 
+        void                silenceAllChannels();
+
         //////////////////////////////////////////////////
         //  Running
         virtual void        run(timestamp_t runto) override;
@@ -42,6 +44,7 @@ namespace schcore
 
         
         virtual void        endFrame(timestamp_t subadjust) override;
+
 
     private:
 
