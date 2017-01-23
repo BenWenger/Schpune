@@ -159,6 +159,7 @@
     <ClInclude Include="..\..\src\nescore\eventmanager.h" />
     <ClInclude Include="..\..\src\nescore\expansion_audio\exaudio.h" />
     <ClInclude Include="..\..\src\nescore\expansion_audio\vrc6.h" />
+    <ClInclude Include="..\..\src\nescore\mappers\nrom.h" />
     <ClInclude Include="..\..\src\nescore\nsfdriver.h" />
     <ClInclude Include="..\..\src\nescore\ppu.h" />
     <ClInclude Include="..\..\src\nescore\ppubus.h" />

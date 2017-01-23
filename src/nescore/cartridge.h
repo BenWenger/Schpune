@@ -29,7 +29,7 @@ namespace schcore
     protected:
         NesFile*        loadedFile;
         virtual void    cartLoad(NesFile& file) {}
-        virtual void    cartReset(const ResetInfo& info) {}
+        virtual void    cartReset(const ResetInfo& info) = 0;
 
         ////////////////////////////////////////////////
         //  Useful on reset
@@ -45,6 +45,17 @@ namespace schcore
         //  Bankswapping
         void            swapPrg_4k(int slot, int page, bool ram = false);
         void            swapPrg_8k(int slot, int page, bool ram = false);
+        void            swapPrg_16k(int slot, int page, bool ram = false);
+        void            swapPrg_32k(int slot, int page, bool ram = false);
+        
+        void            swapChr_1k(int slot, int page, bool ram = false);
+        void            swapChr_2k(int slot, int page, bool ram = false);
+        void            swapChr_4k(int slot, int page, bool ram = false);
+        void            swapChr_8k(int slot, int page, bool ram = false);
+        
+        void            mir_horz();
+        void            mir_vert();
+        void            mir_hdr();
 
 
 

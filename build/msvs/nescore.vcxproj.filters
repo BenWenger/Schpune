@@ -10,6 +10,9 @@
     <Filter Include="private\expansion_audio">
       <UniqueIdentifier>{f2871fe7-7904-4836-b696-31231707cc80}</UniqueIdentifier>
     </Filter>
+    <Filter Include="private\mappers">
+      <UniqueIdentifier>{dae1a1a9-48ff-47fb-b12b-e1ec9474283c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\nescore\schpunetypes.h">
@@ -107,6 +110,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\nescore\expansion_audio\exaudio.h">
       <Filter>private\expansion_audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\mappers\nrom.h">
+      <Filter>private\mappers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

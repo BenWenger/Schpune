@@ -48,14 +48,15 @@ namespace schcore
 
     void Cartridge::swapPrg_4k(int slot, int page, bool ram)
     {
+        apu->catchUp();
         if(ram && !loadedFile->prgRamChips.empty())
             prgPages[slot & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page);
         else
             prgPages[slot & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page);
     }
-
     void Cartridge::swapPrg_8k(int slot, int page, bool ram)
     {
+        apu->catchUp();
         page <<= 1;
         if(ram && !loadedFile->prgRamChips.empty())
         {
@@ -66,6 +67,52 @@ namespace schcore
         {
             prgPages[ slot    & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page);
             prgPages[(slot+1) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+1);
+        }
+    }
+    void Cartridge::swapPrg_16k(int slot, int page, bool ram)
+    {
+        apu->catchUp();
+        page <<= 2;
+        if(ram && !loadedFile->prgRamChips.empty())
+        {
+            prgPages[ slot    & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page);
+            prgPages[(slot+1) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+1);
+            prgPages[(slot+2) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+2);
+            prgPages[(slot+3) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+3);
+        }
+        else
+        {
+            prgPages[ slot    & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page);
+            prgPages[(slot+1) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+1);
+            prgPages[(slot+2) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+2);
+            prgPages[(slot+3) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+3);
+        }
+    }
+    void Cartridge::swapPrg_32k(int slot, int page, bool ram)
+    {
+        apu->catchUp();
+        page <<= 3;
+        if(ram && !loadedFile->prgRamChips.empty())
+        {
+            prgPages[ slot    & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page);
+            prgPages[(slot+1) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+1);
+            prgPages[(slot+2) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+2);
+            prgPages[(slot+3) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+3);
+            prgPages[(slot+4) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+4);
+            prgPages[(slot+5) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+5);
+            prgPages[(slot+6) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+6);
+            prgPages[(slot+7) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+7);
+        }
+        else
+        {
+            prgPages[ slot    & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page);
+            prgPages[(slot+1) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+1);
+            prgPages[(slot+2) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+2);
+            prgPages[(slot+3) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+3);
+            prgPages[(slot+4) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+4);
+            prgPages[(slot+5) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+5);
+            prgPages[(slot+6) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+6);
+            prgPages[(slot+7) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+7);
         }
     }
 
