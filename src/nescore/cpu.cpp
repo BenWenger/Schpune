@@ -361,7 +361,7 @@ namespace schcore
             case 0x9C:  adWrAx_xxx( cpu.Y );            break;  /* SHY  */
             case 0x8B:  XAA( adRdIm() );                break;  /* XAA  */
 
-            case 0x9B:  cpu.SP = cpu.A & cpu.X; ( cpu.SP );     break;  /* TAS  */
+            case 0x9B:  cpu.SP = cpu.A & cpu.X; adWrAy_xxx( cpu.SP );     break;  /* TAS  */
                 
                 /* AHX  */
             case 0x9F:  adWrAy_xxx( cpu.A & cpu.X );    break;
