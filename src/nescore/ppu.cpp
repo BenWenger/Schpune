@@ -181,12 +181,12 @@ namespace schcore
         case 6:     // $2006
             if(regToggle)
             {
-                addrTemp = (addrTemp & 0x00FF) | ((v & 0x7F) << 8);
+                addrTemp = (addrTemp & 0x7F00) | v;
                 addr = addrTemp;
             }
             else
             {
-                addrTemp = (addrTemp & 0x7F00) | v;
+                addrTemp = (addrTemp & 0x00FF) | ((v & 0x3F) << 8);
             }
             regToggle = !regToggle;
             break;

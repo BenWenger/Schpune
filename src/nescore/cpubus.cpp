@@ -125,7 +125,7 @@ namespace schcore
         template <typename T, int S>
         void addProc(int pagefirst, int pagelast, const T& proc, T (&lst)[0x10][S])
         {
-            if(pagefirst < 0)           throw std::runtime_error("Internal error:  Bus proc being added with invalid page");
+            if(pagefirst < 0)           return;
             if(pagelast > 0x0F)         throw std::runtime_error("Internal error:  Bus proc being added with invalid page");
             if(pagefirst > pagelast)    throw std::runtime_error("Internal error:  Bus proc being added with invalid page");
 

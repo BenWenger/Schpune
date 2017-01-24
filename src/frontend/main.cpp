@@ -9,154 +9,106 @@
 #include <algorithm>
 
 #include "nes.h"
+#include "display.h"
 
-void textOut(HDC dc, int x, int y, const char* str)
+namespace
 {
-    TextOutA(dc, x, y, str, std::strlen(str));
+    Display             display;
+    schcore::Nes        nes;
+    SoundOut            snd(48000, false, 100);
+    bool                runApp = true;
+    bool                loaded = false;
+    bool                isnsf;
+    HWND                wnd;
 }
 
-const bool inStereo =       false;
+LRESULT CALLBACK wndProc(HWND wnd, UINT msg, WPARAM w, LPARAM l);
 
-const char* const           classname = "Temp NSF Player";
-//schcore::TempFront          nsf;
-schcore::Nes                nes;
-SoundOut                    snd(48000, inStereo, 200);
-bool                        runApp = true;
-bool                        loaded = false;
-std::ofstream               traceFile;
-bool                        tracing = false;
-const char* const           traceFileName = "tempnsf_trace.txt";
-const char* const           dumpFileName = "tempnsf_dump.bin";
+void makeWindow(HINSTANCE inst, const char* windowname)
+{
+    WNDCLASSEXA         wc = {};
+    wc.cbSize =         sizeof(wc);
+    wc.hCursor =        LoadCursorA(nullptr, IDC_ARROW);
+    wc.hInstance =      inst;
+    wc.lpfnWndProc =    &wndProc;
+    wc.lpszClassName =  windowname;
+    RegisterClassExA(&wc);
 
-unsigned char               tempdumpbuf[10000];
+    static const int targetWd = 512;
+    static const int targetHt = 480;
 
+    wnd = CreateWindowExA( 0, windowname, windowname, WS_BORDER | WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_OVERLAPPED, 300, 300, targetWd, targetHt, nullptr, nullptr, inst, nullptr );
 
-FILE*                       dumpfile = nullptr;
-bool                        dumping = false;
+    RECT rc;
+    GetClientRect(wnd,&rc);
+    rc.right = (targetWd * 2) - rc.right;
+    rc.bottom = (targetHt * 2) - rc.bottom;
 
+    MoveWindow(wnd, 300, 300, rc.right, rc.bottom, false);
+    ShowWindow(wnd, SW_SHOW);
+}
 
-void drawWindow(HWND wnd)
+void handlePaint()
 {
     PAINTSTRUCT ps;
     HDC dc = BeginPaint(wnd,&ps);
-    
-    textOut(dc, 20, 20, "Press Escape to load an NSF" );
-    textOut(dc, 20, 40, "Press Left/Right arrows to switch tracks" );
-
-    if(!loaded)
-    {
-        textOut( dc, 40, 80, "No file loaded" );
-    }
-    else
-    {
-        char buf[80];
-        //sprintf( buf, "Track %d of %d", nsf.getTrack(), nsf.getTrackCount() );
-        sprintf( buf, "Track %d of %d", nes.nsf_getTrack(), nes.nsf_getTrackCount() );
-        textOut( dc, 40, 80, buf );
-    }
-
-    if(tracing)
-    {
-        textOut( dc, 60, 200, " ** TRACING **" );
-    }
-    if(dumping)
-    {
-        textOut( dc, 60, 250, " ** DUMPING **" );
-    }
-
-    EndPaint(wnd, &ps);
+    display.blit(dc);
+    EndPaint(wnd,&ps);
 }
 
-void toggleDump()
+bool readyForNextFrame()
 {
-    if(!dumping)
-    {
-        if(!dumpfile)
-            dumpfile = fopen(dumpFileName, "wb");
-        if(dumpfile)
-        {
-            dumping = true;
-        }
-    }
-    else
-    {
-        dumping = false;
-        fclose(dumpfile);
-        dumpfile = nullptr;
-    }
-}
+    if(!loaded)     return false;
 
-void toggleTrace()
-{
-    if(!tracing)
-    {
-        if(!traceFile.is_open())
-            traceFile.open(traceFileName);
-        if(traceFile.is_open() && traceFile.good())
-        {
-            tracing = true;
-            //nsf.setTracer( &traceFile );   TODO -- implement this
-            nes.setTracer( &traceFile );
-        }
-    }
-    else
-    {
-        tracing = false;
-        //nsf.setTracer(nullptr);
-        nes.setTracer( nullptr );
-    }
+    return snd.canWrite() >= nes.getApproxNaturalAudioSize();
 }
 
 void fillAudio()
 {
-    {
-        using schcore::s16;
-        auto lk = snd.lock();
-        int written = 0;
-        
+    using schcore::s16;
+    auto lk = snd.lock();
 
-        if(dumping)
-        {
-            //written = nsf.getSamples( reinterpret_cast<s16*>(tempdumpbuf), lk.getSize(0) + lk.getSize(1), nullptr, 0 );
-            written = nes.getAudio( tempdumpbuf, lk.getSize(0) + lk.getSize(1), nullptr, 0 );
-            if(dumping)
-                fwrite( tempdumpbuf, 1, written, dumpfile );
-            
-            int writa = std::min(lk.getSize(0), written);
-            int writb = std::min(lk.getSize(1), written - writa);
+    int written = nes.getAudio( lk.getBuffer(0), lk.getSize(0), lk.getBuffer(1), lk.getSize(1) );
 
-            memcpy( lk.getBuffer(0), tempdumpbuf, writa );
-            memcpy( lk.getBuffer(1), tempdumpbuf + writa, writb );
-            written = 0;
-        }
-        else
-        {
-            //written = nsf.getSamples( lk.getBuffer<s16>(0), lk.getSize(0), lk.getBuffer<s16>(1), lk.getSize(1) );
-            written = nes.getAudio( lk.getBuffer(0), lk.getSize(0), lk.getBuffer(1), lk.getSize(1) );
-        }
-
-        lk.setWritten(written);
-    }
-    //nsf.doFrame();
-    nes.doFrame();
+    lk.setWritten(written);
 }
 
-void changeTrack(int chg, HWND wnd)
+void doFrame()
 {
-    //int oldtrack = nsf.getTrack();
-    int oldtrack = nes.nsf_getTrack();
-    int newtrack = oldtrack + chg;
-    if(newtrack < 1)                        newtrack = 1;
-    if(newtrack > nes.nsf_getTrackCount())  newtrack = nes.nsf_getTrackCount();
-
-    if(newtrack != oldtrack)
+    nes.doFrame();
+    fillAudio();
+    if(!isnsf)
     {
-        nes.nsf_setTrack(newtrack);
-        InvalidateRect(wnd,nullptr,true);
+        display.refresh_rom( nes.getVideoBuffer() );
+        HDC dc = GetDC(wnd);
+        display.blit(dc);
+        ReleaseDC(wnd, dc);
     }
 }
 
-void loadFile(HWND wnd)
+void changeNsfTrack(int change)
+{
+    if(!isnsf || !loaded)
+        return;
+
+    int cur = nes.nsf_getTrack();
+    int next = cur + change;
+    int count = nes.nsf_getTrackCount();
+    
+    if(next > count)
+        next = count;
+    if(next < 1)
+        next = 1;
+
+    if(cur != next)
+    {
+        nes.nsf_setTrack(next);
+        display.refresh_nsf(next, count);
+        InvalidateRect(wnd,nullptr,false);
+    }
+}
+
+void loadFile()
 {
     snd.stop(false);
     
@@ -165,7 +117,7 @@ void loadFile(HWND wnd)
     OPENFILENAMEA ofn = {0};
     ofn.hwndOwner =         wnd;
     ofn.Flags =             OFN_HIDEREADONLY | OFN_FILEMUSTEXIST;
-    ofn.lpstrFilter =       "NSF Files\0*.nsf\0All Files\0*\0\0";
+    ofn.lpstrFilter =       "Supported Files\0*.nsf;*.nes\0All Files\0*\0\0";
     ofn.nFilterIndex =      1;
     ofn.lStructSize =       sizeof(ofn);
     ofn.lpstrFile =         filebuf;
@@ -180,23 +132,33 @@ void loadFile(HWND wnd)
         }
         catch(std::exception& e)
         {
-            loaded = false;
             MessageBoxA(wnd, e.what(), "File load error", MB_OK);
+            loaded = false;
         }
     }
-
-    InvalidateRect(wnd,NULL,true);
-
+    else        // hit 'cancel' to get out of dialog -- no change
+    {
+        if(loaded)
+            snd.play();
+        return;
+    }
+    
     if(loaded)
     {
+        isnsf = nes.isNsf();
+        if(isnsf)
+        {
+            display.refresh_nsf( nes.nsf_getTrack(), nes.nsf_getTrackCount() );
+            InvalidateRect(wnd,nullptr,false);
+        }
+
         snd.stop(true);
-        nes.doFrame();
-        fillAudio();
+        doFrame();
         snd.play();
     }
 }
 
-LRESULT CALLBACK WndProc(HWND wnd, UINT msg, WPARAM w, LPARAM l)
+LRESULT CALLBACK wndProc(HWND wnd, UINT msg, WPARAM w, LPARAM l)
 {
     switch(msg)
     {
@@ -205,28 +167,18 @@ LRESULT CALLBACK WndProc(HWND wnd, UINT msg, WPARAM w, LPARAM l)
         break;
 
     case WM_PAINT:
-        drawWindow(wnd);
+        handlePaint();
         break;
 
     case WM_KEYDOWN:
         {
             switch(w)
             {
-            case VK_ESCAPE:
-                loadFile(wnd);
-                break;
-            case VK_TAB:
-                toggleTrace();
-                InvalidateRect(wnd,nullptr,true);
-                break;
-            case VK_BACK:
-                toggleDump();
-                InvalidateRect(wnd,nullptr,true);
-                break;
-            case VK_LEFT:       changeTrack( -1,wnd);   break;
-            case VK_RIGHT:      changeTrack(  1,wnd);   break;
-            case VK_UP:         changeTrack( 10,wnd);   break;
-            case VK_DOWN:       changeTrack(-10,wnd);   break;
+            case VK_ESCAPE:     loadFile();             break;
+            case VK_LEFT:       changeNsfTrack( -1);    break;
+            case VK_RIGHT:      changeNsfTrack(  1);    break;
+            case VK_UP:         changeNsfTrack( 10);    break;
+            case VK_DOWN:       changeNsfTrack(-10);    break;
             }
         }
         break;
@@ -237,24 +189,10 @@ LRESULT CALLBACK WndProc(HWND wnd, UINT msg, WPARAM w, LPARAM l)
 
 int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show)
 {
-    WNDCLASSEXA wc = {0};
-    wc.cbSize = sizeof(wc);
-    wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
-    wc.hCursor = LoadCursorA(NULL, IDC_ARROW);
-    wc.hInstance = inst;
-    wc.lpfnWndProc = &WndProc;
-    wc.lpszClassName = classname;
-
-    if(!RegisterClassExA(&wc))
-        return 1;
-
-    HWND wnd = CreateWindowExA(0, classname, classname, WS_OVERLAPPEDWINDOW | WS_VISIBLE, 100, 100, 800, 600, NULL, NULL, inst, NULL );
-    if(!wnd)
-        return 2;
-
-    MSG msg;
+    makeWindow(inst,"Schpune");
     runApp = true;
 
+    MSG msg;
     while(runApp)
     {
         while(PeekMessage(&msg, wnd, 0, 0, PM_REMOVE))
@@ -266,16 +204,9 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show)
         if(!runApp)
             break;
 
-        if(loaded && (snd.canWrite() >= nes.getAvailableAudioSize()))
-        {
-            fillAudio();
-        }
-        else
-            Sleep(10);
+        if(readyForNextFrame())     doFrame();
+        else                        Sleep(1);
     }
-
-    if(dumping)
-        toggleDump();
 
     return 0;
 }
