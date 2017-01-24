@@ -10,6 +10,8 @@ namespace schcore
 {
     void Cartridge::reset(const ResetInfo& info)
     {
+        apu = info.apu;
+        ppu = info.ppu;
         cpuBus = info.cpuBus;
         subSystem_HardReset( info.cpu, info.region.cpuClockBase );
         if(info.hardReset)
@@ -164,7 +166,7 @@ namespace schcore
         auto& chip = (ram ? loadedFile->chrRamChips.front() : loadedFile->chrRomChips.front());
 
         ppu->catchUp();
-        page <<= 2;
+        page <<= 3;
         chrPages[ slot    & 0x07] = chip.get1kPage(page);
         chrPages[(slot+1) & 0x07] = chip.get1kPage(page+1);
         chrPages[(slot+2) & 0x07] = chip.get1kPage(page+2);

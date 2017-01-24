@@ -78,6 +78,7 @@ namespace schcore
         std::unique_ptr<CpuTracer>      cpuTracer;
         std::unique_ptr<EventManager>   eventManager;
         NesFile                         loadedFile;
+        std::unique_ptr<Cartridge>      ownedCartridge;
         Cartridge*                      cartridge;
 
         std::unique_ptr<NsfDriver>      nsfDriver;

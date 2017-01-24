@@ -11,6 +11,7 @@
 #include "audiobuilder.h"
 #include "nsfdriver.h"
 #include "cputracer.h"
+#include "mappers/mappers.h"
 
 
 //////////////////////////////////////////////////////////////
@@ -79,8 +80,8 @@ namespace schcore
             if(file.chrRomChips.empty() && file.chrRamChips.empty() && file.fileType == NesFile::FileType::ROM)
                 throw Error("Nes::loadFile: give file has no CHR");
 
-            // TODO
-            throw Error( "ROM files not yet supported" );
+            ownedCartridge = mpr::buildCartridgeFromFile(file);
+            cartridge = ownedCartridge.get();
             break;
 
         case NesFile::FileType::NSF:
@@ -241,6 +242,22 @@ namespace schcore
             
             cpu->endFrame( clocksPerFrame );
             apu->endFrame( clocksPerFrame );
+        }
+        else
+        {
+            timestamp_t run = clocksPerFrame;
+
+            cpu->run( run );
+            apu->run( run );
+            ppu->run( run );
+            cartridge->run( run );
+
+            run = ppu->finalizeFrame();
+            
+            cpu->endFrame( run );
+            apu->endFrame( run );
+            ppu->endFrame( run );
+            cartridge->endFrame( run );
         }
     }
 }
