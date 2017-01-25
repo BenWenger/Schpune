@@ -42,14 +42,14 @@ namespace schcore
             void            setState(int v, bool dpad_protect = true);
 
         private:
-            virtual void            hardReset() override    { latch = 0; strobe_reload = false;     }
+            virtual void            hardReset() override    { latch = 0; strobe_bit = false;    }
             virtual void            connect() override      { }
             virtual void            write(u8 v) override;
             virtual u8              read() override;
 
             u8              state = 0;
             u8              latch = 0;
-            bool            strobe_reload = false;
+            bool            strobe_bit = false;
         };
     }
 }

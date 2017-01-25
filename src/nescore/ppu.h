@@ -97,6 +97,8 @@ namespace schcore
         u16                 outputBuffer[240 * 256];
         u16*                pixel;
 
+        u8                  sprPixels[256 + 8];             // $40 = spr 0, $80 = high prio
+
         //  output shifters
         u16                 chrLoShift;
         u16                 chrHiShift;
@@ -118,6 +120,9 @@ namespace schcore
         timestamp_t         run_preRenderLine_Off(timestamp_t ticks);
         timestamp_t         run_line_On(timestamp_t ticks);
         timestamp_t         run_renderLine_Off(timestamp_t ticks);
+
+
+        void                buildSpritePixels();
     };
 
 

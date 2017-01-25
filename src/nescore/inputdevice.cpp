@@ -25,19 +25,19 @@ namespace schcore
         {
             bool newstrobe = (v & 0x01) != 0;
 
-            if(strobe_reload && !newstrobe)
+            if(!strobe_bit && newstrobe)
                 latch = state;
 
-            strobe_reload = newstrobe;
+            strobe_bit = newstrobe;
         }
 
         u8 Controller::read()
         {
-            if(strobe_reload)       return (state & 0x01);
+            if(strobe_bit)      return (state & 0x01);
 
-            u8 out = (state & 0x01);
-            state >>= 1;
-            state |= 0x80;
+            u8 out = (latch & 0x01);
+            latch >>= 1;
+            latch |= 0x80;
             return out;
         }
     }

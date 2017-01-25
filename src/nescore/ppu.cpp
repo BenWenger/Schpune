@@ -75,6 +75,7 @@ namespace schcore
             eventManager = info.eventManager;
 
             for(auto i : outputBuffer)  i = 0x0F;
+            for(auto i : sprPixels)     i = 0;
             
             cpuBus->addReader(0x2, 0x3, this, &Ppu::onRead);
             cpuBus->addWriter(0x2, 0x3, this, &Ppu::onWrite);
@@ -360,6 +361,11 @@ namespace schcore
             if(scanCyc < 256)
                 *pixel++ = clrout;
 
+            if(scanCyc == 256)
+            {
+                buildSpritePixels();
+            }
+
             cyc();
             --ticks;
             ++scanCyc;
@@ -411,6 +417,7 @@ namespace schcore
                 break;
 
             case 256:
+                buildSpritePixels();
                 resetX();
                 // no break
                       case   8: case  16: case  24: case  32: case  40: case  48: case  56:
@@ -465,12 +472,23 @@ namespace schcore
             {
                 u8 bgpix = ((chrLoShift >> (15-fineX)) & 0x01)
                          | ((chrHiShift >> (14-fineX)) & 0x02);
+                if(scanCyc < bgClip)        bgpix = 0;
 
                 // TODO - add attributes
+                
+                ////////////////////////////////////////
+                // get sprite pixel
+                u8 sprpix = sprPixels[scanCyc];
+                if(scanCyc < spClip)        sprpix = 0;
 
-                // TODO multiplex with sprite pixel
+                //sprite 0 hit?
+                if(bgpix && (sprpix & 0x40) && scanCyc != 255)
+                    statusByte |= 0x40;                             // TODO - this is delayed 1 cycle
 
-                // TODO sprite 0 hit
+                // which pixel to use?
+                if(!bgpix || (sprpix & 0x80))
+                    bgpix = sprpix & 0x1F;
+
 
                 *pixel++ = emphasis | (palette[bgpix] & pltMask);
                 chrLoShift <<= 1;
@@ -598,4 +616,83 @@ namespace schcore
         }
     }
 
+
+    ///////////////////////////////////////////
+
+    void Ppu::buildSpritePixels()
+    {
+        // TODO -- this entire routine is temporary.  Replace this with actual OAM evaluation logic
+        for(auto& i : sprPixels)        i = 0;      // TODO -- this is temporary
+
+        if(!renderOn) return;
+
+        int spritesfound = 0;
+        u16 a;
+        u8 at;
+
+        for(int i = 0; i < 256; i += 4)
+        {
+            int y = scanline - oam[i+0];
+            if(y < 0)               continue;
+            if(y >= spriteSize)     continue;
+
+            ++spritesfound;
+            if(spritesfound > 8)
+            {
+                statusByte |= 0x20;
+                break;
+            }
+
+            // v-flip
+            if(oam[i+2] & 0x80)     y ^= 0x0F;
+
+            if(spriteSize == 16)
+            {
+                a  = (oam[i+1] & 0xFE) << 4;
+                a |= (oam[i+1] & 0x01) << 12;
+                if(y & 0x08)
+                    a |= 0x0010;
+            }
+            else
+            {
+                a  = oam[i+1] << 4;
+                a |= spPage;
+            }
+            a |= (y & 0x07);
+
+
+            at  = (oam[i+2] << 2) & 0x8C;
+            at ^= 0x80;                     // flip priority bit (makes drawing logic easier)
+            at |= 0x10;                     // sprites always use the 1x palette
+            if(!i)      at |= 0x40;         //sprite 0
+
+            u8 lo = ppuBus->read(a);
+            u8 hi = ppuBus->read(a | 8);
+
+            // h-flip
+            u8* dst = &sprPixels[ oam[i+3] ];
+            if(oam[i+2] & 0x40)
+            {
+                if(!dst[0])     if(dst[0] = ((hi << 1) & 2) | ((lo     ) & 1))      dst[0] |= at;
+                if(!dst[1])     if(dst[1] = ((hi     ) & 2) | ((lo >> 1) & 1))      dst[1] |= at;
+                if(!dst[2])     if(dst[2] = ((hi >> 1) & 2) | ((lo >> 2) & 1))      dst[2] |= at;
+                if(!dst[3])     if(dst[3] = ((hi >> 2) & 2) | ((lo >> 3) & 1))      dst[3] |= at;
+                if(!dst[4])     if(dst[4] = ((hi >> 3) & 2) | ((lo >> 4) & 1))      dst[4] |= at;
+                if(!dst[5])     if(dst[5] = ((hi >> 4) & 2) | ((lo >> 5) & 1))      dst[5] |= at;
+                if(!dst[6])     if(dst[6] = ((hi >> 5) & 2) | ((lo >> 6) & 1))      dst[6] |= at;
+                if(!dst[7])     if(dst[7] = ((hi >> 6) & 2) | ((lo >> 7) & 1))      dst[7] |= at;
+            }
+            else
+            {
+                if(!dst[0])     if(dst[0] = ((hi >> 6) & 2) | ((lo >> 7) & 1))      dst[0] |= at;
+                if(!dst[1])     if(dst[1] = ((hi >> 5) & 2) | ((lo >> 6) & 1))      dst[1] |= at;
+                if(!dst[2])     if(dst[2] = ((hi >> 4) & 2) | ((lo >> 5) & 1))      dst[2] |= at;
+                if(!dst[3])     if(dst[3] = ((hi >> 3) & 2) | ((lo >> 4) & 1))      dst[3] |= at;
+                if(!dst[4])     if(dst[4] = ((hi >> 2) & 2) | ((lo >> 3) & 1))      dst[4] |= at;
+                if(!dst[5])     if(dst[5] = ((hi >> 1) & 2) | ((lo >> 2) & 1))      dst[5] |= at;
+                if(!dst[6])     if(dst[6] = ((hi     ) & 2) | ((lo >> 1) & 1))      dst[6] |= at;
+                if(!dst[7])     if(dst[7] = ((hi << 1) & 2) | ((lo     ) & 1))      dst[7] |= at;
+            }
+        }
+    }
 }
