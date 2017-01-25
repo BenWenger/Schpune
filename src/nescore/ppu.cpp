@@ -562,7 +562,7 @@ namespace schcore
         {
             addr &= 0x0FFF;
             if     ((addr & 0x03E0) == 0x03E0)  addr ^= 0x03E0;
-            else if((addr & 0x03E0) == 0x03C0)  addr ^= 0x03C0 | 0x0800;
+            else if((addr & 0x03E0) == 0x03A0)  addr ^= 0x03A0 | 0x0800;
             else                                addr += 0x0020;
         }
         else
