@@ -13,6 +13,7 @@ namespace schcore
     class CpuBus;
     class PpuBus;
     class EventManager;
+    class CpuTracer;
 
     class Ppu : public SubSystem
     {

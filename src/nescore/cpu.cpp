@@ -97,13 +97,17 @@ namespace schcore
             // hijacking happens at this point
             if(bus->isNmiPending())
             {
+                if( *tracer )
+                    tracer->traceRawLine( "** NMI **" );
                 vector = 0xFFFA;
                 bus->acknowledgeNmi();
-                sw = false;
+                sw = false;                 // does this get changed here?
             }
             else if(bus->isIrqPending())
             {
-                sw = false;
+                if( *tracer )
+                    tracer->traceRawLine( "** IRQ: " + bus->getPendingIrqName() + " **" );
+                sw = false;                 // does this get changed here?
             }
             push( cpu.getStatus(sw) );
         }

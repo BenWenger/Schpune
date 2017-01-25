@@ -137,7 +137,7 @@ void full_RTI()
     rd(cpu.PC);
     rd( 0x0100 | cpu.SP );
     cpu.setStatus( pull() );
-    cpu.PC  = pull();
+    cpu.PC  = pull();               pollInterrupt();
     cpu.PC |= pull() << 8;
 }
 
@@ -146,7 +146,7 @@ void full_RTS()
     rd(cpu.PC);
     rd( 0x0100 | cpu.SP );
     cpu.PC  = pull();
-    cpu.PC |= pull() << 8;
+    cpu.PC |= pull() << 8;          pollInterrupt();
     rd( cpu.PC++ );
 }
 
@@ -155,13 +155,13 @@ void full_JSR()
     u8 a = rd(cpu.PC++);
     rd( 0x0100 | cpu.SP );
     push( static_cast<u8>( cpu.PC >> 8 ) );
-    push( static_cast<u8>( cpu.PC      ) );
+    push( static_cast<u8>( cpu.PC      ) ); pollInterrupt();
     cpu.PC = a | (rd(cpu.PC) << 8);
 }
 
 void full_JMP()
 {
-    u8 a = rd(cpu.PC++);
+    u8 a = rd(cpu.PC++);            pollInterrupt();
     cpu.PC = a | (rd(cpu.PC) << 8);
 }
 
@@ -169,7 +169,7 @@ void full_JMP_Indirect()
 {
     u8 lo   = rd(cpu.PC++);
     u16 hi  = rd(cpu.PC) << 8;
-    cpu.PC  = rd(hi | lo++);
+    cpu.PC  = rd(hi | lo++);        pollInterrupt();
     cpu.PC |= rd(hi | lo) << 8;
 }
 

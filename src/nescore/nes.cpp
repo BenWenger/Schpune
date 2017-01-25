@@ -33,6 +33,7 @@ namespace schcore
     {
         cpuTracer->enable();            // leave it enabled -- whether or not it has a stream will be whether it's enabled
         cpuTracer->supplyBus( cpuBus.get() );
+        inputDevices[0] = inputDevices[1] = nullptr;
     }
 
     Nes::~Nes()
@@ -169,6 +170,14 @@ namespace schcore
             cpuBus->addReader( 0, 1, this, &Nes::onReadRam );
             cpuBus->addWriter( 0, 1, this, &Nes::onWriteRam );
             cpuBus->addPeeker( 0, 1, this, &Nes::onPeekRam );
+            if(!isNsf())                    // add controller access for non-nsfs
+            {
+                cpuBus->addReader( 4, 4, this, &Nes::onReadInput );
+                cpuBus->addWriter( 4, 4, this, &Nes::onWriteInput );
+                
+                if(inputDevices[0]) inputDevices[0]->hardReset();
+                if(inputDevices[1]) inputDevices[1]->hardReset();
+            }
         }
     }
     
@@ -223,6 +232,38 @@ namespace schcore
     {
         return ppu->getVideo();
     }
+    ///////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////
+
+    //  Input!
+    void Nes::setInputDevice(int port, input::InputDevice* device)
+    {
+        inputDevices[port != 0] = device;
+        if(device)
+            device->hardReset();
+    }
+    
+    void Nes::onReadInput(u16 a, u8& v)
+    {
+        if(a == 0x4016 || a == 0x4017)
+        {
+            a &= 1;
+            v &= ~0x1F;
+
+            if(inputDevices[a])     v |= inputDevices[a]->read() & 0x19;
+                    //  TODO - expansion port / Famicom differences
+        }
+    }
+
+    void Nes::onWriteInput(u16 a, u8 v)
+    {
+        if(a == 0x4016)
+        {
+            if(inputDevices[0])     inputDevices[0]->write(v & 0x01);
+            if(inputDevices[1])     inputDevices[1]->write(v & 0x01);
+                    // TODO - expansion port
+        }
+    }
     
     ///////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////
@@ -258,6 +299,7 @@ namespace schcore
             apu->endFrame( run );
             ppu->endFrame( run );
             cartridge->endFrame( run );
+            eventManager->subtractFromTimestamps( run );
         }
     }
 }

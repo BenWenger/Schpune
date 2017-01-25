@@ -117,6 +117,11 @@ namespace schcore
 
         return out;
     }
+
+    std::string CpuBus::getPendingIrqName() const
+    {
+        return getIrqName( pendingIrq );
+    }
     
     //////////////////////////////////////////////////
     //  Adding read/write/peek handlers

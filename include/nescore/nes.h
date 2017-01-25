@@ -7,6 +7,7 @@
 #include <vector>
 #include "schpunetypes.h"
 #include "nesfile.h"
+#include "inputdevice.h"
 
 namespace schcore
 {
@@ -36,6 +37,8 @@ namespace schcore
 
                         Nes();
                         ~Nes();
+
+        void            setInputDevice(int port, input::InputDevice* device);       // port=0 is P1, port=1 is P2
                         
         void            loadFile(NesFile&& file);           // takes ownership
         void            loadFile(const char* filename);
@@ -83,6 +86,8 @@ namespace schcore
 
         std::unique_ptr<NsfDriver>      nsfDriver;
 
+        input::InputDevice*             inputDevices[2];
+
         // nsf specific stuff
         int                             curNsfTrack = 0;
 
@@ -99,6 +104,8 @@ namespace schcore
         int             onPeekRam(u16 a) const          { return systemRam[a & 0x07FF];                 }
         void            onReadRam(u16 a, u8& v)         { v = systemRam[a & 0x07FF];                    }
         void            onWriteRam(u16 a, u8 v)         { systemRam[a & 0x07FF] = v;                    }
+        void            onReadInput(u16 a, u8& v);
+        void            onWriteInput(u16 a, u8 v);
     };
 }
 

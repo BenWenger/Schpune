@@ -204,7 +204,7 @@ namespace schcore
                 dmcaud.supplier =                                   &dmcPeekSampleBuffer;
                 dmcpu.freqCounter =     dmcaud.freqCounter =        dmcFreqTimer;
                 dmcpu.addr =            dmcaud.addr =               dmcAddrLoad;
-                dmcpu.len =             dmcaud.len =                dmcLenLoad;
+                dmcpu.len =             dmcaud.len =                0;
                 dmcpu.outputUnit =      dmcaud.outputUnit =         0;
                 dmcpu.bitsRemaining =   dmcaud.bitsRemaining =      8;
                 dmcpu.audible =         dmcaud.audible =            false;
@@ -215,6 +215,12 @@ namespace schcore
             nse.length.writeEnable(0);
             dmcpu.len = 0;
             dmcaud.len = 0;
+
+            // flush audible DMC buffers
+            dmcaud.audible = false;
+            u8 t;
+            bool b;
+            dmcaud.supplier->getFetchedByte(t,b);
         }
     }
 

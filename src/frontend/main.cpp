@@ -13,14 +13,37 @@
 
 namespace
 {
-    Display             display;
-    schcore::Nes        nes;
-    SoundOut            snd(48000, false, 100);
-    bool                runApp = true;
-    bool                loaded = false;
-    bool                isnsf;
-    HWND                wnd;
+    Display                     display;
+    schcore::Nes                nes;
+    SoundOut                    snd(48000, false, 100);
+    bool                        runApp = true;
+    bool                        loaded = false;
+    bool                        isnsf;
+    HWND                        wnd;
+    std::ofstream               traceFile;
+    schcore::input::Controller  controller;
+
+    const char* const   traceFileName = "schpunetrace.txt";
 }
+
+///////////////////////////////////////////////
+///////////////////////////////////////////////
+void toggleTrace()
+{
+    if(traceFile.is_open())
+    {
+        nes.setTracer(nullptr);
+        traceFile.close();
+    }
+    else
+    {
+        traceFile.open(traceFileName);
+        nes.setTracer(&traceFile);
+    }
+}
+
+///////////////////////////////////////////////
+///////////////////////////////////////////////
 
 LRESULT CALLBACK wndProc(HWND wnd, UINT msg, WPARAM w, LPARAM l);
 
@@ -75,6 +98,21 @@ void fillAudio()
 
 void doFrame()
 {
+    if( !nes.isNsf() )
+    {
+        int btns = 0;
+        if(0x8000 & GetAsyncKeyState('Z'))          btns |= schcore::input::Controller::Btn_A;
+        if(0x8000 & GetAsyncKeyState('X'))          btns |= schcore::input::Controller::Btn_B;
+        if(0x8000 & GetAsyncKeyState(VK_RSHIFT))    btns |= schcore::input::Controller::Btn_Select;
+        if(0x8000 & GetAsyncKeyState(VK_RETURN))    btns |= schcore::input::Controller::Btn_Start;
+        if(0x8000 & GetAsyncKeyState(VK_UP))        btns |= schcore::input::Controller::Btn_Up;
+        if(0x8000 & GetAsyncKeyState(VK_DOWN))      btns |= schcore::input::Controller::Btn_Down;
+        if(0x8000 & GetAsyncKeyState(VK_LEFT))      btns |= schcore::input::Controller::Btn_Left;
+        if(0x8000 & GetAsyncKeyState(VK_RIGHT))     btns |= schcore::input::Controller::Btn_Right;
+
+        controller.setState(btns);
+    }
+
     nes.doFrame();
     fillAudio();
     if(!isnsf)
@@ -179,6 +217,8 @@ LRESULT CALLBACK wndProc(HWND wnd, UINT msg, WPARAM w, LPARAM l)
             case VK_RIGHT:      changeNsfTrack(  1);    break;
             case VK_UP:         changeNsfTrack( 10);    break;
             case VK_DOWN:       changeNsfTrack(-10);    break;
+
+            case VK_F9:         toggleTrace();          break;
             }
         }
         break;
@@ -191,6 +231,8 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show)
 {
     makeWindow(inst,"Schpune");
     runApp = true;
+
+    nes.setInputDevice( 0, &controller );
 
     MSG msg;
     while(runApp)

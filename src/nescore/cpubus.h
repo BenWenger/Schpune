@@ -38,6 +38,7 @@ namespace schcore
         //  Interrupt detection
         irqsource_t         createIrqCode(const std::string& name);
         std::string         getIrqName(irqsource_t s) const;
+        std::string         getPendingIrqName() const;
 
         irqsource_t         isIrqPending() const            { return pendingIrq & allowedIrqs;  }
         bool                isNmiPending() const            { return pendingNmi;    }

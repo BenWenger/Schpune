@@ -111,6 +111,6 @@ void Display::buildPalette()
         g = std::min(src[1] * emph[1] / 1000, 0xFF);
         b = std::min(src[2] * emph[2] / 1000, 0xFF);
 
-        palette[i] = (r <<  0) | (g <<  8) << (b << 16);
+        palette[i] = (r << 16) | (g <<  8) | (b <<  0);
     }
 }

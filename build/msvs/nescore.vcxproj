@@ -133,6 +133,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\nescore\audiosettings.h" />
+    <ClInclude Include="..\..\include\nescore\inputdevice.h" />
     <ClInclude Include="..\..\include\nescore\mapperdesc.h" />
     <ClInclude Include="..\..\include\nescore\memorychip.h" />
     <ClInclude Include="..\..\include\nescore\nes.h" />
@@ -181,6 +182,7 @@
     <ClCompile Include="..\..\src\nescore\dmc_supplier.cpp" />
     <ClCompile Include="..\..\src\nescore\eventmanager.cpp" />
     <ClCompile Include="..\..\src\nescore\expansion_audio\vrc6.cpp" />
+    <ClCompile Include="..\..\src\nescore\inputdevice.cpp" />
     <ClCompile Include="..\..\src\nescore\mappers\mappers.cpp" />
     <ClCompile Include="..\..\src\nescore\nes.cpp" />
     <ClCompile Include="..\..\src\nescore\nesfile.cpp" />

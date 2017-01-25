@@ -96,7 +96,11 @@ namespace schcore
         }
     }
 
-
+    void CpuTracer::traceRawLine(const std::string& str)
+    {
+        if(isOn())
+            (*streamOutput) << str << '\n';
+    }
     
     void CpuTracer::traceCpuLine(const CpuState& stt)
     {

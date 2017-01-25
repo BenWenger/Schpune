@@ -25,8 +25,9 @@ namespace schcore
         void                    enable()                { active = true;                        }
         void                    disable()               { active = false;                       }
         void                    toggle()                { active = !active;                     }
-
+        
         void                    traceCpuLine(const CpuState& stt);
+        void                    traceRawLine(const std::string& str);
 
     private:
         bool                    active = false;

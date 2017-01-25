@@ -6,6 +6,7 @@
 #include "eventmanager.h"
 #include "resetinfo.h"
 #include "cpu.h"
+#include "cputracer.h"
 
 // TODO PPU Warm up time?   https://wiki.nesdev.com/w/index.php/PPU_power_up_state
 
@@ -27,7 +28,7 @@ namespace schcore
     void Ppu::reset(const ResetInfo& info)
     {
         regBus =            0;
-        scanline =          line_vbl;
+        scanline =          line_post;
         scanCyc =           0;
         oddFrame =          false;
         oddCycSkipped =     false;
@@ -77,6 +78,9 @@ namespace schcore
             
             cpuBus->addReader(0x2, 0x3, this, &Ppu::onRead);
             cpuBus->addWriter(0x2, 0x3, this, &Ppu::onWrite);
+            
+            vblankCycles = 20 * 341 * info.region.ppuClockBase;     // TODO - do this smarter
+            safeOamCycles = 20 * 341 * info.region.ppuClockBase;
         }
     }
 
@@ -139,6 +143,7 @@ namespace schcore
             addrTemp =          (addrTemp & 0x73FF) | ((v & 0x03) << 10);
             if(nmiEnabled)
                 predictNextEvent();
+
             break;
 
         case 1:     // $2001
@@ -385,7 +390,8 @@ namespace schcore
             // pre-render scanline stuff
             if(scanline == line_pre)
             {
-                if(scanCyc >= 279 && scanCyc < 304)     addr = addrTemp;
+                if(scanCyc >= 279 && scanCyc < 304)
+                    addr = addrTemp;
 
                 if(scanCyc == 340)
                 {
@@ -583,15 +589,12 @@ namespace schcore
             evt *= getClockBase();      // scale up to an actual timestamp
             evt += curCyc();
 
-            ////////////////////////////////////////
-            //  you have to run 1 cycle into VBlank for NMI to trigger.
-            //   but we also want to add an event 1 cycle early in case there's an odd frame cycle skip
+            ///////////////////////////
+            // Add the event at this timestamp
+            eventManager->addEvent( evt, EventType::evt_ppu );
 
-            // So add this timestamp for the skipped-frame cycle (+1-1 = 0)
-            eventManager->addEvent( evt, EventType::evt_ppu );                          // TODO don't do this on PAL since there are no skipped cycles?
-
-            // and +1 for the not-skipped-frame cycle
-            eventManager->addEvent( evt + getClockBase(), EventType::evt_ppu );
+            // and also at time-1 in case the odd cycle is skipped
+            eventManager->addEvent( evt - getClockBase(), EventType::evt_ppu );                          // TODO don't do this on PAL since there are no skipped cycles?
         }
     }
 

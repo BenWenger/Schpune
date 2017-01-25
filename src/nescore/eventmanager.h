@@ -15,6 +15,7 @@ namespace schcore
 
     class ResetInfo;
     class SubSystem;
+    class CpuTracer;
 
 
     class EventManager
