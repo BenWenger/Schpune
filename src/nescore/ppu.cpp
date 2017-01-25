@@ -389,6 +389,7 @@ namespace schcore
         //  In other words -- ALL the rendering work is done here
 
         timestamp_t cyclesRun = 0;        // ticks ran
+        u16 a;
 
         while((cyclesRun < ticks) && (scanline < line_post))
         {
@@ -427,6 +428,7 @@ namespace schcore
             case 328: case 336:
                 chrLoShift |= chrLoFetch;
                 chrHiShift |= chrHiFetch;
+                atShift = (atShift << 2) | atFetch;
                 break;
                 
             case   1: case   9: case  17: case  25: case  33: case  41: case  49: case  57:
@@ -442,7 +444,12 @@ namespace schcore
             case 131: case 139: case 147: case 155: case 163: case 171: case 179: case 187:
             case 195: case 203: case 211: case 219: case 227: case 235: case 243: case 251:
             case 323: case 331:
-                atFetch = ppuBus->read(0);       // TODO -- do the actual attribute read!
+                // attributes are a beast
+                a = 0x23C0 | ((addr >> 2) & 0x0007) | ((addr >> 4) & 0x0038) | (addr & 0x0C00);
+                atFetch = ppuBus->read(a);
+                if(addr & 0x0002)   atFetch >>= 2;
+                if(addr & 0x0040)   atFetch >>= 4;
+                atFetch &= 0x03;
                 break;
                 
             case   5: case  13: case  21: case  29: case  37: case  45: case  53: case  61:
@@ -474,7 +481,12 @@ namespace schcore
                          | ((chrHiShift >> (14-fineX)) & 0x02);
                 if(scanCyc < bgClip)        bgpix = 0;
 
-                // TODO - add attributes
+                // apply attributes
+                if(bgpix)
+                {
+                    if( ((scanCyc & 7) + fineX) & 8 )   bgpix |= (atShift << 2) & 0x0C;
+                    else                                bgpix |= atShift & 0x0C;
+                }
                 
                 ////////////////////////////////////////
                 // get sprite pixel

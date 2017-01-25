@@ -102,6 +102,7 @@ namespace schcore
         //  output shifters
         u16                 chrLoShift;
         u16                 chrHiShift;
+        u8                  atShift;
 
         bool                spr0Hit;
         u8                  ntFetch;
