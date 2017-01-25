@@ -98,6 +98,9 @@ namespace schcore
         inesMapperNumber =      ((hdr[0x06] & 0xF0) >> 4) | (hdr[0x07] & 0xF0);
         mapper =                MapperId::INES_NUMBER;
 
+        // default to 8K PRG-RAM
+        prgRamChips.emplace_back( 0x2000 );
+
         ////////////////////////////////////
         //   Read the ROM data
         std::vector<u8> prg(prgSize);

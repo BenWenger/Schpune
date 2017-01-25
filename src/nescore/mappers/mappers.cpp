@@ -6,6 +6,7 @@
 
 ////////////////////////////////////////
 #include "000.h"
+#include "001.h"
 #include "002.h"
 #include "003.h"
 #include "007.h"
@@ -23,6 +24,7 @@ namespace schcore
                 switch(file.inesMapperNumber)
                 {
                 case   0:   MPR(Mpr_000)();
+                case   1:   MPR(Mpr_001)();
                 case   2:   MPR(Mpr_002)();
                 case   3:   MPR(Mpr_003)();
                 case   7:   MPR(Mpr_007)();

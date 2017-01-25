@@ -52,9 +52,11 @@ namespace schcore
         //      Therefore they can be called from read/write handlers to see what
         //  the 'previous' address/data was prior to the current read/write being processed.
         //  This makes detecting bus line changes easier.
-        u16                 getALine() const        { return aLine;     }
-        u8                  getDLine() const        { return dLine;     }
-        bool                wasWriteLast() const    { return wLine;     }   // true if the last access was a write
+        u16                 getALine() const                { return aLine;     }
+        u8                  getDLine() const                { return dLine;     }
+        bool                wasWriteLast() const            { return wLine;     }   // true if the last access was a write
+        bool                isDuplicateWrite(u16 a) const   { return wLine && (a == getALine());    }
+        bool                isDuplicateRead(u16 a) const    { return !wLine && (a == getALine());   }
 
 
         //////////////////////////////////////////////////
