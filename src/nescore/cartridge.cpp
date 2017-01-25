@@ -23,6 +23,13 @@ namespace schcore
         cartReset(info);
     }
 
+    u8 Cartridge::busConflict(u16 a, u8 v)
+    {
+        u8 out = v;
+        onReadPrg(a, v);
+        return out & v;
+    }
+
     void Cartridge::setPrgCallbacks(int readablestart, int readablestop, int writablestart, int writablestop, bool addprgram)
     {
         cpuBus->addPeeker( readablestart, readablestop, this, &Cartridge::onPeekPrg );
@@ -128,8 +135,8 @@ namespace schcore
     //  CHR
     void Cartridge::swapChr_1k(int slot, int page, bool ram)
     {
-        if(loadedFile->prgRomChips.empty()) ram = true;
-        if(loadedFile->prgRamChips.empty()) ram = false;
+        if(loadedFile->chrRomChips.empty()) ram = true;
+        if(loadedFile->chrRamChips.empty()) ram = false;
         auto& chip = (ram ? loadedFile->chrRamChips.front() : loadedFile->chrRomChips.front());
 
         ppu->catchUp();
@@ -137,8 +144,8 @@ namespace schcore
     }
     void Cartridge::swapChr_2k(int slot, int page, bool ram)
     {
-        if(loadedFile->prgRomChips.empty()) ram = true;
-        if(loadedFile->prgRamChips.empty()) ram = false;
+        if(loadedFile->chrRomChips.empty()) ram = true;
+        if(loadedFile->chrRamChips.empty()) ram = false;
         auto& chip = (ram ? loadedFile->chrRamChips.front() : loadedFile->chrRomChips.front());
 
         ppu->catchUp();
@@ -148,8 +155,8 @@ namespace schcore
     }
     void Cartridge::swapChr_4k(int slot, int page, bool ram)
     {
-        if(loadedFile->prgRomChips.empty()) ram = true;
-        if(loadedFile->prgRamChips.empty()) ram = false;
+        if(loadedFile->chrRomChips.empty()) ram = true;
+        if(loadedFile->chrRamChips.empty()) ram = false;
         auto& chip = (ram ? loadedFile->chrRamChips.front() : loadedFile->chrRomChips.front());
 
         ppu->catchUp();
@@ -161,8 +168,8 @@ namespace schcore
     }
     void Cartridge::swapChr_8k(int slot, int page, bool ram)
     {
-        if(loadedFile->prgRomChips.empty()) ram = true;
-        if(loadedFile->prgRamChips.empty()) ram = false;
+        if(loadedFile->chrRomChips.empty()) ram = true;
+        if(loadedFile->chrRamChips.empty()) ram = false;
         auto& chip = (ram ? loadedFile->chrRamChips.front() : loadedFile->chrRomChips.front());
 
         ppu->catchUp();
@@ -190,6 +197,12 @@ namespace schcore
         ppu->catchUp();
         ntPages[0] = ntPages[2] = ppu->getNt(0);
         ntPages[1] = ntPages[3] = ppu->getNt(1);
+    }
+    void Cartridge::mir_1scr(int scr)
+    {
+        ppu->catchUp();
+        ntPages[0] = ntPages[2] = 
+        ntPages[1] = ntPages[3] = ppu->getNt(scr);
     }
     void Cartridge::mir_hdr()
     {

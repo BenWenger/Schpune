@@ -26,6 +26,7 @@ namespace schcore
 
         // Mapper
         MapperId                                mapper;
+        int                                     inesMapperNumber;
 
         enum class Region
         {   NTSC, PAL, Either, Unknown  }       region = Region::Unknown;

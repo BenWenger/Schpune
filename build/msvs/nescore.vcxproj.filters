@@ -111,14 +111,23 @@
     <ClInclude Include="..\..\src\nescore\expansion_audio\exaudio.h">
       <Filter>private\expansion_audio</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\nescore\mappers\nrom.h">
-      <Filter>private\mappers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\nescore\mappers\mappers.h">
       <Filter>private\mappers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\nescore\inputdevice.h">
       <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\mappers\000.h">
+      <Filter>private\mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\mappers\003.h">
+      <Filter>private\mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\mappers\002.h">
+      <Filter>private\mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\mappers\007.h">
+      <Filter>private\mappers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

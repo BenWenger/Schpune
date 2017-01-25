@@ -82,6 +82,8 @@ namespace schcore
                 throw Error("Nes::loadFile: give file has no CHR");
 
             ownedCartridge = mpr::buildCartridgeFromFile(file);
+            if(!ownedCartridge)
+                throw Error("Mapper not supported");
             cartridge = ownedCartridge.get();
             break;
 

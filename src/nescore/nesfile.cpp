@@ -95,8 +95,8 @@ namespace schcore
         if(hdr[0x06] & 0x08)    headerMirroring = Mirror::FourScr;
         else                    headerMirroring = (hdr[0x06] & 0x01) ? Mirror::Vert : Mirror::Horz;
 
-        int inesMapperNumber =  ((hdr[0x06] & 0xF0) >> 4) | (hdr[0x07] & 0xF0);
-        mapper =                MapperId::NROM;     // TODO this is temporary
+        inesMapperNumber =      ((hdr[0x06] & 0xF0) >> 4) | (hdr[0x07] & 0xF0);
+        mapper =                MapperId::INES_NUMBER;
 
         ////////////////////////////////////
         //   Read the ROM data

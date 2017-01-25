@@ -7,6 +7,7 @@
 #include "nesfile.h"
 #include "error.h"
 #include "ppubus.h"
+#include "cpubus.h"
 
 namespace schcore
 {
@@ -60,6 +61,11 @@ namespace schcore
         void            mir_horz();
         void            mir_vert();
         void            mir_hdr();
+        void            mir_1scr(int scr);
+
+        ////////////////////////////////////////////////
+        //  Other
+        u8              busConflict(u16 a, u8 v);
 
 
 

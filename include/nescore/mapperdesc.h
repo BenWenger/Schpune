@@ -6,8 +6,8 @@ namespace schcore
 {
     enum class MapperId
     {
-        NSF =       0x100000,
-        NROM =      0
+        NSF =           0x100000,
+        INES_NUMBER =   0
     };
 }
 
