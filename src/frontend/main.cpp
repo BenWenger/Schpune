@@ -67,7 +67,7 @@ void makeWindow(HINSTANCE inst, const char* windowname)
     rc.right = (targetWd * 2) - rc.right;
     rc.bottom = (targetHt * 2) - rc.bottom;
 
-    MoveWindow(wnd, 300, 300, rc.right, rc.bottom, false);
+    MoveWindow(wnd, 100, 100, rc.right, rc.bottom, false);
     ShowWindow(wnd, SW_SHOW);
 }
 

@@ -30,14 +30,13 @@ namespace schcore
         return out & v;
     }
 
-    void Cartridge::setPrgCallbacks(int readablestart, int readablestop, int writablestart, int writablestop, bool addprgram)
+    void Cartridge::setDefaultPrgCallbacks()
     {
-        cpuBus->addPeeker( readablestart, readablestop, this, &Cartridge::onPeekPrg );
-        cpuBus->addReader( readablestart, readablestop, this, &Cartridge::onReadPrg );
-        cpuBus->addWriter( writablestart, writablestop, this, &Cartridge::onWritePrg );
+        cpuBus->addPeeker( 0x6, 0xF, this, &Cartridge::onPeekPrg );
+        cpuBus->addReader( 0x6, 0xF, this, &Cartridge::onReadPrg );
+        cpuBus->addWriter( 0x6, 0x7, this, &Cartridge::onWritePrg );
 
-        if(addprgram && !loadedFile->prgRamChips.empty())
-            swapPrg_8k( 6, 0, true );
+        swapPrg_8k( 6, 0, true );       // TODO -- is this desired?
     }
 
     void Cartridge::clearPrgRam(u8 v)
@@ -60,128 +59,115 @@ namespace schcore
     }
 
     /////////////////////////////////////////////
+    // Getting Prg/Chr chips for easy swapping
+    MemoryChip* Cartridge::getFirstChrChip(bool preferram)
+    {
+        if(loadedFile->chrRomChips.empty())     preferram = true;
+        if(loadedFile->chrRamChips.empty())     preferram = false;
+
+        auto& chipset = preferram ? loadedFile->chrRamChips : loadedFile->chrRomChips;
+        if(chipset.empty())     return &dummyChip;
+        return &chipset.front();
+    }
+
+    MemoryChip* Cartridge::getFirstPrgChip(bool preferram)
+    {
+        if(loadedFile->prgRomChips.empty())     preferram = true;
+        if(loadedFile->prgRamChips.empty())     preferram = false;
+
+        auto& chipset = preferram ? loadedFile->prgRamChips : loadedFile->prgRomChips;
+        if(chipset.empty())     return &dummyChip;
+        return &chipset.front();
+    }
+
+    /////////////////////////////////////////////
     // PRG
     void Cartridge::swapPrg_4k(int slot, int page, bool ram)
     {
         apu->catchUp();
-        if(ram && !loadedFile->prgRamChips.empty())
-            prgPages[slot & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page);
-        else
-            prgPages[slot & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page);
+
+        auto chip = getFirstPrgChip(ram);
+        prgPages[slot & 0x0F] = chip->get4kPage(page);
     }
     void Cartridge::swapPrg_8k(int slot, int page, bool ram)
     {
         apu->catchUp();
         page <<= 1;
-        if(ram && !loadedFile->prgRamChips.empty())
-        {
-            prgPages[ slot    & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page);
-            prgPages[(slot+1) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+1);
-        }
-        else
-        {
-            prgPages[ slot    & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page);
-            prgPages[(slot+1) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+1);
-        }
+
+        auto chip = getFirstPrgChip(ram);
+        prgPages[ slot    & 0x0F] = chip->get4kPage(page);
+        prgPages[(slot+1) & 0x0F] = chip->get4kPage(page+1);
     }
     void Cartridge::swapPrg_16k(int slot, int page, bool ram)
     {
         apu->catchUp();
         page <<= 2;
-        if(ram && !loadedFile->prgRamChips.empty())
-        {
-            prgPages[ slot    & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page);
-            prgPages[(slot+1) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+1);
-            prgPages[(slot+2) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+2);
-            prgPages[(slot+3) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+3);
-        }
-        else
-        {
-            prgPages[ slot    & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page);
-            prgPages[(slot+1) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+1);
-            prgPages[(slot+2) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+2);
-            prgPages[(slot+3) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+3);
-        }
+
+        auto chip = getFirstPrgChip(ram);
+        prgPages[ slot    & 0x0F] = chip->get4kPage(page);
+        prgPages[(slot+1) & 0x0F] = chip->get4kPage(page+1);
+        prgPages[(slot+2) & 0x0F] = chip->get4kPage(page+2);
+        prgPages[(slot+3) & 0x0F] = chip->get4kPage(page+3);
     }
     void Cartridge::swapPrg_32k(int slot, int page, bool ram)
     {
         apu->catchUp();
         page <<= 3;
-        if(ram && !loadedFile->prgRamChips.empty())
-        {
-            prgPages[ slot    & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page);
-            prgPages[(slot+1) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+1);
-            prgPages[(slot+2) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+2);
-            prgPages[(slot+3) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+3);
-            prgPages[(slot+4) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+4);
-            prgPages[(slot+5) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+5);
-            prgPages[(slot+6) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+6);
-            prgPages[(slot+7) & 0x0F] = loadedFile->prgRamChips.front().get4kPage(page+7);
-        }
-        else
-        {
-            prgPages[ slot    & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page);
-            prgPages[(slot+1) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+1);
-            prgPages[(slot+2) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+2);
-            prgPages[(slot+3) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+3);
-            prgPages[(slot+4) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+4);
-            prgPages[(slot+5) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+5);
-            prgPages[(slot+6) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+6);
-            prgPages[(slot+7) & 0x0F] = loadedFile->prgRomChips.front().get4kPage(page+7);
-        }
+
+        auto chip = getFirstPrgChip(ram);
+        prgPages[ slot    & 0x0F] = chip->get4kPage(page);
+        prgPages[(slot+1) & 0x0F] = chip->get4kPage(page+1);
+        prgPages[(slot+2) & 0x0F] = chip->get4kPage(page+2);
+        prgPages[(slot+3) & 0x0F] = chip->get4kPage(page+3);
+        prgPages[(slot+4) & 0x0F] = chip->get4kPage(page+4);
+        prgPages[(slot+5) & 0x0F] = chip->get4kPage(page+5);
+        prgPages[(slot+6) & 0x0F] = chip->get4kPage(page+6);
+        prgPages[(slot+7) & 0x0F] = chip->get4kPage(page+7);
     }
 
     ///////////////////////////////////////
     //  CHR
     void Cartridge::swapChr_1k(int slot, int page, bool ram)
     {
-        if(loadedFile->chrRomChips.empty()) ram = true;
-        if(loadedFile->chrRamChips.empty()) ram = false;
-        auto& chip = (ram ? loadedFile->chrRamChips.front() : loadedFile->chrRomChips.front());
-
         ppu->catchUp();
-        chrPages[slot & 0x07] = chip.get1kPage(page);
+        
+        auto chip = getFirstChrChip(ram);
+        chrPages[slot & 0x07] = chip->get1kPage(page);
     }
     void Cartridge::swapChr_2k(int slot, int page, bool ram)
     {
-        if(loadedFile->chrRomChips.empty()) ram = true;
-        if(loadedFile->chrRamChips.empty()) ram = false;
-        auto& chip = (ram ? loadedFile->chrRamChips.front() : loadedFile->chrRomChips.front());
-
         ppu->catchUp();
         page <<= 1;
-        chrPages[ slot    & 0x07] = chip.get1kPage(page);
-        chrPages[(slot+1) & 0x07] = chip.get1kPage(page+1);
+        
+        auto chip = getFirstChrChip(ram);
+        chrPages[ slot    & 0x07] = chip->get1kPage(page);
+        chrPages[(slot+1) & 0x07] = chip->get1kPage(page+1);
     }
     void Cartridge::swapChr_4k(int slot, int page, bool ram)
     {
-        if(loadedFile->chrRomChips.empty()) ram = true;
-        if(loadedFile->chrRamChips.empty()) ram = false;
-        auto& chip = (ram ? loadedFile->chrRamChips.front() : loadedFile->chrRomChips.front());
-
         ppu->catchUp();
         page <<= 2;
-        chrPages[ slot    & 0x07] = chip.get1kPage(page);
-        chrPages[(slot+1) & 0x07] = chip.get1kPage(page+1);
-        chrPages[(slot+2) & 0x07] = chip.get1kPage(page+2);
-        chrPages[(slot+3) & 0x07] = chip.get1kPage(page+3);
+
+        auto chip = getFirstChrChip(ram);
+        chrPages[ slot    & 0x07] = chip->get1kPage(page);
+        chrPages[(slot+1) & 0x07] = chip->get1kPage(page+1);
+        chrPages[(slot+2) & 0x07] = chip->get1kPage(page+2);
+        chrPages[(slot+3) & 0x07] = chip->get1kPage(page+3);
     }
     void Cartridge::swapChr_8k(int slot, int page, bool ram)
     {
-        if(loadedFile->chrRomChips.empty()) ram = true;
-        if(loadedFile->chrRamChips.empty()) ram = false;
-        auto& chip = (ram ? loadedFile->chrRamChips.front() : loadedFile->chrRomChips.front());
-
         ppu->catchUp();
         page <<= 3;
-        chrPages[ slot    & 0x07] = chip.get1kPage(page);
-        chrPages[(slot+1) & 0x07] = chip.get1kPage(page+1);
-        chrPages[(slot+2) & 0x07] = chip.get1kPage(page+2);
-        chrPages[(slot+3) & 0x07] = chip.get1kPage(page+3);
-        chrPages[(slot+4) & 0x07] = chip.get1kPage(page+4);
-        chrPages[(slot+5) & 0x07] = chip.get1kPage(page+5);
-        chrPages[(slot+6) & 0x07] = chip.get1kPage(page+6);
-        chrPages[(slot+7) & 0x07] = chip.get1kPage(page+7);
+
+        auto chip = getFirstChrChip(ram);
+        chrPages[ slot    & 0x07] = chip->get1kPage(page);
+        chrPages[(slot+1) & 0x07] = chip->get1kPage(page+1);
+        chrPages[(slot+2) & 0x07] = chip->get1kPage(page+2);
+        chrPages[(slot+3) & 0x07] = chip->get1kPage(page+3);
+        chrPages[(slot+4) & 0x07] = chip->get1kPage(page+4);
+        chrPages[(slot+5) & 0x07] = chip->get1kPage(page+5);
+        chrPages[(slot+6) & 0x07] = chip->get1kPage(page+6);
+        chrPages[(slot+7) & 0x07] = chip->get1kPage(page+7);
     }
 
     ////////////////////////////////////////////////

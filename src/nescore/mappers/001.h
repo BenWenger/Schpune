@@ -9,7 +9,7 @@ namespace schcore{ namespace mpr {
             if(info.hardReset)
             {
                 swapPrg_8k(6,0,true);
-                setPrgCallbacks(0x6,0xF,0x6,0x7,false);
+                setDefaultPrgCallbacks();
                 regs[1] = 0;
                 regs[2] = 0;
                 regs[3] = 0;

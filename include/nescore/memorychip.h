@@ -26,11 +26,15 @@ namespace schcore
     class MemoryChip
     {
     public:
-        bool                readable;
-        bool                writable;
-        bool                hasBattery;
+        bool                readable = false;
+        bool                writable = false;
+        bool                hasBattery = false;
 
         /////////////////////////////////////////////////
+        MemoryChip()
+        {
+        }
+
         MemoryChip(std::vector<u8>&& d, bool writ = false)
         {
             adoptDataFromVector( std::move(d) );
@@ -76,6 +80,8 @@ namespace schcore
         ChipPage    get4kPage(unsigned page)
         {
             ChipPage pg;
+            if(data.empty())            return pg;
+
             pg.readable =   &readable;
             pg.writable =   &writable;
             pg.mask =       0x0FFF & mask;
@@ -87,6 +93,8 @@ namespace schcore
         ChipPage    get1kPage(unsigned page)
         {
             ChipPage pg;
+            if(data.empty())            return pg;
+
             pg.readable =   &readable;
             pg.writable =   &writable;
             pg.mask =       0x03FF & mask;
@@ -101,7 +109,7 @@ namespace schcore
 
     private:
         std::vector<u8>     data;
-        std::size_t         mask;
+        std::size_t         mask = 0;
     };
 }
 

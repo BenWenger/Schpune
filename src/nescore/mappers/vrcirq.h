@@ -28,7 +28,18 @@ namespace schcore{ namespace mpr {
         void    writeIrqLatch(u8 v)         { catchUp();    latch = v;                              }
         void    writeIrqLatch_lo(u8 v)      { catchUp();    latch = (latch & 0xF0) | (v & 0x0F);    }
         void    writeIrqLatch_hi(u8 v)      { catchUp();    latch = (latch & 0x0F) | (v & 0xF0);    }
-        void    writeIrqControl(u8 v)       { catchUp();    control = v;      ack();  predict();    }
+        void    writeIrqControl(u8 v)
+        {
+            catchUp();
+            control = v;
+            if(control & 0x02)
+            {
+                counter = latch;
+                prescalar = 341;
+            }
+            ack();
+            predict();
+        }
         void    writeIrqAcknowledge()
         {
             catchUp();
@@ -63,7 +74,7 @@ namespace schcore{ namespace mpr {
             if(ticks >= 0x100)
             {
                 trigger();
-                ticks = (ticks - 0x100) % (0x100 - latch);
+                ticks = ((ticks - 0x100) % (0x100 - latch)) + latch; 
             }
             counter = static_cast<u8>(ticks);
         }

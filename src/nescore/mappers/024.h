@@ -16,7 +16,7 @@ namespace schcore{ namespace mpr {
             audio->reset(info);
             if(info.hardReset)
             {
-                setPrgCallbacks(0x6,0xF,0x6,0x7,false);
+                setDefaultPrgCallbacks();
                 swapPrg_8k(0xE, ~0);
                 for(auto& i : chr)      i = 0;
                 bigprg = 0;

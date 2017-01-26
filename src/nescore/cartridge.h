@@ -17,6 +17,7 @@ namespace schcore
     class Cartridge : public SubSystem, public PpuIo
     {
     public:
+                Cartridge() {}
         virtual ~Cartridge() { }
 
         virtual void run(timestamp_t runto) {}          // can override
@@ -38,7 +39,7 @@ namespace schcore
 
         ////////////////////////////////////////////////
         //  Useful on reset
-        void            setPrgCallbacks(int readablestart, int readablestop, int writablestart, int writablestop, bool addprgram = true);
+        void            setDefaultPrgCallbacks();
         void            clearPrgRam(u8 v = 0);
 
         ////////////////////////////////////////////////
@@ -82,6 +83,11 @@ namespace schcore
         ChipPage        prgPages[0x10];
         ChipPage        chrPages[0x08];
         ChipPage        ntPages[0x04];
+
+        MemoryChip      dummyChip;
+
+        MemoryChip*     getFirstPrgChip(bool preferram);
+        MemoryChip*     getFirstChrChip(bool preferram);
     };
 
 }
