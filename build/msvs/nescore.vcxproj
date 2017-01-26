@@ -159,6 +159,7 @@
     <ClInclude Include="..\..\src\nescore\dmc_supplier.h" />
     <ClInclude Include="..\..\src\nescore\eventmanager.h" />
     <ClInclude Include="..\..\src\nescore\expansion_audio\exaudio.h" />
+    <ClInclude Include="..\..\src\nescore\expansion_audio\sunsoft.h" />
     <ClInclude Include="..\..\src\nescore\expansion_audio\vrc6.h" />
     <ClInclude Include="..\..\src\nescore\mappers\001.h" />
     <ClInclude Include="..\..\src\nescore\mappers\007.h" />
@@ -188,6 +189,7 @@
     <ClCompile Include="..\..\src\nescore\dmaunit.cpp" />
     <ClCompile Include="..\..\src\nescore\dmc_supplier.cpp" />
     <ClCompile Include="..\..\src\nescore\eventmanager.cpp" />
+    <ClCompile Include="..\..\src\nescore\expansion_audio\sunsoft.cpp" />
     <ClCompile Include="..\..\src\nescore\expansion_audio\vrc6.cpp" />
     <ClCompile Include="..\..\src\nescore\inputdevice.cpp" />
     <ClCompile Include="..\..\src\nescore\mappers\mappers.cpp" />

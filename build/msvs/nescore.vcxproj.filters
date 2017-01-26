@@ -141,6 +141,9 @@
     <ClInclude Include="..\..\src\nescore\mappers\069.h">
       <Filter>private\mappers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\nescore\expansion_audio\sunsoft.h">
+      <Filter>private\expansion_audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\nescore\cpubus.cpp">
@@ -202,6 +205,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\nescore\inputdevice.cpp">
       <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\nescore\expansion_audio\sunsoft.cpp">
+      <Filter>private\expansion_audio</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
