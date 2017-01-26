@@ -93,6 +93,7 @@ namespace schcore
             break;
         }
 
+        resetInfo->cartridge = cartridge;
         loadedFile = std::move(file);
         cartridge->load(loadedFile);
         fillResetInfo();

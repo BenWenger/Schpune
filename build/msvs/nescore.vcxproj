@@ -164,8 +164,10 @@
     <ClInclude Include="..\..\src\nescore\mappers\007.h" />
     <ClInclude Include="..\..\src\nescore\mappers\002.h" />
     <ClInclude Include="..\..\src\nescore\mappers\003.h" />
+    <ClInclude Include="..\..\src\nescore\mappers\024.h" />
     <ClInclude Include="..\..\src\nescore\mappers\mappers.h" />
     <ClInclude Include="..\..\src\nescore\mappers\000.h" />
+    <ClInclude Include="..\..\src\nescore\mappers\vrcirq.h" />
     <ClInclude Include="..\..\src\nescore\nsfdriver.h" />
     <ClInclude Include="..\..\src\nescore\ppu.h" />
     <ClInclude Include="..\..\src\nescore\ppubus.h" />

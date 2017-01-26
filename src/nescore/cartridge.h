@@ -63,9 +63,12 @@ namespace schcore
         void            mir_hdr();
         void            mir_1scr(int scr);
 
+        void            mir_chrPage(int slot, int page, bool ram = false);
+
         ////////////////////////////////////////////////
         //  Other
         u8              busConflict(u16 a, u8 v);
+        void            prgRamEnable(int en);
 
 
 

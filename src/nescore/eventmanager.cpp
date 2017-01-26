@@ -5,6 +5,7 @@
 #include "apu.h"
 #include "ppu.h"
 #include "cputracer.h"
+#include "cartridge.h"
 
 namespace schcore
 {
@@ -15,6 +16,7 @@ namespace schcore
         {
             apu =           info.apu;
             ppu =           info.ppu;
+            mpr =           info.cartridge;
 
             events.clear();
             nextEvent = Time::Never;
@@ -60,9 +62,9 @@ namespace schcore
                 i = events.erase(i);
             }
             
-            // TODO -- add all subsystems here
             if(toupdate & EventType::evt_apu)   apu->run(checktime);
             if(toupdate & EventType::evt_ppu)   ppu->run(checktime);
+            if(toupdate & EventType::evt_mpr)   mpr->run(checktime);
         }
     }
 

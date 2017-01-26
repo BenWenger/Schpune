@@ -213,6 +213,16 @@ namespace schcore
         case NesFile::Mirror::Vert:     mir_vert();     break;
         }
     }
+    
+    void Cartridge::mir_chrPage(int slot, int page, bool ram)
+    {
+        if(loadedFile->chrRomChips.empty()) ram = true;
+        if(loadedFile->chrRamChips.empty()) ram = false;
+        auto& chip = (ram ? loadedFile->chrRamChips.front() : loadedFile->chrRomChips.front());
+
+        ppu->catchUp();
+        ntPages[slot & 0x03] = chip.get1kPage(page);
+    }
 
     void Cartridge::onReadPrg(u16 a, u8& v)     { prgPages[a>>12].memRead(a,v);         }
     void Cartridge::onWritePrg(u16 a, u8 v)     { prgPages[a>>12].memWrite(a,v);        }
@@ -227,6 +237,15 @@ namespace schcore
     {
         if(a & 0x2000)      ntPages[(a >> 10) & 3].memRead(a,v);
         else                chrPages[(a >> 10) & 7].memRead(a,v);
+    }
+
+
+    void Cartridge::prgRamEnable(int v)
+    {
+        for(auto& i : loadedFile->prgRamChips)
+        {
+            i.readable = i.writable = (v != 0);
+        }
     }
 }
 

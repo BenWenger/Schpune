@@ -17,6 +17,7 @@ namespace schcore
     class           CpuTracer;
     class           DmaUnit;
     class           NesFile;
+    class           Cartridge;
 
     class           EventManager;
 
@@ -30,6 +31,7 @@ namespace schcore
         Cpu*            cpu;
         Ppu*            ppu;
         Apu*            apu;
+        Cartridge*      cartridge;
         CpuBus*         cpuBus;
         PpuBus*         ppuBus;
         AudioBuilder*   audioBuilder;

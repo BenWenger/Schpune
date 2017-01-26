@@ -10,7 +10,8 @@ namespace schcore
     enum EventType
     {
         evt_apu         = (1<<0),
-        evt_ppu         = (1<<1)
+        evt_ppu         = (1<<1),
+        evt_mpr         = (1<<2)
     };
 
     class ResetInfo;
@@ -31,6 +32,7 @@ namespace schcore
     private:
         SubSystem*                  apu;
         SubSystem*                  ppu;
+        SubSystem*                  mpr;
         std::map<timestamp_t, int>  events;
         timestamp_t                 nextEvent;
     };

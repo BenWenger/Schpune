@@ -3,6 +3,13 @@
 #include "mappers.h"
 #include "nesfile.h"
 #include "../cartridge.h"
+#include "../eventmanager.h"
+
+////////////////////////////////////////
+#include "../expansion_audio/vrc6.h"
+
+////////////////////////////////////////
+#include "vrcirq.h"
 
 ////////////////////////////////////////
 #include "000.h"
@@ -10,6 +17,7 @@
 #include "002.h"
 #include "003.h"
 #include "007.h"
+#include "024.h"
 
 namespace schcore
 {
@@ -28,6 +36,8 @@ namespace schcore
                 case   2:   MPR(Mpr_002)();
                 case   3:   MPR(Mpr_003)();
                 case   7:   MPR(Mpr_007)();
+                case  24:   MPR(Mpr_024)(false);
+                case  26:   MPR(Mpr_024)(true);
                 }
 #undef MPR
 

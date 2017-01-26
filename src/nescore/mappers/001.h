@@ -81,12 +81,7 @@ namespace schcore{ namespace mpr {
 
         void syncPrg()
         {
-            // PRG-RAM enable
-            if(!loadedFile->prgRamChips.empty())
-            {
-                auto& ram = loadedFile->prgRamChips.front();
-                ram.readable = ram.writable = !(regs[3] & 0x80);
-            }
+            prgRamEnable( !(regs[3] & 0x80) );
 
             // PRG swapping
             switch(regs[0] & 0x0C)
