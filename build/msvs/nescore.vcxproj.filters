@@ -138,6 +138,9 @@
     <ClInclude Include="..\..\src\nescore\mappers\vrcirq.h">
       <Filter>private\mappers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\nescore\mappers\069.h">
+      <Filter>private\mappers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\nescore\cpubus.cpp">

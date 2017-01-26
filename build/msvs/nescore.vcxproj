@@ -165,6 +165,7 @@
     <ClInclude Include="..\..\src\nescore\mappers\002.h" />
     <ClInclude Include="..\..\src\nescore\mappers\003.h" />
     <ClInclude Include="..\..\src\nescore\mappers\024.h" />
+    <ClInclude Include="..\..\src\nescore\mappers\069.h" />
     <ClInclude Include="..\..\src\nescore\mappers\mappers.h" />
     <ClInclude Include="..\..\src\nescore\mappers\000.h" />
     <ClInclude Include="..\..\src\nescore\mappers\vrcirq.h" />
