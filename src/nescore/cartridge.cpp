@@ -38,6 +38,17 @@ namespace schcore
 
         swapPrg_8k( 6, 0, true );       // TODO -- is this desired?
     }
+    
+    void Cartridge::setPrgReaders(int start, int stop)
+    {
+        cpuBus->addPeeker( start, stop, this, &Cartridge::onPeekPrg );
+        cpuBus->addReader( start, stop, this, &Cartridge::onReadPrg );
+    }
+
+    void Cartridge::setPrgWriters(int start, int stop)
+    {
+        cpuBus->addWriter( start, stop, this, &Cartridge::onWritePrg );
+    }
 
     void Cartridge::clearPrgRam(u8 v)
     {

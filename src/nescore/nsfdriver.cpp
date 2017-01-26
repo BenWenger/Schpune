@@ -80,12 +80,20 @@ namespace schcore
             apu = info.apu;
 
             if(isFdsTune())
-            {/*
+            {
                 setPrgReaders(0x6,0xF);
-                setPrgWriters(0x6,0xF);*/            // TODO this is all broken.  Figure I also have to swap PRG in for NSFs.  Figure this out
+                setPrgWriters(0x6,0xF);
+                swapPrg_8k(0x6,0,true);
+                swapPrg_8k(0x8,1,true);
+                swapPrg_8k(0xA,2,true);
+                swapPrg_8k(0xC,3,true);
+                swapPrg_8k(0xE,4,true);
             }
             else
+            {
                 setDefaultPrgCallbacks();
+                swapPrg_32k(0x8,0,false);
+            }
             
             info.cpuBus->addReader( 0x3, 0x3, this, &NsfDriver::onReadNsfDriver );
             info.cpuBus->addPeeker( 0x3, 0x3, this, &NsfDriver::onPeekNsfDriver );

@@ -40,6 +40,8 @@ namespace schcore
         ////////////////////////////////////////////////
         //  Useful on reset
         void            setDefaultPrgCallbacks();
+        void            setPrgReaders(int start, int stop);
+        void            setPrgWriters(int start, int stop);
         void            clearPrgRam(u8 v = 0);
 
         ////////////////////////////////////////////////
