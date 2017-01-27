@@ -23,6 +23,10 @@ namespace schcore
         vrc6_pulse0,
         vrc6_pulse1,
         vrc6_saw,
+        
+        sunsoft_chan0,
+        sunsoft_chan1,
+        sunsoft_chan2,
 
 
         count           // must be last

@@ -27,6 +27,7 @@ namespace schcore
         virtual void            subtractFromAudioTimestamp(timestamp_t sub) override    { audTimestamp -= sub;      }
         void                    subtractFromCpuTimestamp(timestamp_t sub)               { cpuTimestamp -= sub;      }
         void                    setClockRate(timestamp_t rate)                          { clockRate = rate;         }
+        timestamp_t             getClockRate() const                                    { return clockRate;         }
 
         void                    channelHardReset()                                      { prevOut = 0;  audTimestamp = cpuTimestamp = 0;        }
 

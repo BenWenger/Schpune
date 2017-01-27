@@ -7,6 +7,7 @@
 
 ////////////////////////////////////////
 #include "../expansion_audio/vrc6.h"
+#include "../expansion_audio/sunsoft.h"
 
 ////////////////////////////////////////
 #include "vrcirq.h"

@@ -4,6 +4,7 @@
 #include "apu.h"
 #include "expansion_audio/exaudio.h"
 #include "expansion_audio/vrc6.h"
+#include "expansion_audio/sunsoft.h"
 
 namespace schcore
 {
@@ -70,7 +71,8 @@ namespace schcore
 
         // expansion audio?
         expansion.clear();
-        if(file.extraAudio & NesFile::Audio_Vrc6)   expansion.emplace_back( std::make_unique<Vrc6Audio>(false) );
+        if(file.extraAudio & NesFile::Audio_Vrc6)       expansion.emplace_back( std::make_unique<Vrc6Audio>(false) );
+        if(file.extraAudio & NesFile::Audio_Sunsoft)    expansion.emplace_back( std::make_unique<SunsoftAudio>() );
     }
 
     void NsfDriver::cartReset(const ResetInfo& info)

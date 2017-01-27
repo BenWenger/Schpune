@@ -7,6 +7,8 @@ namespace schcore{ namespace mpr {
 
         virtual void cartReset(const ResetInfo& info) override
         {
+            audio->reset(info);
+
             if(info.hardReset)
             {
                 setDefaultPrgCallbacks();
@@ -31,6 +33,7 @@ namespace schcore{ namespace mpr {
         }
 
     private:
+        std::unique_ptr<SunsoftAudio>  audio = std::make_unique<SunsoftAudio>();
         u8              addr;
         u8              chrRegs[8];
         u8              prgRegs[4];

@@ -89,10 +89,12 @@ namespace schcore
         levels[0].resize(maxstep+1);
         levels[1].resize(maxstep+1);
 
+        float scale = baseoutput * settings.masterVol;
+
         for(int i = 0; i <= maxstep; ++i)
         {
-            levels[0][i] = i * baseoutput * mul.first  / maxstep;
-            levels[1][i] = i * baseoutput * mul.second / maxstep;
+            levels[0][i] = i * mul.first  * scale / maxstep;
+            levels[0][i] = i * mul.second * scale / maxstep;
         }
     }
 

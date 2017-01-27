@@ -126,7 +126,7 @@ namespace schcore
     }
     void Vrc6Audio::Pulse::recalcOutputLevels(const AudioSettings& settings, ChannelId chanid, std::vector<float> (&levels)[2])
     {
-        doLinearOutputLevels(settings, chanid, levels, 0x0F, -0.25848310567936736161035226455787f);
+        doLinearOutputLevels(settings, chanid, levels, 0x0F, -0.22f);
     }
     void Vrc6Audio::Pulse::hardReset()
     {
