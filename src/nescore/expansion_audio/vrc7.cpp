@@ -99,6 +99,7 @@ namespace schcore
     {
         if(info.hardReset)
         {
+            info.cpuBus->addWriter(0x9, 0x9, this, &Vrc7Audio::onWrite );
             setApuObj(info.apu);
             for(int i = 0; i < 6; ++i)
             {
@@ -108,8 +109,6 @@ namespace schcore
                 channels[i].hardReset(this);
 
                 addr = 0;
-
-                info.cpuBus->addWriter(0x9, 0x9, this, &Vrc7Audio::onWrite );
             }
         }
     }

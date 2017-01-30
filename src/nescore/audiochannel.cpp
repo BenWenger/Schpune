@@ -38,7 +38,7 @@ namespace schcore
             if(useRawOutput)
             {
                 float dif = (outraw - prevRawOut);
-                if(dif*dif < 0.000001f)
+                if(dif*dif > 0.000001f)
                 {
                     builder->addTransition( audTimestamp, dif * outputLevels[0][0], dif * outputLevels[1][0] );
                     prevRawOut = outraw;
@@ -105,15 +105,23 @@ namespace schcore
     void AudioChannel::doLinearOutputLevels(const AudioSettings& settings, ChannelId chanid, std::vector<float> (&levels)[2], int maxstep, float baseoutput)
     {
         auto mul = getVolMultipliers( settings, chanid );
-        levels[0].resize(maxstep+1);
-        levels[1].resize(maxstep+1);
-
         float scale = baseoutput * settings.masterVol;
-
-        for(int i = 0; i <= maxstep; ++i)
+        
+        if(maxstep <= 0)
         {
-            levels[0][i] = i * mul.first  * scale / maxstep;
-            levels[0][i] = i * mul.second * scale / maxstep;
+            levels[0].clear();      levels[0].push_back( mul.first  * scale );
+            levels[1].clear();      levels[1].push_back( mul.second * scale );
+        }
+        else
+        {
+            levels[0].resize(maxstep+1);
+            levels[1].resize(maxstep+1);
+
+            for(int i = 0; i <= maxstep; ++i)
+            {
+                levels[0][i] = i * mul.first  * scale / maxstep;
+                levels[1][i] = i * mul.second * scale / maxstep;
+            }
         }
     }
 
