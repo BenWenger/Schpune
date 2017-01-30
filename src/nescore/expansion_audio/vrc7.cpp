@@ -269,7 +269,7 @@ namespace schcore
         if(feedback)        fb = slots[0].output >> (8-feedback);
         
         clockSlot( slots[0], fb );
-        clockSlot( slots[1], slots[0].output );
+        clockSlot( slots[1], 0/*slots[0].output*/ );
 
         return static_cast<float>( slots[1].output );
     }
@@ -341,9 +341,9 @@ namespace schcore
         else
         {
             phase >>= 20-7;
-            phase &= 0x7F;
-            if(highbit)
-                phase ^= 0x7F;
+            phase &= 0xFF;
+            if(phase & 0x80)
+                phase ^= 0xFF;
             nextout = host->quarterSineLut[phase];
         }
 
