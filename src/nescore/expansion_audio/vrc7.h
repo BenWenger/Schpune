@@ -1,6 +1,6 @@
 
-#ifndef SCHPUNE_NESCORE_VRC6AUDIO_H_INCLUDED
-#define SCHPUNE_NESCORE_VRC6AUDIO_H_INCLUDED
+#ifndef SCHPUNE_NESCORE_VRC7AUDIO_H_INCLUDED
+#define SCHPUNE_NESCORE_VRC7AUDIO_H_INCLUDED
 
 #include "exaudio.h"
 #include "../audiochannel.h"
@@ -77,6 +77,8 @@ namespace schcore
 
             void                    updateInstrumentInfo();
             void                    clockSlot( Slot& slt, int phaseadj );
+            int                     getKeyScaleAttenuation( Slot& slt );
+            int                     getEnvelope( Slot& slt );
         };
 
         /////////////////////////////////////////
@@ -89,6 +91,7 @@ namespace schcore
         u32         fmPhase;
 
         std::vector<int>        quarterSineLut;     // 0x80 entries -- use 7 bit lookups
+        std::vector<int>        keyScaleLevelLut;
 
         void        onWrite(u16 a, u8 v);
     };

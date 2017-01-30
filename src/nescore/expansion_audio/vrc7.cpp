@@ -48,6 +48,10 @@ namespace schcore
         const int multiLut[0x10] = {
             1, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 20, 24, 24, 30, 30
         };
+
+        const double keyScaleLevelBuilderLut[0x10] = {     // dB attenuation
+               0,18.00,24.00,27.75,30.00,32.25,33.75,35.25,36.00,37.50,38.25,39.00,39.75,40.50,41.25,42.00
+        };
     }
 
 
@@ -60,10 +64,34 @@ namespace schcore
         quarterSineLut.resize(0x80);
 
         quarterSineLut[0] = 1<<23;
-
         for(int i = 1; i < 0x80; ++i)
         {
             quarterSineLut[i] = static_cast<int>( -20 * std::log10( std::sin( pi * i / 0x80 / 2 ) ) * (1<<23)/48 );
+        }
+
+        /*
+  F = high 4 bits of the current F-Num
+  B = 3-bit Block (Octave)
+  A = table[ F ] - 6 * (7-B)
+
+  if A < 0:   key_scale = 0
+  otherwise:  key_scale = A >> (3-K)
+  */
+        keyScaleLevelLut.resize(0x80 * 3);
+        for(int i = 0; i < (0x80 * 3); ++i)
+        {
+            int f = i & 0x0F;
+            int b = (i >> 4) & 0x07;
+            int k = (i >> 7) & 0x03;
+
+            double out = keyScaleLevelBuilderLut[f] - (6*(7-b));
+            if((out > 0) && (k > 0))
+            {
+                out /= std::pow<double>(2, k);
+                keyScaleLevelLut[i] = static_cast<int>( std::pow<double>(10, out / -20 / ((1<<23)/48.0)) );
+            }
+            else
+                keyScaleLevelLut[i] = 0;
         }
     }
 
@@ -162,7 +190,7 @@ namespace schcore
             if(s.adsr == Adsr::Attack)
                 s.egc = calcAttackEgc(s.egc);
 
-            // otherwise, just switch to Release
+            // then, just switch to Release
             if(s.adsr != Adsr::Idle)
                 s.adsr = Adsr::Release;
         }
@@ -227,7 +255,7 @@ namespace schcore
 
     void Vrc7Audio::Channel::recalcOutputLevels(const AudioSettings& settings, ChannelId chanid, std::vector<float> (&levels)[2])
     {
-        doLinearOutputLevels( settings, chanid, levels, 0, 0.000001f );     // TODO - figure out that base level
+        doLinearOutputLevels( settings, chanid, levels, 0, 0.2f / (1<<20) );
     }
     
     /////////////////////////////////////////////////
@@ -243,6 +271,8 @@ namespace schcore
         
         clockSlot( slots[0], fb );
         clockSlot( slots[1], slots[0].output );
+
+        return static_cast<float>( slots[1].output );
     }
 
 
@@ -319,7 +349,58 @@ namespace schcore
         }
 
         // nextout has the current sine output
-        nextout += slt.baseAtten +          // TODO -- key scale is a whole other thing too.  argh  FM synth is a nightmare
+        nextout += slt.baseAtten + getKeyScaleAttenuation(slt) + getEnvelope(slt);      // TODO - plus AM
+
+        // convert from dB to linear
+        nextout = static_cast<int>( (1<<20) * std::pow<double>( 10.0, nextout / -20 / ((1<<23)/48.0) ) );
+
+        if(highbit)     nextout = -nextout;
+
+        slt.output = (slt.output + nextout)/2;
+    }
+    
+    int Vrc7Audio::Channel::getKeyScaleAttenuation( Slot& slt )
+    {
+        if(!slt.ksl)        return 0;
+
+        return host->keyScaleLevelLut[ (fNum >> 5) | (block << 4) | ((3-slt.ksl) << 7) ];
+    }
+    
+    int Vrc7Audio::Channel::getEnvelope( Slot& slt )
+    {
+        if(slt.adsr == Adsr::Attack)        return calcAttackEgc(slt.egc);
+        else                                return slt.egc;
+    }
+
+    void Vrc7Audio::Channel::hardReset(Vrc7Audio* thehost)
+    {
+        host =          thehost;
+        fNum =          0;
+        block =         0;
+        slowRelease =   false;
+        instSelect =    0;
+        feedback =      0;
+
+        for(auto& s : slots)
+        {
+            s.phase =       0;
+            s.output =      0;
+            s.egc =         (1<<23);
+            s.adsr =        Adsr::Idle;
+            s.baseAtten =   (1<<23);
+            
+            s.enableAm =    false;
+            s.enableFm =    false;
+            s.percussive =  false;
+            s.ksr =         false;
+            s.rectifySine = false;
+            s.multi =       1;
+            s.ksl =         0;
+            s.attackRate =  0;
+            s.decayRate =   0;
+            s.sustainLevel =0;
+            s.releaseRate = 0;
+        }
     }
 
 }

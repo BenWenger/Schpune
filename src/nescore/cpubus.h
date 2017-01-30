@@ -74,7 +74,7 @@ namespace schcore
             { addPeeker(pagefirst, pagelast, std::bind(proc, obj, std::placeholders::_1) );                             }
 
     private:
-        static const int            maxProcs = 6;
+        static const int            maxProcs = 8;       // TODO - had to up this from 6 becuse of VRC7, but shouldn't have had to.  CHECK
         rdproc_t                    readers[0x10][maxProcs];
         wrproc_t                    writers[0x10][maxProcs];
         pkproc_t                    peekers[0x10][maxProcs];

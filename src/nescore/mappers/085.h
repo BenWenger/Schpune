@@ -4,16 +4,18 @@ namespace schcore{ namespace mpr {
     {
     public:
         Mpr_085()
+            : audio( std::make_unique<Vrc7Audio>() )
         {}
     protected:
 
         virtual void cartReset(const ResetInfo& info) override
         {
             VrcIrq_Mapper::cartReset(info);
+            
+            audio->reset(info);
 
             if(info.hardReset)
             {
-                // TODO reset audio
                 setDefaultPrgCallbacks();
                 swapPrg_8k(0xE, ~0);
                 for(auto& i : chr)      i = 0;
@@ -26,7 +28,7 @@ namespace schcore{ namespace mpr {
         }
 
     private:
-        //std::unique_ptr<Vrc6Audio>  audio;            // TODO
+        std::unique_ptr<Vrc7Audio>  audio;            // TODO
         u8                          prg[3];
         u8                          chr[8];
         u8                          mode;
