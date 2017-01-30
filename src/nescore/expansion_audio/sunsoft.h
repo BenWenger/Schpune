@@ -11,8 +11,6 @@
 
 namespace schcore
 {
-    class Apu;
-
     class SunsoftAudio : public ExAudio
     {
     public:
@@ -45,10 +43,8 @@ namespace schcore
         /////////////////////////////////////////
         //  Host info
         u8          addr;
-        Apu*        apu;                        // TODO -- move this to ExAudio
         Tone        chans[3];
         void        onWrite(u16 a, u8 v);
-        void        catchUp();
     };
 }
 

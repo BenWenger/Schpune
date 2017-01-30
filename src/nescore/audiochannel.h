@@ -38,6 +38,7 @@ namespace schcore
     protected:
         //  To be implemented by derived classes
         virtual int             doTicks(timestamp_t ticks, bool doaudio, bool docpu) = 0;
+        virtual float           doTicks_raw(timestamp_t ticks, bool doaudio, bool docpu) { return 0; }
         virtual timestamp_t     clocksToNextUpdate() = 0;
         virtual void            recalcOutputLevels(const AudioSettings& settings, ChannelId chanid, std::vector<float> (&levels)[2]) = 0;
         static void             doLinearOutputLevels(const AudioSettings& settings, ChannelId chanid, std::vector<float> (&levels)[2], int maxstep, float baseoutput);
@@ -54,8 +55,10 @@ namespace schcore
         timestamp_t             clockRate;
         timestamp_t             audTimestamp;
         timestamp_t             cpuTimestamp;
-
+        
+        bool                    useRawOutput;
         int                     prevOut;
+        float                   prevRawOut;
         AudioBuilder*           builder;
 
         std::map<ChannelId, AudioChannel*>  exAudio;

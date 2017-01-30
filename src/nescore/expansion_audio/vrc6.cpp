@@ -18,10 +18,10 @@ namespace schcore
             pulse[1].hardReset();
             saw.hardReset();
 
-            apu = info.apu;
-            apu->addExAudioChannel( ChannelId::vrc6_pulse0,  &pulse[0] );
-            apu->addExAudioChannel( ChannelId::vrc6_pulse1, &pulse[1] );
-            apu->addExAudioChannel( ChannelId::vrc6_saw, &saw );
+            setApuObj(info.apu);
+            addChannel( ChannelId::vrc6_pulse0,  &pulse[0] );
+            addChannel( ChannelId::vrc6_pulse1, &pulse[1] );
+            addChannel( ChannelId::vrc6_saw, &saw );
 
             info.cpuBus->addWriter( 0x9, 0xB, this, &Vrc6Audio::onWrite );
         }
@@ -32,11 +32,6 @@ namespace schcore
             pulse[1].makeSilent();
             saw.makeSilent();
         }
-    }
-
-    inline void Vrc6Audio::catchUp()
-    {
-        apu->catchUp();
     }
 
     void Vrc6Audio::onWrite(u16 a, u8 v)

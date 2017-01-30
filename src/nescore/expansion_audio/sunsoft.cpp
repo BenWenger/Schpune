@@ -11,24 +11,18 @@ namespace schcore
     {
         if(info.hardReset)
         {
-            
             addr = 0;
-            apu = info.apu;
             chans[0].hardReset();
             chans[1].hardReset();
             chans[2].hardReset();
             
-            apu->addExAudioChannel( ChannelId::sunsoft_chan0, &chans[0] );
-            apu->addExAudioChannel( ChannelId::sunsoft_chan1, &chans[1] );
-            apu->addExAudioChannel( ChannelId::sunsoft_chan2, &chans[2] );
+            setApuObj(info.apu);
+            addChannel( ChannelId::sunsoft_chan0, &chans[0] );
+            addChannel( ChannelId::sunsoft_chan1, &chans[1] );
+            addChannel( ChannelId::sunsoft_chan2, &chans[2] );
             
             info.cpuBus->addWriter(0xC, 0xF, this, &SunsoftAudio::onWrite);
         }
-    }
-
-    void SunsoftAudio::catchUp()
-    {
-        apu->catchUp();
     }
 
     void SunsoftAudio::onWrite(u16 a, u8 v)

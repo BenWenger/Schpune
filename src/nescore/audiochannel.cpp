@@ -24,18 +24,34 @@ namespace schcore
         //    change due to a register write
         timestamp_t step = 0;
 
+        int out;
+        float outraw;
+
         while(audtick > 0)
         {
-            int out = doTicks( step, true, (cputick > 0) );
+            if(useRawOutput)    outraw = doTicks_raw( step, true, (cputick > 0) );
+            else                out = doTicks( step, true, (cputick > 0) );
 
             audTimestamp += (step * clockRate);
             if(cputick > 0)             cpuTimestamp += (step * clockRate);
 
-            if(out != prevOut)
+            if(useRawOutput)
             {
-                builder->addTransition( audTimestamp, outputLevels[0][out] - outputLevels[0][prevOut],
-                                                      outputLevels[1][out] - outputLevels[1][prevOut] );
-                prevOut = out;
+                float dif = (outraw - prevRawOut);
+                if(dif*dif < 0.000001f)
+                {
+                    builder->addTransition( audTimestamp, dif * outputLevels[0][0], dif * outputLevels[1][0] );
+                    prevRawOut = outraw;
+                }
+            }
+            else
+            {
+                if(out != prevOut)
+                {
+                    builder->addTransition( audTimestamp, outputLevels[0][out] - outputLevels[0][prevOut],
+                                                          outputLevels[1][out] - outputLevels[1][prevOut] );
+                    prevOut = out;
+                }
             }
 
             audtick -= step;
@@ -51,7 +67,8 @@ namespace schcore
         //   in one clump
         if(cputick > 0)
         {
-            doTicks( cputick, false, true );
+            if(useRawOutput)    doTicks_raw( cputick, false, true );
+            else                doTicks( cputick, false, true );
             cpuTimestamp += (cputick * clockRate);
         }
     }
@@ -61,6 +78,8 @@ namespace schcore
     void AudioChannel::updateSettings(const AudioSettings& settings, ChannelId chanid)
     {
         recalcOutputLevels( settings, chanid, outputLevels );
+
+        useRawOutput = outputLevels[0].size() == 1;
     }
     
     std::pair<float,float> AudioChannel::getVolMultipliers(const AudioSettings& settings, ChannelId chanid)

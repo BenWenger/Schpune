@@ -144,6 +144,12 @@
     <ClInclude Include="..\..\src\nescore\expansion_audio\sunsoft.h">
       <Filter>private\expansion_audio</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\nescore\mappers\085.h">
+      <Filter>private\mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\expansion_audio\vrc7.h">
+      <Filter>private\expansion_audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\nescore\cpubus.cpp">
@@ -207,6 +213,9 @@
       <Filter>private</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\nescore\expansion_audio\sunsoft.cpp">
+      <Filter>private\expansion_audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\nescore\expansion_audio\vrc7.cpp">
       <Filter>private\expansion_audio</Filter>
     </ClCompile>
   </ItemGroup>

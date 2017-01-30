@@ -239,6 +239,7 @@ namespace schcore
 
     void Cartridge::prgRamEnable(int v)
     {
+        syncApu();
         for(auto& i : loadedFile->prgRamChips)
         {
             i.readable = i.writable = (v != 0);

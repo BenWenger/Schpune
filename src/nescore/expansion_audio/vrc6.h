@@ -71,11 +71,9 @@ namespace schcore
         /////////////////////////////////////////
         //  Host info
         bool        swapLines;
-        Apu*        apu;
         Pulse       pulse[2];
         Sawtooth    saw;
         void        onWrite(u16 a, u8 v);
-        void        catchUp();
     };
 }
 

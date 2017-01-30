@@ -20,6 +20,7 @@
 #include "007.h"
 #include "024.h"
 #include "069.h"
+#include "085.h"
 
 namespace schcore
 {
@@ -41,6 +42,7 @@ namespace schcore
                 case  24:   MPR(Mpr_024)(false);
                 case  26:   MPR(Mpr_024)(true);
                 case  69:   MPR(Mpr_069)();
+                case  85:   MPR(Mpr_085)();
                 }
 #undef MPR
 

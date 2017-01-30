@@ -24,6 +24,13 @@ namespace schcore
         vrc6_pulse1,
         vrc6_saw,
         
+        vrc7_0,
+        vrc7_1,
+        vrc7_2,
+        vrc7_3,
+        vrc7_4,
+        vrc7_5,
+        
         sunsoft_chan0,
         sunsoft_chan1,
         sunsoft_chan2,
