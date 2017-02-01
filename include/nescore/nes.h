@@ -8,6 +8,7 @@
 #include "schpunetypes.h"
 #include "nesfile.h"
 #include "inputdevice.h"
+#include "audiosettings.h"
 
 namespace schcore
 {
@@ -64,6 +65,9 @@ namespace schcore
         const u16*      getVideoBuffer();
 
         void            setTracer(std::ostream* stream);
+
+        AudioSettings   getAudioSettings() const;
+        void            setAudioSettings(const AudioSettings& stgs);
         
         static const int    videoWidth = 256;
         static const int    videoHeight = 240;

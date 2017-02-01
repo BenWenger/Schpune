@@ -202,6 +202,16 @@ namespace schcore
     
     ///////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////
+    
+    AudioSettings Nes::getAudioSettings() const
+    {
+        return apu->getAudioSettings();
+    }
+
+    void Nes::setAudioSettings(const AudioSettings& stgs)
+    {
+        apu->setAudioSettings(stgs);
+    }
 
     int Nes::getApproxNaturalAudioSize() const
     {

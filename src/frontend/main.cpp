@@ -21,9 +21,13 @@ namespace
     bool                        isnsf;
     HWND                        wnd;
     std::ofstream               traceFile;
+    std::ofstream               dumpFile;
     schcore::input::Controller  controller;
 
+    const schcore::ChannelId    soloChan = schcore::ChannelId::vrc7_0;//schcore::ChannelId::count;
+    
     const char* const   traceFileName = "schpunetrace.txt";
+    const char* const   dumpFileName =  "schpuneaudiodump.bin";
 }
 
 ///////////////////////////////////////////////
@@ -40,6 +44,30 @@ void toggleTrace()
         traceFile.open(traceFileName);
         nes.setTracer(&traceFile);
     }
+}
+
+void toggleDump()
+{
+    if(dumpFile.is_open())
+        dumpFile.close();
+    else
+        dumpFile.open(dumpFileName, std::ostream::binary);
+}
+
+void doSoloChannel()
+{
+    if(soloChan == schcore::ChannelId::count)       return;
+
+    auto s = nes.getAudioSettings();
+
+    for(auto& c : s.chans)
+    {
+        c.vol = 0;
+    }
+
+    s.chans[soloChan].vol = 1.0f;
+
+    nes.setAudioSettings(s);
 }
 
 ///////////////////////////////////////////////
@@ -89,11 +117,29 @@ bool readyForNextFrame()
 void fillAudio()
 {
     using schcore::s16;
-    auto lk = snd.lock();
+    if(dumpFile.is_open())
+    {
+        int siz = nes.getAvailableAudioSize();
+        std::unique_ptr<char[]> buf( new char[siz] );
+        nes.getAudio( buf.get(), siz, nullptr, 0 );
 
-    int written = nes.getAudio( lk.getBuffer(0), lk.getSize(0), lk.getBuffer(1), lk.getSize(1) );
+        dumpFile.write( buf.get(), siz );
 
-    lk.setWritten(written);
+        auto lk = snd.lock();
+        int writa = std::min(siz, lk.getSize(0));       siz -= writa;
+        int writb = std::min(siz, lk.getSize(1));
+        
+        std::copy_n( buf.get()        , writa, lk.getBuffer<char>(0) );
+        std::copy_n( buf.get() + writa, writb, lk.getBuffer<char>(1) );
+
+        lk.setWritten(writa + writb);
+    }
+    else
+    {
+        auto lk = snd.lock();
+        int written = nes.getAudio( lk.getBuffer(0), lk.getSize(0), lk.getBuffer(1), lk.getSize(1) );
+        lk.setWritten(written);
+    }
 }
 
 void doFrame()
@@ -219,6 +265,7 @@ LRESULT CALLBACK wndProc(HWND wnd, UINT msg, WPARAM w, LPARAM l)
             case VK_DOWN:       changeNsfTrack(-10);    break;
 
             case VK_F9:         toggleTrace();          break;
+            case VK_F5:         toggleDump();           break;
             }
         }
         break;
@@ -232,6 +279,7 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show)
     makeWindow(inst,"Schpune");
     runApp = true;
 
+    doSoloChannel();
     nes.setInputDevice( 0, &controller );
 
     MSG msg;
