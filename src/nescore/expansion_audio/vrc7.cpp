@@ -360,7 +360,7 @@ namespace schcore
             slot[1].update( 0 );
 #else
             slot[0].update(       fb       );
-            slot[1].update( slot[0].output );
+            slot[1].update( slot[0].output * 4 );
 #endif
         }
         return slot[1].output;
@@ -502,7 +502,7 @@ namespace schcore
 
         // Update the sine phase
         int fm = 1;                     // TODO - get FM output if enabled
-        phase += phaseRate * fm / 2;        // TODO is this supposed to be div 4 ???  Or should the clock speed be halved?  ???
+        phase += phaseRate * fm / 1;        // TODO is this supposed to be div 4 ???  Or should the clock speed be halved?  ???
 
         int useph = ((phase + phaseadj) >> lut_SineShift);
         bool rectified = (useph & lut_SineRectifyBit) != 0;
