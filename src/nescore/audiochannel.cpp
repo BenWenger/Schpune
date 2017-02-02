@@ -25,23 +25,21 @@ namespace schcore
         timestamp_t step = 0;
 
         int out;
-        float outraw;
 
         while(audtick > 0)
         {
-            if(useRawOutput)    outraw = doTicks_raw( step, true, (cputick > 0) );
-            else                out = doTicks( step, true, (cputick > 0) );
+            out = doTicks( step, true, (cputick > 0) );
 
             audTimestamp += (step * clockRate);
             if(cputick > 0)             cpuTimestamp += (step * clockRate);
 
             if(useRawOutput)
             {
-                float dif = (outraw - prevRawOut);
-                if(dif*dif > 0.000001f)
+                int dif = out - prevOut;
+                if(dif != 0)
                 {
                     builder->addTransition( audTimestamp, dif * outputLevels[0][0], dif * outputLevels[1][0] );
-                    prevRawOut = outraw;
+                    prevOut = out;
                 }
             }
             else
@@ -67,8 +65,7 @@ namespace schcore
         //   in one clump
         if(cputick > 0)
         {
-            if(useRawOutput)    doTicks_raw( cputick, false, true );
-            else                doTicks( cputick, false, true );
+            doTicks( cputick, false, true );
             cpuTimestamp += (cputick * clockRate);
         }
     }

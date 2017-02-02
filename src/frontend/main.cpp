@@ -1,6 +1,7 @@
 
 //#define WIN32_LEAN_AND_MEAN
 #define _CRT_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #define NOMINMAX
 #include <Windows.h>
 #include <soundout.h>
@@ -24,7 +25,8 @@ namespace
     std::ofstream               dumpFile;
     schcore::input::Controller  controller;
 
-    const schcore::ChannelId    soloChan = schcore::ChannelId::vrc7_0;//schcore::ChannelId::count;
+    //const schcore::ChannelId    soloChan = schcore::ChannelId::vrc7_0;
+    const schcore::ChannelId    soloChan = schcore::ChannelId::count;
     
     const char* const   traceFileName = "schpunetrace.txt";
     const char* const   dumpFileName =  "schpuneaudiodump.bin";
