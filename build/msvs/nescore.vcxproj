@@ -162,6 +162,7 @@
     <ClInclude Include="..\..\src\nescore\expansion_audio\sunsoft.h" />
     <ClInclude Include="..\..\src\nescore\expansion_audio\vrc6.h" />
     <ClInclude Include="..\..\src\nescore\expansion_audio\vrc7.h" />
+    <ClInclude Include="..\..\src\nescore\expansion_audio\vrc7_luts.h" />
     <ClInclude Include="..\..\src\nescore\mappers\001.h" />
     <ClInclude Include="..\..\src\nescore\mappers\007.h" />
     <ClInclude Include="..\..\src\nescore\mappers\002.h" />

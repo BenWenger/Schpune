@@ -1,0 +1,111 @@
+Channel Output=
+    Output of Carrier.
+    Carrier uses output of Modulator as input.
+    
+Carrier Output:
+    'egout' = calc_envelope
+    'pgout' = calc_phase
+    'fm' = 
+        for carrier:
+            actual output of modulator
+        for modulator:
+            if 'feedback' bits are 0, fm=0
+            otherwise previous actual output of modulator >> (8-feedback)
+            
+        full actual output maps to 8 pi ... therefore actual output is 2
+        bits wider than 'pgout'
+        
+        'pgout' is 18 bits wide.  Therefore actual output is 20 bits not counting negative bit
+    
+    
+    rawoutput = db2linear[ sin[pgout+fm] + egout ]
+    
+    actual output = (rawoutput[-1] + rawoutput[0]) >> 1
+    
+    
+    
+    egc is 22 bits
+    
+    
+calc_phase:  every 36 CPU cycles
+
+    phase += (dphase * PM) >> PM_AMP_BITS
+        
+    
+calc_envelope:
+
+ATTACK
+    egout = AR_ADJUST_TABLE[ high bits of eg_phase ]
+    eg_phase += eg_dphase
+    if eg_phase exceeds max:
+        enter decay
+        reset eg_phase and egout
+        
+DECAY
+    egout = high bits of eg_phase
+    eg_phase += eg_dphase
+    if eg_phase >= sustain level:
+        eg_phase = sustain level
+        enter SUSHOLD (percussive bit set) or SUSTINE (otherwise)
+        
+SUSHOLD
+    egout = high bits of eg_phase
+    eg_phase does not change at all!
+    
+SUSTINE/RELEASE
+    egout = high bits of eg_phase
+    eg_phase += eg_dphase
+    until max attenuation
+    
+    
+    
+egout is 7 bits wide
+add to it slot->tll (also 7 bits)       see makeTllTable  (KSL)
+Add to it volume/level  (volume = 3dB, modlevel = 0.75dB per step)
+then convert to 8 bits
+then add AM (if applicable)             see makeAmTable
+
+cap at 8 bit output
+
+
+==========================================
+deltas:
+
+dphase = fNumber * (1<<block) * MULTI
+
+        eg_dphase
+attack:     dphaseARTable[inst->AR][rks]
+decay:      dphaseDRTable[inst->DR][rks]
+sushold:    0
+sustine:    dphaseDRTable[inst->RR][rks]
+release:    dphaseDRTable[5][rks]               (if 'Sustain On' bit set $2x.5)
+            dphaseDRTable[inst->RR][rks]        (elif 'percussive' bit set (inst))
+            dphaseDRTable[7][rks]               else
+
+where rks = (block<<1) + high_fnum_bit
+    if(KSR bit in instrument is clear)      rks>>=2
+            
+dphaseARTable:
+    dphaseARTable[0][rks] = 0
+    dphaseARTable[15][rks] = egc max
+    dphaseARTable[x][rks] = (3*(RL+4)) << (RM+1)
+        where       RL = rks & 3,  RM = min( x+(rks>>2), 15 )
+        
+        
+makeDphaseDRTable:
+    dphaseDRTable[0][rks] = 0
+    dphaseDRTable[x][rks] = (RL+4) << (RM-1)
+    
+    
+=========================================
+AR_ADJUST_TABLE
+    AR_ADJUST_TABLE[n] = maxAtten - (maxAtten * ln(n) / ln(max_n))
+    
+    
+tll:
+    If ksl bits are 0, tll=0
+    ---  nesdev notes are correct
+    
+    
+DB2 linear:     pow(10, -dB / 20)
+linear to DB:   

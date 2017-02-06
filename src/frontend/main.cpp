@@ -58,16 +58,18 @@ void toggleDump()
 
 void doSoloChannel()
 {
-    if(soloChan == schcore::ChannelId::count)       return;
-
     auto s = nes.getAudioSettings();
-
-    for(auto& c : s.chans)
+    s.masterVol = 1.5f;
+    
+    if(soloChan != schcore::ChannelId::count)
     {
-        c.vol = 0;
-    }
+        for(auto& c : s.chans)
+        {
+            c.vol = 0;
+        }
 
-    s.chans[soloChan].vol = 1.0f;
+        s.chans[soloChan].vol = 1.0f;
+    }
 
     nes.setAudioSettings(s);
 }

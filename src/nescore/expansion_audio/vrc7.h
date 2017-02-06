@@ -22,61 +22,80 @@ namespace schcore
 
         struct Slot
         {
-            int         phase;                      // current phase (in the sine wave).  Effectively 18-bits wide
-            int         phaseRate;                  // F num * (1 << block) * multiplier
-            Adsr        adsr;                       // current adsr mode
-            int         egc;                        // the envelope counter (effectively 23-bits wide)
-            int         attackRate;                 // amount to add to egc every clock in attack mode
-            int         decayRate;                  //  ... in decay
-            int         sustainRate;                //  ...
-            int         releaseRate;                //  ...
-            int         sustainLevel;               // level at which you switch from Decay->Sustain
-            int         baseAtten;                  // base attenuation (ie, volume for the carrier, level for the modulator)
-            int         kslAtten;                   // attenuation for ksl (based on current F Number, ksl settings, etc)
-            int         output;                     // previous output of this slot
-            int         rectifyMultipler;           // -1 for normal sine waves, 0 for rectified sine waves
-            
-            bool        amEnabled;                  // AM enabled for this slot
-            bool        fmEnabled;                  // FM enabled for this slot
+            Adsr            adsr;               // Current Adsr phase
+            int             rawOut[2];          // raw output
+            int             output;             // actual output (used outside this slot)
 
-            void        update(int phaseadj);
-            int         getEnvelope();
+            int             phase;              // Current phase (position in sine)
+            int             phaseAdd;           // Value to add to phase every clock
+            int             multi;
+
+            int             baseAtten;          // base attenuation level for this slot (volume or total level)
+            int             kslAtten;           // Key-Scale level attenuation
+
+            int             egc;                // Envelope level
+            int             rateAttack;
+            int             rateDecay;
+            int             rateSustain;
+            int             rateRelease;
+            int             sustainLevel;
+
+            int             kslBits;
+
+            bool            rectify;            // false = normal sine, true = 2nd half of sine is zero'd
+            bool            amEnabled;          // AM enabled
+            bool            fmEnabled;          // FM enabled
+            bool            percussive;
+            bool            useKsr;
+
+
+
+            int             update(int phaseadj);
+
         private:
-            void        updateEnvelope();
+            int             updateEnv();
         };
 
         class Channel : public AudioChannel
         {
         public:
             virtual void            makeSilent() override;
+            bool                    isTrulySilent() const;
 
-            bool                    isTrulyIdle() const;
-            void                    write(u8 a, u8 v);
+            Slot                    slot[2];        // [0]=modulator, [1]=carrier
 
-            Slot                    slot[2];            // 0=Modulator, 1=Carrier
-            int                     fNum;               // the F number for this channel
-            int                     block;              // the block (octave) as written
-            int                     feedback;           // the feedback level (as written)
-            int                     instId;             // ID of the selected instrument
-            u8                      instData[8];        // Current 8-byte instrument data set
-            const u8*               customInstData;     // pointer to where the custom instrument data set is stored
-            bool                    sustainOn;          // 'Sustain On' bit (reg $2x)
+            int                     fNum;           // fNumber for this channel
+            int                     block;
+            int                     feedbackLevel;
+            int                     instId;
+            u8                      inst[8];
+
+            bool                    slowRelease;
+
+            
+            void                    keyOn();
+            void                    keyOff();
 
         protected:
             virtual int             doTicks(timestamp_t ticks, bool doaudio, bool docpu) override;
             virtual timestamp_t     clocksToNextUpdate() override;
             virtual void            recalcOutputLevels(const AudioSettings& settings, ChannelId chanid, std::vector<float> (&levels)[2]) override;
-            
-            void                    updateFreq();
-            void                    captureInstrument(int inst);
-            void                    updateFreq_and_keyOn();
-            void                    updateFreq_and_keyOff();
         };
 
-        Channel     channels[6];
+        Channel     ch[6];
         u8          customInstData[0x08];
         u8          vrc7Addr;
         void        onWrite(u16 a, u8 v);
+        
+        void        write_reg1(Channel& c, u8 v);
+        void        write_reg2(Channel& c, u8 v);
+        void        write_reg3(Channel& c, u8 v);
+        
+        void        updateInst(Channel& c, const u8* instdat);
+        void        updateFreq(Channel& c);
+        
+        static int  calcAtkRate(int rks, int r);
+        static int  calcStdRate(int rks, int r);
     };
 }
 
