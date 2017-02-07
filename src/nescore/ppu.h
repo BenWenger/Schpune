@@ -54,6 +54,7 @@ namespace schcore
 
         u8                  regBus;
 
+        bool                catchingUp;
         int                 scanline;
         timestamp_t         scanCyc;
         timestamp_t         vblankCycles;   // total number of cycles in vblank

@@ -27,6 +27,8 @@ namespace schcore
     //  Resetting
     void Ppu::reset(const ResetInfo& info)
     {
+        catchingUp =        false;
+
         regBus =            0;
         scanline =          line_post;
         scanCyc =           0;
@@ -219,6 +221,10 @@ namespace schcore
     //  Running
     void Ppu::run(timestamp_t runto)
     {
+        if(catchingUp)
+            return;
+
+        catchingUp = true;
         auto tick = unitsToTimestamp(runto);
 
         while(tick > 0)
@@ -231,6 +237,7 @@ namespace schcore
             default:            tick = (renderOn ? run_line_On(tick) : run_renderLine_Off(tick));       break;
             }
         }
+        catchingUp = false;
     }
 
     //////////////////////////////////////
