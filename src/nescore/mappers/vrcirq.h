@@ -24,9 +24,9 @@ namespace schcore{ namespace mpr {
             }
         }
 
-        void    writeIrqLatch(u8 v)         { catchUp();    latch = v;                              }
-        void    writeIrqLatch_lo(u8 v)      { catchUp();    latch = (latch & 0xF0) | (v & 0x0F);    }
-        void    writeIrqLatch_hi(u8 v)      { catchUp();    latch = (latch & 0x0F) | (v & 0xF0);    }
+        void    writeIrqLatch(u8 v)         { catchUp();    latch = v;                                  }
+        void    writeIrqLatch_lo(u8 v)      { catchUp();    latch = (latch & 0xF0) | (v & 0x0F);        }
+        void    writeIrqLatch_hi(u8 v)      { catchUp();    latch = (latch & 0x0F) | ((v & 0x0F) << 4); }
         void    writeIrqControl(u8 v)
         {
             catchUp();

@@ -162,6 +162,24 @@
     <ClInclude Include="..\..\src\nescore\mappers\010.h">
       <Filter>private\mappers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\nescore\mappers\vrc4.h">
+      <Filter>private\mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\mappers\023.h">
+      <Filter>private\mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\mappers\025.h">
+      <Filter>private\mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\mappers\021.h">
+      <Filter>private\mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\mappers\vrc2.h">
+      <Filter>private\mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\mappers\022.h">
+      <Filter>private\mappers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\nescore\cpubus.cpp">
