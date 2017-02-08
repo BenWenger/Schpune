@@ -16,8 +16,7 @@ namespace schcore{ namespace mpr {
                 tempReg = 0;
                 nextBit = 0x01;
 
-                info.cpuBus->addWriter(0x8,0xF,this,&Mpr_001::onWrite);
-                bus = info.cpuBus;
+                cpuBus->addWriter(0x8,0xF,this,&Mpr_001::onWrite);
             }
             
             syncAll();
@@ -27,12 +26,11 @@ namespace schcore{ namespace mpr {
         u8      regs[4];
         u8      tempReg;
         u8      nextBit;
-        CpuBus* bus;
 
         void onWrite(u16 a, u8 v)
         {
             // duplicate writes are ignored
-            if(bus->isDuplicateWrite(a))        return;
+            if(cpuBus->isDuplicateWrite(a))        return;
 
             // reg reset?
             if(v & 0x80)

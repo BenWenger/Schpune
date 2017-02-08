@@ -13,9 +13,8 @@ namespace schcore{ namespace mpr {
         {
             if(info.hardReset)
             {
-                bus = info.cpuBus;
                 evt = info.eventManager;
-                irqBit = bus->createIrqCode("Mapper");
+                irqBit = cpuBus->createIrqCode("Mapper");
 
                 latch = 0xFF;
                 control = 0;
@@ -85,7 +84,6 @@ namespace schcore{ namespace mpr {
         u8              control;
         irqsource_t     irqBit;
         bool            pending;
-        CpuBus*         bus;
         EventManager*   evt;
 
         timestamp_t     prescalar;
@@ -94,13 +92,13 @@ namespace schcore{ namespace mpr {
         void ack()
         {
             pending = false;
-            bus->acknowledgeIrq(irqBit);
+            cpuBus->acknowledgeIrq(irqBit);
         }
 
         void trigger()
         {
             pending = true;
-            bus->triggerIrq(irqBit);
+            cpuBus->triggerIrq(irqBit);
         }
 
         void predict()

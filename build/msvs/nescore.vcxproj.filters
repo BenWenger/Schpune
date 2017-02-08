@@ -156,6 +156,12 @@
     <ClInclude Include="..\..\src\nescore\mappers\009.h">
       <Filter>private\mappers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\nescore\mappers\mmc2latch.h">
+      <Filter>private\mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nescore\mappers\010.h">
+      <Filter>private\mappers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\nescore\cpubus.cpp">

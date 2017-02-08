@@ -13,10 +13,11 @@ namespace schcore
         apu = info.apu;
         ppu = info.ppu;
         cpuBus = info.cpuBus;
+        ppuBus = info.ppuBus;
         subSystem_HardReset( info.cpu, info.region.cpuClockBase );
         if(info.hardReset)
         {
-            info.ppuBus->setIoDevice(this);
+            ppuBus->setIoDevice(this);
             mir_hdr();
         }
 

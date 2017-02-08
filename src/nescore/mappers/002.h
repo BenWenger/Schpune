@@ -14,7 +14,7 @@ namespace schcore{ namespace mpr {
                 swapChr_8k(0,0);
                 syncPrg();
 
-                info.cpuBus->addWriter(0x8,0xF,this,&Mpr_002::onWrite);
+                cpuBus->addWriter(0x8,0xF,this,&Mpr_002::onWrite);
             }
         }
 

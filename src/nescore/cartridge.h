@@ -33,6 +33,8 @@ namespace schcore
         virtual     void onPpuRead(u16 a, u8& v) override;
         
     protected:
+        CpuBus*         cpuBus;
+        PpuBus*         ppuBus;
         NesFile*        loadedFile;
         virtual void    cartLoad(NesFile& file) {}
         virtual void    cartReset(const ResetInfo& info) = 0;
@@ -79,7 +81,6 @@ namespace schcore
         void            onReadPrg(u16 a, u8& v);
         int             onPeekPrg(u16 a) const;
         void            onWritePrg(u16 a, u8 v);
-        CpuBus*         cpuBus;
         Apu*            apu;
         Ppu*            ppu;
         ChipPage        prgPages[0x10];

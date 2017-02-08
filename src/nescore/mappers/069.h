@@ -13,7 +13,6 @@ namespace schcore{ namespace mpr {
             {
                 setDefaultPrgCallbacks();
 
-                bus = info.cpuBus;
                 evt = info.eventManager;
 
                 addr = 0;
@@ -22,13 +21,13 @@ namespace schcore{ namespace mpr {
                 ntReg = 0;
                 irqCtrl = 0;
                 irqCounter = 0;
-                irqBit = bus->createIrqCode("Mapper");
+                irqBit = cpuBus->createIrqCode("Mapper");
                 irqPending = false;
 
                 swapPrg_8k( 0xE, ~0 );
                 syncAll();
 
-                bus->addWriter(0x8, 0xB, this, &Mpr_069::onWrite);
+                cpuBus->addWriter(0x8, 0xB, this, &Mpr_069::onWrite);
             }
         }
 
@@ -42,7 +41,6 @@ namespace schcore{ namespace mpr {
         u16             irqCounter;
         irqsource_t     irqBit;
         bool            irqPending;
-        CpuBus*         bus;
         EventManager*   evt;
 
         void onWrite(u16 a, u8 v)
@@ -127,13 +125,13 @@ namespace schcore{ namespace mpr {
         void trigger()
         {
             irqPending = true;
-            bus->triggerIrq(irqBit);
+            cpuBus->triggerIrq(irqBit);
         }
 
         void ack()
         {
             irqPending = false;
-            bus->acknowledgeIrq(irqBit);
+            cpuBus->acknowledgeIrq(irqBit);
         }
 
         void predict()

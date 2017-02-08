@@ -1,6 +1,6 @@
 namespace schcore{ namespace mpr {
 
-    class Mpr_009 : public Mmc2Latch
+    class Mpr_010 : public Mmc2Latch
     {
     protected:
         virtual void cartReset(const ResetInfo& info) override
@@ -9,14 +9,13 @@ namespace schcore{ namespace mpr {
 
             if(info.hardReset)
             {
-                swapPrg_8k(0xE,-1);
-                swapPrg_8k(0xC,-2);
-                swapPrg_8k(0xA,-3);
+                swapPrg_8k(6,0,true);
+                swapPrg_16k(0xC,-1);
                 setDefaultPrgCallbacks();
                 prg = 0;
                 mir = 0;
 
-                info.cpuBus->addWriter(0xA,0xF,this,&Mpr_009::onWrite);
+                info.cpuBus->addWriter(0xA,0xF,this,&Mpr_010::onWrite);
             }
             
             syncAll();
@@ -48,7 +47,7 @@ namespace schcore{ namespace mpr {
 
         void syncPrg()
         {
-            swapPrg_8k(8, prg & 0x0F);
+            swapPrg_16k(8, prg & 0x0F);
         }
 
         void syncMir()

@@ -12,6 +12,7 @@
 
 ////////////////////////////////////////
 #include "vrcirq.h"
+#include "mmc2latch.h"
 
 ////////////////////////////////////////
 #include "000.h"
@@ -20,6 +21,7 @@
 #include "003.h"
 #include "007.h"
 #include "009.h"
+#include "010.h"
 #include "024.h"
 #include "069.h"
 #include "085.h"
@@ -42,6 +44,7 @@ namespace schcore
                 case   3:   MPR(Mpr_003)();
                 case   7:   MPR(Mpr_007)();
                 case   9:   MPR(Mpr_009)();
+                case  10:   MPR(Mpr_010)();
                 case  24:   MPR(Mpr_024)(false);
                 case  26:   MPR(Mpr_024)(true);
                 case  69:   MPR(Mpr_069)();
