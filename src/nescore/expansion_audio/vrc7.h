@@ -15,6 +15,9 @@ namespace schcore
                         Vrc7Audio();
         virtual void    reset(const ResetInfo& info) override;
         
+    protected:
+        timestamp_t     audMaster_clocksToNextUpdate() override;
+        void            audMaster_doTicks(timestamp_t ticks) override;
 
     private:
         enum class Adsr

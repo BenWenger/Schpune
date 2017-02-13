@@ -6,6 +6,7 @@
 #include "audiobuilder.h"
 #include "resetinfo.h"
 #include "eventmanager.h"
+#include "expansion_audio/exaudio.h"
 
 namespace schcore
 {
@@ -81,6 +82,9 @@ namespace schcore
         SubSystem::endFrame(sub);
         pulses.subtractFromCpuTimestamp(sub);
         tnd.subtractFromCpuTimestamp(sub);
+
+        for(auto& i : exAudioMasters)
+            i->endFrame(sub);
     }
 
     void Apu::silenceAllChannels()
@@ -222,6 +226,11 @@ namespace schcore
             timestamp_t step = std::min(seqCounter, ticks);
             if(modeResetCounter && (step > modeResetCounter))       step = modeResetCounter;
 
+            for(auto& i : exAudioMasters)
+            {
+                step = std::min(step, i->audMaster_clocksToNextUpdate());
+            }
+
             // advance our aud/cpu timestamps
             ticks -= step;
             cyc(step);
@@ -232,6 +241,10 @@ namespace schcore
             tnd.run(curCyc(), audTimestamp);
             for(auto& i : exAudioChannels)
                 i.second->run( curCyc(), audTimestamp );
+
+            // run exaudio master systems (after audio channels)
+            for(auto& i : exAudioMasters)
+                i->run( curCyc() );
             
             ///////////////////////////////////////
             ///////////////////////////////////////
@@ -295,6 +308,7 @@ namespace schcore
         {
             subSystem_HardReset(info.cpu, info.region.apuClockBase);
             exAudioChannels.clear();
+            exAudioMasters.clear();
 
             eventManager = info.eventManager;
 

@@ -17,6 +17,7 @@ namespace schcore
     class CpuBus;
     class AudioBuilder;
     class EventManager;
+    class ExAudio;
 
     class Apu : public SubSystem, public AudioTimestampHolder
     {
@@ -30,6 +31,7 @@ namespace schcore
         //////////////////////////////////////////////////
         //  Expansion audio
         void                addExAudioChannel(ChannelId id, AudioChannel* channel, bool apply_clock_rate = true);
+        void                addExAudioMaster(ExAudio* exaudio)      { exAudioMasters.push_back(exaudio);    }
 
         //////////////////////////////////////////////////
         //  Output configuration
@@ -87,6 +89,7 @@ namespace schcore
         AudioSettings       audSettings;
 
         std::map<ChannelId, AudioChannel*>  exAudioChannels;
+        std::vector<ExAudio*>               exAudioMasters;
     };
 
 

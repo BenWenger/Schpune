@@ -28,6 +28,9 @@ namespace schcore
     {
         if(info.hardReset)
         {
+            setClockBase( info.region.apuClockBase * 36 );  // TODO - load VRC7 clock from region
+            info.apu->addExAudioMaster(this);
+
             setApuObj(info.apu);
             int index = 0;
 
@@ -373,5 +376,18 @@ namespace schcore
 
             ++inst;
         }
+    }
+
+    //////////////////////////////////////////////////
+    //  AM/FM stuff
+    
+    timestamp_t Vrc7Audio::audMaster_clocksToNextUpdate()
+    {
+        return Time::Never;     // TODO - clock AM/FM
+    }
+
+    void Vrc7Audio::audMaster_doTicks(timestamp_t ticks)
+    {
+        // TODO AM/FM
     }
 }

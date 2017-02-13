@@ -12,11 +12,23 @@ namespace schcore
     //  There isn't very much to this class
     //  This is abstracted mostly for NSFs
 
-    class ExAudio
+    class ExAudio : public SubSystem
     {
     public:
         virtual ~ExAudio() = default;
         virtual void reset(const ResetInfo& info) = 0;
+
+        // Stuff only needed for things which have a master clock (MMC5's frame sequencer, VRC7's AM/FM)
+        virtual timestamp_t audMaster_clocksToNextUpdate()          { return Time::Never;  }
+        virtual void        audMaster_doTicks(timestamp_t ticks)    { }
+
+        
+        virtual void        run(timestamp_t runto) override
+        {
+            auto ticks = unitsToTimestamp(runto);
+            cyc(ticks);
+            audMaster_doTicks(ticks);
+        }
 
     protected:
         void setApuObj(Apu* apu_)      { apu = apu_;       }
